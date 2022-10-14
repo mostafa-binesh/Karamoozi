@@ -18,7 +18,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'register_getphone', 'register_verifycode', 'register_getinfo', 'login2', 'login3']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'register_getphone', 'register_verifycode', 'register_getinfo', 'login_verify', 'login_getphone']]);
     }
     public function sendSMS($text, $phone_number)
     {
@@ -48,7 +48,7 @@ class AuthController extends Controller
         if (!$token) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized',
+                'message' => 'غیر مجاز',
             ], 401);
         }
 
@@ -62,7 +62,7 @@ class AuthController extends Controller
             ]
         ]);
     }
-    public function login2(Request $req)
+    public function login_getphone(Request $req)
     { // verify phone number, send login code
         $validator = Validator::make($req->all(), [
             'phone_number' => 'required|max:255|min:3'
@@ -92,7 +92,7 @@ class AuthController extends Controller
             }
         }
     }
-    public function login3(Request $req)
+    public function login_verify(Request $req)
     { // verify phone number, send login code
         $validator = Validator::make($req->all(), [
             'phone_number' => 'required',
@@ -118,7 +118,7 @@ class AuthController extends Controller
                 if (!$token) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Unauthorized',
+                        'message' => 'غیرمجاز',
                     ], 401);
                 }
 
@@ -133,7 +133,7 @@ class AuthController extends Controller
                     ]
                 ]);
             } else {
-                return response()->json(['status' => 'error', 'message' => 'user not found']);
+                return response()->json(['status' => 'error', 'message' => 'کاربر یافت نشد']);
             }
         }
     }
@@ -153,12 +153,12 @@ class AuthController extends Controller
             // TODO: first need to check if sms not been sent in last 2 minutes
             $verification_code = rand(1000, 9999);
             $phone_registration = Phone_Registration::create(['phone_number' => $req->phone_number, 'verification_code' => $verification_code]);
-            if (isset($req->real) && $req->real == 'true') {
+            if (isset($req->real)) {
                 $text = 'کد تاییدیه: ' . $verification_code;
                 $response = self::sendSMS($text, $req->phone_number);
-                return response()->json(['status' => 'ok', 'sms' => $response->StrRetStatus, 'message' => 'message has been sent']);
+                return response()->json(['status' => 'ok', 'sms' => $response->StrRetStatus, 'message' => 'پیامک ارسال شد.']);
             } else {
-                return response()->json(['status' => 'ok', 'sms' => $verification_code, 'message' => 'message has been sent']);
+                return response()->json(['status' => 'ok', 'sms' => $verification_code, 'message' => 'خطا در ارسال پیامک']);
             }
             // return ['status' => 'ok', 'message' => "sms has been sent"];
         }
@@ -180,9 +180,9 @@ class AuthController extends Controller
         } else {
             $verification_code = Phone_Registration::where('phone_number', $req->phone_number)->where('verification_code', $req->verification_code)->first();
             if (isset($verification_code)) {
-                return response()->json(['status' => 'ok', 'message' => 'verification code matched']);
+                return response()->json(['status' => 'ok', 'message' => 'کد تایید مطابقت داشت.']);
             } else {
-                return response()->json(['status' => 'error', 'message' => 'verification code is not right']);
+                return response()->json(['status' => 'error', 'message' => 'کد تایید مطابقت نداشت.']);
             }
         }
     }
@@ -192,8 +192,8 @@ class AuthController extends Controller
             'first_name' => 'required|max:255',
             'last_name' => 'required|max:255',
             'email' => 'required|max:255|email|unique:users',
-            'phone_number' => 'required|max:255|min:5',
-            'birthday' => 'required|date_format:d/m/Y'
+            'phone_number' => 'required|max:255|min:5|unique:users',
+            'birthday' => 'required|date_format:Y-m-d'
         ]);
         if ($validator->fails()) {
             # code...
@@ -215,7 +215,7 @@ class AuthController extends Controller
             $token = Auth::login($created_user);
             return response()->json([
                 'status' => 'ok',
-                'message' => 'User created successfully',
+                'message' => 'عضویت با موفقیت انجام شد.',
                 'user' => $created_user,
                 'authorisation' => [
                     'token' => $token,
@@ -245,7 +245,7 @@ class AuthController extends Controller
         $token = Auth::login($user);
         return response()->json([
             'status' => 'success',
-            'message' => 'User created successfully',
+            'message' => 'عضویت با موفقیت انجام شد.',
             'user' => $user,
             'authorisation' => [
                 'token' => $token,
@@ -259,7 +259,7 @@ class AuthController extends Controller
         Auth::logout();
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully logged out',
+            'message' => 'با موفقیت خارج شدید.',
         ]);
     }
 
