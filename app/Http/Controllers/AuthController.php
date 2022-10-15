@@ -158,7 +158,7 @@ class AuthController extends Controller
                 $response = self::sendSMS($text, $req->phone_number);
                 return response()->json(['status' => 'ok', 'sms' => $response->StrRetStatus, 'message' => 'پیامک ارسال شد.']);
             } else {
-                return response()->json(['status' => 'ok', 'sms' => $verification_code, 'message' => 'خطا در ارسال پیامک']);
+                return response()->json(['status' => 'ok', 'sms' => $verification_code, 'message' => 'کد در متن موجود است']);
             }
             // return ['status' => 'ok', 'message' => "sms has been sent"];
         }
