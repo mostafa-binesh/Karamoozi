@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Melipayamak\MelipayamakApi;
 use App\Models\Phone_Registration;
 use App\Http\Controllers\Controller;
+use App\Models\committee;
+use Exception;
 // use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +20,11 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'register_getphone', 'register_verifycode', 'register_getinfo', 'login_verify', 'login_getphone']]);
+        $this->middleware('auth:api', ['except' => [
+            'login', 'register', 'register_getphone', 'register_verifycode',
+            'register_getinfo', 'login_verify', 'login_getphone', 'all_comms', 'add_comm', 'delete_comm'
+        ]]);
+        // $this->middleware('cors');
     }
     public function sendSMS($text, $phone_number)
     {
@@ -156,9 +162,11 @@ class AuthController extends Controller
             if (isset($req->real)) {
                 $text = 'کد تاییدیه: ' . $verification_code;
                 $response = self::sendSMS($text, $req->phone_number);
-                return response()->json(['status' => 'ok', 'sms' => $response->StrRetStatus, 'message' => 'پیامک ارسال شد.']);
+                $status = $response->StrRetStatus == 'Ok' ? 'ok' : 'خطا در ارسال  پیامک';
+                return response()->json(['status' => $status, 'message' => 'پیامک ارسال شد.']);
             } else {
-                return response()->json(['status' => 'ok', 'sms' => $verification_code, 'message' => 'کد در متن موجود است']);
+                $status = 'ok';
+                return response()->json(['status' => $status, 'sms' => $verification_code, 'message' => 'کد در متن موجود است']);
             }
             // return ['status' => 'ok', 'message' => "sms has been sent"];
         }
@@ -273,5 +281,70 @@ class AuthController extends Controller
                 'type' => 'bearer',
             ]
         ]);
+    }
+    public function all_comms()
+    {
+        $all_comms = committee::all();
+        return response()->json([
+            'status' => 200,
+            'comms' => $all_comms,
+        ]);
+    }
+    public function add_comm(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'committee_name' => 'required|max:255|min:3|unique:committees',
+            'caption' => 'required',
+            'image' => 'required',
+        ]);
+        if ($validator->fails()) {
+            # code...
+            return [
+                'status' => 'error',
+                'message' => $validator->errors()
+            ];
+        } else {
+            committee::create([
+                'committee_name' => $req->committee_name,
+                'caption' => $req->caption,
+                'image' => $req->image,
+            ]);
+            response()->json([
+                'status' => '200',
+                'message' => 'کمیته با موفقیت ایجاد شد.'
+            ]);
+        }
+    }
+    public function delete_comm(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'committee_name' => 'required|max:255|min:3|exists:committees',
+            // 'caption' => 'required',
+            // 'image' => 'required',
+        ]);
+        if ($validator->fails()) {
+            # code...
+            return [
+                'status' => 'error',
+                'message' => $validator->errors()
+            ];
+        } else {
+            try {
+                committee::where('committee_name',$req->committee_name)->forceDelete();
+            }
+            catch(Exception $e) {
+                // return 'pashm';
+                return response()->json([
+                    'status' => 404,
+                    // 'message' => $e->__toString(),
+                    'message' => $e->getMessage(),
+                ]);
+            }
+            // !! TOOD: bayad inja check kone ke aya in hafz shod ya na. baraye har model bayad in ettefagh biofte
+            return response()->json([
+                'status' => 200,
+                'message' => 'کمیته با موفقیت حذف شد.'
+            ]);
+        }
     }
 }

@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TodoController;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Ybazli\Faker\Facades\Faker;
 
+// NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
 
 // Route::get('/sms', function () {
 //     try{
@@ -34,19 +36,38 @@ Route::get('users/{id}', function ($id) {
     $user = User::all();
     return response()->json(['status' => 'ok','user' => $user]);
 });
-Route::controller(AuthController::class)->group(function () {
+Route::get('xy', function () {
+    $x = Faker::firstName();
+    return $x;
+});
+Route::get('/home', function()
+{
+    return response()->json([
+        'coms' => 'hello',
+        'news' => 'news',
+    ]);
+});
+Route::controller(AuthController::class)->group(
+    // ['middleware' => ['cors']],
+    function () {
     // Route::post('login', 'login');
     // Route::post('register', 'register');
     // Route::post('logout', 'logout');
     // Route::post('refresh', 'refresh');
-    Route::post('reg-getphone', 'register_getphone');
+    Route::post('reg-getphone', 'register_getphone'); 
     Route::post('reg-verify', 'register_verifycode');
     Route::post('reg-getinfo', 'register_getinfo');
     Route::post('login-getphone', 'login_getphone');
     Route::post('login-verify', 'login_verify');
-
+    
+    Route::get('comss', 'all_comms');
+    Route::post('add-comm', 'add_comm');
+    Route::post('delete-comm', 'delete_comm');
+    
 });
-
+Route::get('/greeting', function () {
+    return 'Hello World';
+});
 // Route::controller(TodoController::class)->group(function () {
 //     Route::get('todos', 'index');
 //     Route::post('todo', 'store');
@@ -54,8 +75,4 @@ Route::controller(AuthController::class)->group(function () {
 //     Route::put('todo/{id}', 'update');
 //     Route::delete('todo/{id}', 'destroy');
 // }); 
-
-
-
-
 ?>
