@@ -8,6 +8,7 @@ use Melipayamak\MelipayamakApi;
 use App\Models\Phone_Registration;
 use App\Http\Controllers\Controller;
 use App\Models\committee;
+use App\Models\news;
 use Exception;
 // use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,8 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => [
             'login', 'register', 'register_getphone', 'register_verifycode',
-            'register_getinfo', 'login_verify', 'login_getphone', 'all_comms', 'add_comm', 'delete_comm'
+            'register_getinfo', 'login_verify', 'login_getphone', 'all_comms', 'add_comm', 'delete_comm',
+            'all_news', 'add_news', 'delete_news','authentication'
         ]]);
         // $this->middleware('cors');
     }
@@ -67,6 +69,52 @@ class AuthController extends Controller
                 'type' => 'bearer',
             ]
         ]);
+    }
+    public function authentication(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'phone_number' => 'required|max:255|min:3'
+        ]);
+        if ($validator->fails()) {
+            # code...
+            // return [
+            //     // 'status' => 'error',
+            //     'message' => $validator->errors()
+            // ];
+            return response()->json([
+                'message' => $validator->errors()
+            ], 201);
+        } else {
+            $user = User::where('phone_number', $req->phone_number)->first();
+            if ($user == null) {
+                // user doesn't exist
+                // go for registration
+                $verification_code = rand(1000, 9999);
+                $phone_registration = Phone_Registration::create(['phone_number' => $req->phone_number, 'verification_code' => $verification_code]);
+                if (isset($req->real)) {
+                    $text = 'کد تاییدیه: ' . $verification_code;
+                    $response = self::sendSMS($text, $req->phone_number);
+                    $status = $response->StrRetStatus == 'Ok' ? 'ok' : 'خطا در ارسال  پیامک';
+                    return response()->json(['status' => $status, 'message' => 'پیامک ارسال شد.']);
+                } else {
+                    $status = 'ok';
+                    return response()->json(['status' => $status, 'sms' => $verification_code, 'message' => 'کد در متن موجود است']);
+                }
+            } else {
+                // user exist
+                // go for login
+                $login_temp_code = rand(1000, 9999);
+                $user->phone_code = $login_temp_code;
+                $user->save();
+                // $user->save('phone_code',$login_temp_code);
+                if (isset($req->real)) {
+                    $sms = self::sendSMS('کد تاییدیه: ' . $login_temp_code, $req->phone_number);
+                } else {
+                    $sms = $login_temp_code;
+                }
+                return response()->json(['status' => 'ok', 'message' => 'sms been sent', 'time' => 120, 'sms' => $sms]);
+            }
+        }
     }
     public function login_getphone(Request $req)
     { // verify phone number, send login code
@@ -330,9 +378,8 @@ class AuthController extends Controller
             ];
         } else {
             try {
-                committee::where('committee_name',$req->committee_name)->forceDelete();
-            }
-            catch(Exception $e) {
+                committee::where('committee_name', $req->committee_name)->forceDelete();
+            } catch (Exception $e) {
                 // return 'pashm';
                 return response()->json([
                     'status' => 404,
@@ -344,6 +391,70 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'کمیته با موفقیت حذف شد.'
+            ]);
+        }
+    }
+    public function all_news()
+    {
+        $all_news = news::all();
+        return response()->json([
+            'status' => 200,
+            'news' => $all_news,
+        ]);
+    }
+    public function add_news(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'title' => 'required|max:255|min:3|unique:news',
+            'description' => 'required',
+            'image' => 'required',
+        ]);
+        if ($validator->fails()) {
+            # code...
+            return [
+                'status' => 'error',
+                'message' => $validator->errors()
+            ];
+        } else {
+            news::create([
+                'title' => $req->title,
+                'description' => $req->description,
+                'image' => $req->image,
+            ]);
+            return response()->json([
+                'status' => '200',
+                'message' => 'خبر با موفقیت ایجاد شد.'
+            ]);
+        }
+    }
+    public function delete_news(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'title' => 'required|max:255|exists:news',
+            // 'caption' => 'required',
+            // 'image' => 'required',
+        ]);
+        if ($validator->fails()) {
+            # code...
+            return [
+                'status' => 'error',
+                'message' => $validator->errors()
+            ];
+        } else {
+            try {
+                news::where('title', $req->committee_name)->forceDelete();
+            } catch (Exception $e) {
+                // return 'pashm';
+                return response()->json([
+                    'status' => 404,
+                    // 'message' => $e->__toString(),
+                    'message' => $e->getMessage(),
+                ]);
+            }
+            // !! TOOD: bayad inja check kone ke aya in hafz shod ya na. baraye har model bayad in ettefagh biofte
+            return response()->json([
+                'status' => 200,
+                'message' => 'خبر با موفقیت حذف شد.'
             ]);
         }
     }

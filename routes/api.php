@@ -60,10 +60,16 @@ Route::controller(AuthController::class)->group(
     Route::post('login-getphone', 'login_getphone');
     Route::post('login-verify', 'login_verify');
     
+    Route::post('auth', 'authentication');
+
+
     Route::get('comss', 'all_comms');
     Route::post('add-comm', 'add_comm');
-    Route::post('delete-comm', 'delete_comm');
+    Route::delete('delete-comm', 'delete_comm');
     
+    Route::get('news', 'all_news');
+    Route::post('add-news', 'add_news');
+    Route::delete('delete-news', 'delete_news');
 });
 Route::get('/greeting', function () {
     return 'Hello World';

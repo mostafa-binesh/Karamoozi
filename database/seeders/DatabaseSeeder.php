@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         // ]);
         // committee::factory(10)->create();
         $this->call(comm::class);
+        // $this->call(newsseeder::class);
     }
 }
