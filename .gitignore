@@ -14,3 +14,23 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+/Jahadi.zip
+/Jahadi2.zip
+/notes.txt
+/config/auth copy.php
+Jahadi3.zip
+J12.zip
+kar.zip
+karamoozi.zip
+*.zip
+routes/api copy.php
+app/Http/Controllers/auth2.ph
+.htaccess
+.ht
+app/Models/User copy.ph
+database/seeders/comm.php
+database/seeders/newsseeder.php
+database/factories/commfactoryFactory.php
+database/factories/committeeFactory.php
+database/factories/newsFactory.php
+database/migrations/2022_10_21_195124_roles.ph
