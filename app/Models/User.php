@@ -78,6 +78,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Employee::class);
     }
+    public function industryBoss()
+    {
+        return $this->hasOne(Company::class);
+    }
     public function sendPasswordResetNotification($token)
 {
     $this->notify(new PasswordReset($token,$this->email));
