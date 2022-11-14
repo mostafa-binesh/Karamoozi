@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
+        // this form has to be completed by a company's operator / boss
         Schema::create('Form2s', function (Blueprint $table) {
            $table->id();
            $table->unsignedBigInteger('student_id');

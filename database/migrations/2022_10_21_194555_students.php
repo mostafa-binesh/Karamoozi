@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('students', function (Blueprint $table) {
+            // https://www.figma.com/file/bWf9Ptmonm5qIUBZl4v8tc/%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87-%DA%A9%D8%A7%D8%B1%D8%A7%D9%85%D9%88%D8%B2%DB%8C-%D8%AF%D8%A7%D9%86%D8%B4%DA%AF%D8%A7%D9%87-%D8%B4%D9%87%DB%8C%D8%AF-%D8%B1%D8%AC%D8%A7%DB%8C%DB%8C?node-id=407%3A1527
             // FIX: some of these fields should be unique
             // These commented attributes are available in user table
             // $table->string('first_name');
@@ -38,12 +39,28 @@ return new class extends Migration
             $table->bigInteger('professor_id')->unsigned()->nullable();
             $table->foreign('professor_id')->references('employee_id')
             ->on('employees')->onDelete('cascade');
-            $table->unsignedInteger('intership_year')->nullable();
-            $table->unsignedInteger('intership_type')->nullable();
+            $table->unsignedInteger('internship_year')->nullable();
+            $table->unsignedInteger('internship_type')->nullable();
             $table->bigInteger('company_id')->unsigned()->nullable();
             $table->foreign('company_id')->references('id')
             ->on('companies')->onDelete('cascade');
-            $table->boolean('verified')->nullable();
+            $table->boolean('verified')->default(0); // this needs to be replaced with pre-reg-verified
+            // first stage | academic status page on figma | pre-internship | something between starting of pre-reg 
+                // and internship
+            $table->boolean('pre_reg_verified')->default(0);
+            $table->boolean('expert_verification')->default(0);
+            $table->boolean('supervisor_in_faculty_verification')->default(0);
+            $table->boolean('internship_master_verification')->default(0);
+            $table->boolean('educational_assistant_verification')->default(0);
+
+            // second stage 
+            // start of internship (apprent.) figma
+            
+            // $table->boolean('supervisor_submitted')->default(0); // it can be handled in another way 
+            $table->boolean('supervisor_verification')->default(0);
+            
+            $table->boolean('internship_finished')->default(0);
+            // $table->tinyInteger('intership_status')
             // $table->boolean('done_pre_registration')->default(false);
             // user auth added fields
             $table->timestamp('email_verified_at')->nullable();

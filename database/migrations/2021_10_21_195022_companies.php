@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('company_name')->nullable();
+            // $table->string('company_name')->nullable();
+            $table->string('company_name');
             $table->text('caption')->nullable();
             $table->float("company_grade")->nullable();
-            $table->bigInteger("company_boss_id")->unsigned()->nullable();
+            $table->bigInteger("company_boss_id")->unsigned();
             $table->foreign('company_boss_id')->references('employee_id')
             ->on('employees')->onDelete('cascade');
             $table->string('company_number',11)->nullable();
