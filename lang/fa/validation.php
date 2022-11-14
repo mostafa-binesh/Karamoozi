@@ -48,7 +48,8 @@ return [
     'email' => ':attribute باید آدرس ایمیل معتبری باشد.',
     'ends_with' => 'The :attribute must end with one of the following: :values.',
     'enum' => ':attribute انتخاب شده نامعتبر است.',
-    'exists' => ':attribute انتخاب شده نامعتبر است.',
+    // 'exists' => ':attribute انتخاب شده نامعتبر است.',
+    'exists' => ':attribute انتخاب شده وجود ندارد.',
     'file' => ':attribute باید یک فایل باشد.',
     'filled' => 'مقدار :attribute باید یک مقدار داشته باشد.',
     'gt' => [
