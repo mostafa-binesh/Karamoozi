@@ -31,11 +31,11 @@ return new class extends Migration
             // added 
             $table->boolean("company_is_registered")->nullable();
             $table->unsignedTinyInteger("company_type");
+            $table->boolean('verified');
             $table->timestamps();
 
             
 
-            // $table->string("");
         });
     }
 

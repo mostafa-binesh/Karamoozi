@@ -13,12 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('employees', function (Blueprint $table) {
-            $table->id('employee_id');
-            $table->unsignedBigInteger('faculty_id'); 
-            $table->foreign('faculty_id')->references('id')
-            ->on('university_faculties')->onDelete('cascade'); // FIX: add foregin key bigint and table name should be the same
-            // $table->boolean('verified')->default(true);
+        Schema::create('options', function (Blueprint $table) { 
+            $table->id();
+            $table->string('type');
+            $table->string('name');
+            $table->softDeletes();
         });
     }
 
