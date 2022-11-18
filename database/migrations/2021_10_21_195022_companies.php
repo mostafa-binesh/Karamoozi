@@ -20,8 +20,8 @@ return new class extends Migration
             $table->text('caption')->nullable();
             $table->float("company_grade")->nullable();
             $table->bigInteger("company_boss_id")->unsigned();
-            $table->foreign('company_boss_id')->references('employee_id')
-            ->on('employees')->onDelete('cascade');
+            // $table->foreign('company_boss_id')->references('employee_id')
+            // ->on('employees')->onDelete('cascade');
             $table->string('company_number',11)->nullable();
             $table->string("company_registry_code")->nullable(); // FIX LATER
             $table->string('company_phone')->nullable();

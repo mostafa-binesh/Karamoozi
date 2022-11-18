@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('username')->unique();
-            $table->string('national_code')->unique();
+            $table->string('national_code')->unique(); // because some national codes have 0 in the beginning
             $table->string('email')->unique();
-            $table->string('phone_number')->unique();
+            $table->string('phone_number')->unique(); // because phone numbers have 0 in the beginning
             // $table->string('user_type')->nullable();
             // will handle it with roles, if role!=='student' then user is employee
             $table->timestamp('email_verified_at')->nullable();

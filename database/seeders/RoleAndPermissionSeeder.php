@@ -35,7 +35,7 @@ class RoleAndPermissionSeeder extends Seeder
         $employeeRole = Role::create(['name' => 'employee']);
         $masterRole = Role::create(['name' => 'master']);
         $studentRole = Role::create(['name' => 'student']);
-        $industryBoss = Role::create(['name' => 'industry_boss']);
+        $industryBoss = Role::create(['name' => 'industry_supervisor']);
         $adminRole->givePermissionTo([
             'create-users',
             'edit-users',

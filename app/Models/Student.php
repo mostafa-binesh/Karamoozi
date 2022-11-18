@@ -2,18 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use App\Traits\CPaginationTrait;
 use App\Traits\EnumTrait;
+use EloquentFilter\Filterable;
+use function PHPUnit\Framework\isEmpty;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Student extends Model
 {
-    use HasFactory, Notifiable, EnumTrait;
-
+    use HasFactory, Notifiable, EnumTrait, Filterable;
+    use CPaginationTrait;
+    protected $casts = [
+        'evaluations' => 'array'
+    ];
     /**
      * The attributes that are enum, these are using EnumTrait.
      *
@@ -22,8 +29,8 @@ class Student extends Model
     // it uses EnumTrait
     protected static $enums = [
         'ROLES' => 'role',
-        'INTERSHIP_TYPE' => 'intership_type',
-
+        'INTERNSHIP_TYPE' => 'internship_type',
+        'INTERNSHIP_STATUS' => 'internship_status',
     ];
     /**
      * Users' roles
@@ -45,6 +52,14 @@ class Student extends Model
     public const INTERNSHIP_TYPE = [
         1 => 'x',
         2 => 'y'
+        // 'x' => 1,
+        // 'y' => 2,
+
+    ];
+    public const INTERNSHIP_STATUS = [
+        1 => 'شروع نشده',
+        2 => 'در حال اجرا',
+        3 => 'به اتمام رسیده',
     ];
 
     /**
@@ -66,7 +81,7 @@ class Student extends Model
         return $this->belongsTo(User::class);
     }
     public function status()
-    {
+    {   //  !!  NOT COMPLETED !!
         // ! bayad baraxe in code bezanam. yani avval az marhaleye akhar shooroo konam biam paiin
         // ! besoorate inverse, if(!$condition) ... 
         // return $this->internship_type;
@@ -108,4 +123,13 @@ class Student extends Model
     {
         return $this->hasOne(Company::class);
     }
+    public function industrySupervisorEvaluated() {
+        return isEmpty($this->evaluations);
+    }
+    public function scopeUnevaluated($query) {
+        return $query->whereNull('evaluations');
+    }
+    // public function req() {
+    //     return 
+    // }
 }

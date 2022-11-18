@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\committee;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -16,18 +17,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(comm::class);
         $this->call([
             RoleAndPermissionSeeder::class,
-        ]);
-        $this->call([
+            CarsSeeder::class,
+            OptionsSeeder::class,
             AdminSeeder::class,
-        ]);
-        $this->call([
             UniversityFacultySeeder::class,
         ]);
-        // $this->call([
-        //     UsersSeeder::class,
-        // ]);
     }
 }

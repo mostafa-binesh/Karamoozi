@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\Mail\send_code_reset_password;
 use App\Models\Company;
+use App\Models\IndustrySupervisor;
 
 class AuthController extends Controller
 {
@@ -93,11 +94,23 @@ class AuthController extends Controller
         }
         $user = Auth::user();
         $user->role = $user->getRoleNames()->first();
-        if ($user->role == 'student') {
-            $user->load('student');
-        } else {
-            $user->load('employee');
+        switch ($user->role) {
+            case 'student':
+                $user->load('student');
+                break;
+
+            case 'employee':
+                $user->load('employee');
+                break;
+            case 'industry_supervisor':
+                $user->load('industrySupervisor');
+            default:
+                # code...
+                break;
         }
+        // if ($user->role == 'student') {
+        // } else {
+        // }
         return response()->json([
             'user' => $user,
             'authorisation' => [
@@ -110,12 +123,26 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         $user->role = $user->getRoleNames()->first();
-        if ($user->role == 'student') {
-            $user->load('student');
-        } elseif($user->role == 'employee') {
-            $user->load('employee');
-        } elseif ($user->role == 'industry_boss') {
-            $user->load('industryBoss');
+        // if ($user->role == 'student') {
+        //     $user->load('student');
+        // } elseif($user->role == 'employee') {
+        //     $user->load('employee');
+        // } elseif ($user->role == 'industry_boss') {
+        //     $user->load('industryBoss');
+        // }
+        switch ($user->role) {
+            case 'student':
+                $user->load('student');
+                break;
+
+            case 'employee':
+                $user->load('employee');
+                break;
+            case 'industry_supervisor':
+                $user->load('industrySupervisor');
+            default:
+                # code...
+                break;
         }
         return response()->json([
             'user' => $user
@@ -213,15 +240,15 @@ class AuthController extends Controller
             ]
         ], 200);
     }
-    public function industryBossRegistration($req)
+    public function industryBossRegistration(Request $req)
     {
         $validator = Validator::make($req->all(), [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'national_code' => 'required|string|unique:users',
+            'national_code' => 'required|string|unique:users,username',
             'phone_number' => 'required|unique:users|digits:11|regex:/^(09)+[0-9]{9}$/',
             'email' => 'required|email|unique:users',
-            'company_name' => 'required|string|unique:companies',
+            'company_name' => 'required|string',
             'password' => 'required|string|min:5',
             'repeat_password' => 'required|string|same:password'
         ]);
@@ -230,23 +257,35 @@ class AuthController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $companyBoss = User::create([
+        $industrySupervisor = User::create([
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
+            'username' => $req->national_code,
             'national_code' => $req->national_code,
             'phone_number' => $req->phone_number,
             'email' => $req->email,
             'password' => Hash::make($req->password),
-        ])->assignRole('industry_boss');
+        ])->assignRole('industry_supervisor');
         Company::create([
             'company_name' => $req->company_name,
-            'company_boss_id' => $companyBoss, 
+            'company_boss_id' => $industrySupervisor->id,
+            'company_type' => 1,
+            'verified' => false,
+        ]); // ! FIX: company type is a dummy data
+        IndustrySupervisor::create([
+            'user_id' => $industrySupervisor->id,
+            'verified' => false,
         ]);
+        $token = Auth::login($industrySupervisor);
+        $industrySupervisor->load('industrySupervisor');
         return response()->json([
-            'data' => [
-                'message' => 'ثبت نام با موفقیت انجام شد'
+            'message' => 'عضویت با موفقیت انجام شد.',
+            'user' => $industrySupervisor,
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
             ]
-        ],201);
+        ], 201);
     }
     // FIX: bayad tooye reg-getinfo, biaim o check konim ke aya in shomayreye telephone ghablan verify shode ya na
 }

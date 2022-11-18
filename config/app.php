@@ -196,6 +196,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+
+        EloquentFilter\ServiceProvider::class // manually added: https://github.com/Tucker-Eric/EloquentFilter
+
     ],
 
     /*

@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace App\Models;
+
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use App\Notifications\PasswordReset;
@@ -51,7 +53,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-     /**
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
@@ -78,12 +80,36 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Employee::class);
     }
-    public function industryBoss()
+    public function company()
     {
         return $this->hasOne(Company::class);
     }
+    public function cars()
+    {
+        return $this->hasMany(Car::class);
+    }
+    public function industrySupervisor()
+    {
+        return $this->hasOne(IndustrySupervisor::class);
+    }
     public function sendPasswordResetNotification($token)
-{
-    $this->notify(new PasswordReset($token,$this->email));
-}
+    {
+        $this->notify(new PasswordReset($token, $this->email));
+    }
+    public function fullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+    public function ss($req)
+    {
+        return $this->offset((($req->page ?? 1) - 1) * ($req->per_page ?? 5))->limit(($req->per_page ?? 5))->get();
+    }
 }

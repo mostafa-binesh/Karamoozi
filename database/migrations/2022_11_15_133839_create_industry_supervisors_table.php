@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('industry_supervisors', function (Blueprint $table) {
             $table->id();
-            $table->boolean('verified');
             $table->unsignedBigInteger('user_id');
+            $table->boolean('verified');
             $table->timestamps();
         });
     }
