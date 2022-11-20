@@ -36,9 +36,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('reset-password', 'reset_password')->name('password.reset');
 });
 
-// ###############                        #####
-// ###################    STUDENT  ##############
-// ###############                       #####
+// ###############                      #####
+// ################### STUDENT ###################
+// ###############                     #####
 
 Route::controller(StudentController::class)->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
@@ -49,37 +49,22 @@ Route::controller(StudentController::class)->group(function () {
 // ###############                        #####
 // ################ INDUSTRY SUPERVISOR ##############
 // ###############                       #####
-Route::controller(IndustrySupervisor::class)->middleware(['auth:api','role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
+Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
     Route::get('home', 'industrySupervisorHome');
-    // middleware('')->
     Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
     Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
     Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
     Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
     Route::apiResource('students', IndustrySupervisorStudentController::class);
-
-    // Route::post('add-student', 'industrySupervisor');
-    // Route::get('get-student', 'industrySupervisorGetSpecificStudent');
-    // Route::put('update-student', 'industrySupervisorGetSpecificStudent');
-    // Route::get('remove-student', 'industrySupervisorDeleteStudent');
-    // Route::get('get-students', 'industrySupervisorGetStudents');
-    // Route::get('messages', 'industrySupervisorGetMessages');
-    // Route::post('send-message', 'industrySupervisorSendMessage');
-
     Route::resource('messages', MessageController::class);
-    //  get all /messages
-    //  get specific /messages/{id}
-    //  post new /messages
-    //  update put /messages/{id}
     Route::put('profile', 'industrySupervisorProfile');
-
 });
 // // // 
 // TEST CONTROLLER
 // // // 
 Route::controller(TestController::class)->group(function () {
     Route::get('pagination', 'usersPagination');
-    Route::get('user-function',function(Request $req){
+    Route::get('user-function', function (Request $req) {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
     });
 });

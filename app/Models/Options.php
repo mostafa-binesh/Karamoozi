@@ -11,5 +11,6 @@ class Options extends Model
     use HasFactory,SoftDeletes;
     protected $hidden = [
         'deleted_at',
+        'type',
     ];
 }

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\IndustrySupervisorStudentsList;
 use App\Http\Resources\IndustrySupervisor\CheckStudent;
 use App\Http\Resources\pashm;
+use App\Http\Resources\StudentResource;
 use App\Http\Resources\UserPaginationResource;
 use App\Models\form2s;
 use App\Models\Options;
@@ -24,14 +25,14 @@ class IndustrySupervisorStudentController extends Controller
     {
         // return Student::find(1)->user;
         // return Student::all()->filter($req->all())->get();
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req, pashm::class);
+        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class);//->get();
         $h = auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5);
         // return $hgf;
         return new IndustrySupervisorStudentsList(auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5));
         // $x = auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req);
-        $x = auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req, pashm::class);
-        // return $asdas;
-        return $x;
+        // $x = auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req, pashm::class);
+        // // return $asdas;
+        // return $x;
         // $x = auth()->user()->industrySupervisor->industrySupervisorStudents;
         // return new UserPaginationResource($x);
         return new pashm($x);
@@ -213,6 +214,7 @@ class IndustrySupervisorStudentController extends Controller
                 // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
+        // return 1;
         $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
         if ($student == null) {
             return response()->json([
@@ -222,7 +224,8 @@ class IndustrySupervisorStudentController extends Controller
         return response()->json([
             'data' => [
                 'options' => Options::where('type', 'industry_supervisor_evaluation')->get(),
-                'student' => Student::where('student_number', $req->student_number)->first(),
+                'student' => new StudentResource(Student::where('student_number', $req->student_number)->with('user')->first()),
+                // 'student' => Student::where('student_number', $req->student_number)->first(),
             ]
         ], 200);
     }
@@ -258,7 +261,6 @@ class IndustrySupervisorStudentController extends Controller
         $student->evaluations = $req->data;
         $student->internship_finished_at = $req->internship_finished_at;
         $student->save();
-        return $x;
         return [
             'message' => 'عملیات با موفقیت انجام شد',
         ];
@@ -278,7 +280,7 @@ class IndustrySupervisorStudentController extends Controller
         $user = User::where('national_code',$req->national_code)->first();
         if($user == null) {
             return response()->json([
-                'message' => '  '
+                'message' => 'دانشجویی با چنین شماره دانشجویی یافت نشد'
             ],404);
         }
         $student = $user->student->where('student_number', $req->student_number)->first();
