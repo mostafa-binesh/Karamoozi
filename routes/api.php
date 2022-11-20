@@ -21,6 +21,10 @@ use Symfony\Component\Mime\MessageConverter;
 
 // NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
 
+// ###############                        #####
+// ################ AUTHENTICATION ##############
+// ###############                       #####
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('industrySupervisorReg', 'industryBossRegistration');
@@ -31,30 +35,27 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('check-password', 'check_password');
     Route::get('reset-password', 'reset_password')->name('password.reset');
 });
+
+// ###############                        #####
+// ###################    STUDENT  ##############
+// ###############                       #####
+
 Route::controller(StudentController::class)->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
     // Route::put('pre-reg', 'post_pre_registration');
 });
-// // // 
-// TEST CONTROLLER
-// // // 
-Route::controller(TestController::class)->group(function () {
-    Route::get('pagination', 'usersPagination');
-    Route::get('user-function',function(Request $req){
-        return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
-    });
-});
 
 // ###############                        #####
 // ################ INDUSTRY SUPERVISOR ##############
 // ###############                       #####
-// ! add role authentication
-Route::controller(IndustrySupervisor::class)->middleware(['auth:api'])->prefix('industrySupervisor')->middleware('role:industry_supervisor')->group(function () {
+Route::controller(IndustrySupervisor::class)->middleware(['auth:api','role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
     Route::get('home', 'industrySupervisorHome');
-
+    // middleware('')->
+    Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
     Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
     Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
+    Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
     Route::apiResource('students', IndustrySupervisorStudentController::class);
 
     // Route::post('add-student', 'industrySupervisor');
@@ -62,7 +63,6 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api'])->prefix('
     // Route::put('update-student', 'industrySupervisorGetSpecificStudent');
     // Route::get('remove-student', 'industrySupervisorDeleteStudent');
     // Route::get('get-students', 'industrySupervisorGetStudents');
-
     // Route::get('messages', 'industrySupervisorGetMessages');
     // Route::post('send-message', 'industrySupervisorSendMessage');
 
@@ -73,4 +73,13 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api'])->prefix('
     //  update put /messages/{id}
     Route::put('profile', 'industrySupervisorProfile');
 
+});
+// // // 
+// TEST CONTROLLER
+// // // 
+Route::controller(TestController::class)->group(function () {
+    Route::get('pagination', 'usersPagination');
+    Route::get('user-function',function(Request $req){
+        return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
+    });
 });

@@ -19,35 +19,35 @@ class OptionsSeeder extends Seeder
         Options::insert(
             [
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'استفاده از توان علمی در کار های علمی',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'استعداد و علاقه به یادگیری',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'سرعت و دقت در انجام کار های محوله',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'کارآفرین بودن، خلاقیت و نوآوری',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'پشتکار و پیگیری وظایف و امور محوله',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'حضور به موقع و نظم',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'هماهنگی و همکاری با تیم',
                 ],
                 [
-                    'type' => 'internship_evaluation',
+                    'type' => 'industry_supervisor_evaluation',
                     'name' => 'رعایت شئونات اسلامی',
                 ]
             ],

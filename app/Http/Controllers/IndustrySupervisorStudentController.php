@@ -11,6 +11,7 @@ use App\Http\Resources\IndustrySupervisor\CheckStudent;
 use App\Http\Resources\pashm;
 use App\Http\Resources\UserPaginationResource;
 use App\Models\form2s;
+use App\Models\Options;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -21,6 +22,8 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function index(Request $req)
     {
+        // return Student::find(1)->user;
+        // return Student::all()->filter($req->all())->get();
         return auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req, pashm::class);
         $h = auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5);
         // return $hgf;
@@ -100,15 +103,15 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // return $req;
-        $form2 = form2s::where('student_id',Student::where('student_number',$req->student_number)->first()->id)->first();
-        if($form2 != null) {
+        $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
+        if ($form2 != null) {
             return response()->json([
                 'message' => 'این دانشجو از قبل توسط یک سرپرست ثبت نام شده است',
-            ],400);
+            ], 400);
         }
         $form2 = form2s::create([
             'industry_supervisor_id' => auth()->user()->id,
-            'student_id' => User::where('national_code',$req->national_code)->firstorfail()->student->where('student_number',$req->student_number)->first()->id ?? abort(404),
+            'student_id' => User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404),
             // ! fix later, dry
             'schedule_table' => $req->schedule_table,
             'introduction_letter_number' => $req->introduction_letter_number,
@@ -179,7 +182,13 @@ class IndustrySupervisorStudentController extends Controller
                 // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
-        $user = User::where('national_code', $req->national_code)->first()->student->where('student_number', $req->student_number)->first();
+        $user = User::where('national_code', $req->national_code)->first();
+        if ($user == null) {
+            return response()->json([
+                'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+            ], 404);
+        }
+        $user->student->where('student_number', $req->student_number)->first();
         // $user = User::where('national_code',$req->national_code)->firstorfail();
         if ($user == null) {
             return response()->json([
@@ -193,22 +202,10 @@ class IndustrySupervisorStudentController extends Controller
         // ]);
         return new CheckStudent($user);
     }
-    public function industrySupervisorEvaluateStudent(Request $req)
+    public function industrySupervisorEvaluateStudentGET(Request $req)
     {
-        // ! FIX: two queries for same purpose!
-        // ! FIX: internship_finish_date doesn't have a column on student table
-        // return explode(',',Student::find(1)->evaluations);
-        // return array_map('intval', explode(',', Student::find(1)->evaluations));
-        // return json_decode('[' . Student::find(1)->evaluations . ']', true);
-        // return 1;
-        // return Student::all();
-        // $student = Student::where('student_number',$req->student_number)->firstorfail();
-        // return $student;
         $validator = Validator::make($req->all(), [
-            // 'data' => 'required|array|size:8',
             'student_number' => 'required|exists:students,student_number',
-            'internship_finish_date' => 'required|date',
-            'data' => 'required|array',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -216,14 +213,91 @@ class IndustrySupervisorStudentController extends Controller
                 // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
-        // return 1;
-        // return $req;
-        // $student = Student::find(1);
-        $student = Student::where('student_number',$req->student_number)->first();
-        $student->evaluations = implode(',', $req->data);
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        if ($student == null) {
+            return response()->json([
+                'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
+            ], 400);
+        }
+        return response()->json([
+            'data' => [
+                'options' => Options::where('type', 'industry_supervisor_evaluation')->get(),
+                'student' => Student::where('student_number', $req->student_number)->first(),
+            ]
+        ], 200);
+    }
+    public function industrySupervisorEvaluateStudent(Request $req)
+    {
+        // ! FIX: two queries for same purpose!
+        // ! FIX: internship_finish_date doesn't have a column on student table
+        // ! FIX: array id should be checked, 
+        $validator = Validator::make($req->all(), [
+            // 'data' => 'required|array|size:8',
+            'student_number' => 'required|exists:students,student_number',
+            'internship_finish_date' => 'required|date',
+            'data' => 'required|array|max:20', // max 20 items
+            'data.*.id' => 'required|exists:options,id',
+            'data.*.value' => 'required',
+        ], [
+            // 'data.*.id.exists' => 'مقدار id برای هر آیتم مورد ارزیابی مورد نیاز است',
+            'data.*.id.exists' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
+            'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        if ($student == null) {
+            return response()->json([
+                'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
+            ], 400);
+        }
+        // $student->evaluations = implode(',', $req->data);
+        $student->evaluations = $req->data;
+        $student->internship_finished_at = $req->internship_finished_at;
         $student->save();
+        return $x;
         return [
             'message' => 'عملیات با موفقیت انجام شد',
         ];
+    }
+    public function submitCheckedStudent(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'student_number' => 'required|exists:students,student_number',
+            'national_code' => 'required|exists:users,national_code',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+            ], 400);
+        }
+        $user = User::where('national_code',$req->national_code)->first();
+        if($user == null) {
+            return response()->json([
+                'message' => '  '
+            ],404);
+        }
+        $student = $user->student->where('student_number', $req->student_number)->first();
+        // $user = User::where('national_code',$req->national_code)->firstorfail();
+        if ($student == null) {
+            return response()->json([
+                'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+            ], 404);
+        }
+        if($student->supervisor_id !== null) {
+            return response()->json([
+                'message' => 'این دانشجو از قبل سرپرست دارد',
+            ],400);
+        } 
+        // ! DRY with check student function
+        $student->supervisor_id = auth()->id();
+        $student->save();
+        return response()->json([
+            'message' => 'دانشجو با موفقیت اضافه شد',
+        ]);
     }
 }

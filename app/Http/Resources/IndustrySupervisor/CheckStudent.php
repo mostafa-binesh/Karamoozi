@@ -15,11 +15,12 @@ class CheckStudent extends JsonResource
     public function toArray($request)
     {
         // return parent::toArray($request);
+        
         return [
-            'national_Code' => $this->user->national_code,
-            'student_number' => $this->student_number,
-            'first_name' => $this->user->first_name,
-            'last_name' => $this->user->last_name,
+            'national_code' => $this->national_code,
+            'student_number' => $this->student->student_number,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
         ];
     }
 }
