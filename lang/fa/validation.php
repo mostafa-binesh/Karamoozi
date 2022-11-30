@@ -136,7 +136,7 @@ return [
     'starts_with' => ':attribute باید با یکی از این مقادیر شروع شود: :values',
     'string' => ':attribute باید از نوع String باشد.',
     'timezone' => ':attribute باید یک منطقه ی زمانی معتبر باشد.',
-    'unique' => ':attribute از قبل ثبت شده است.',
+    'unique' => ':attribute قبلا ثبت شده است.',
     'uploaded' => 'خطا در آپلود :attribute',
     'url' => ':attribute باید یک آدرس URL معتبر باشد.',
     'uuid' => ':attribute باید یک UUID معتبر باشد.',

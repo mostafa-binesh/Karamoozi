@@ -25,7 +25,9 @@ class IndustrySupervisorStudentController extends Controller
     {
         // return Student::find(1)->user;
         // return Student::all()->filter($req->all())->get();
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class);//->get();
+        $a = auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class); //->get();
+        return $a;
+        return $b;
         $h = auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5);
         // return $hgf;
         return new IndustrySupervisorStudentsList(auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5));
@@ -95,7 +97,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_start_date' => 'required|date',
             'internship_website' => 'required',
             'description' => 'nullable',
-            'schedule_table' => 'required|array|size:6',
+            // 'schedule_table' => 'required|array|size:6',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -107,7 +109,7 @@ class IndustrySupervisorStudentController extends Controller
         $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
         if ($form2 != null) {
             return response()->json([
-                'message' => 'این دانشجو از قبل توسط یک سرپرست ثبت نام شده است',
+                'message' => 'این دانشجو قبلا توسط یک سرپرست ثبت نام شده است',
             ], 400);
         }
         $form2 = form2s::create([
@@ -215,7 +217,7 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // return 1;
-        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->user()->industrySupervisor->id)->first();
         if ($student == null) {
             return response()->json([
                 'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
@@ -234,6 +236,7 @@ class IndustrySupervisorStudentController extends Controller
         // ! FIX: two queries for same purpose!
         // ! FIX: internship_finish_date doesn't have a column on student table
         // ! FIX: array id should be checked, 
+        // ! FIX: internship evaluation should be done only ONCE 
         $validator = Validator::make($req->all(), [
             // 'data' => 'required|array|size:8',
             'student_number' => 'required|exists:students,student_number',
@@ -242,6 +245,7 @@ class IndustrySupervisorStudentController extends Controller
             'data.*.id' => 'required|exists:options,id',
             'data.*.value' => 'required',
         ], [
+            // for advanced users only
             // 'data.*.id.exists' => 'مقدار id برای هر آیتم مورد ارزیابی مورد نیاز است',
             'data.*.id.exists' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
             'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
@@ -251,15 +255,28 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->user()->industrySupervisor->id)->first();
+        // dd($student);
         if ($student == null) {
             return response()->json([
                 'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
             ], 400);
+        } else if ($student->evaluated()) {
+            return response()->json([
+                'message' => 'این دانشجو قبلا ارزیابی شده است'
+            ], 400);
+        } else if ($student->readyToEvaluate()) {
+            return response()->json([
+                'message' => 'ارزشیابی دانشجو هنوز نمی تواند انجام شود'
+            ], 400);
         }
+        // return $student->internship_status;
         // $student->evaluations = implode(',', $req->data);
         $student->evaluations = $req->data;
         $student->internship_finished_at = $req->internship_finished_at;
+        // $student->internship_status = 3;
+        // $student->internship_status = 'به اتمام رسیده';
+        $student->internship_status = 3;
         $student->save();
         return [
             'message' => 'عملیات با موفقیت انجام شد',
@@ -277,11 +294,11 @@ class IndustrySupervisorStudentController extends Controller
                 // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
-        $user = User::where('national_code',$req->national_code)->first();
-        if($user == null) {
+        $user = User::where('national_code', $req->national_code)->first();
+        if ($user == null) {
             return response()->json([
                 'message' => 'دانشجویی با چنین شماره دانشجویی یافت نشد'
-            ],404);
+            ], 404);
         }
         $student = $user->student->where('student_number', $req->student_number)->first();
         // $user = User::where('national_code',$req->national_code)->firstorfail();
@@ -290,13 +307,14 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 404);
         }
-        if($student->supervisor_id !== null) {
+        if ($student->supervisor_id !== null) {
             return response()->json([
-                'message' => 'این دانشجو از قبل سرپرست دارد',
-            ],400);
-        } 
+                'message' => 'این دانشجو سرپرست دارد',
+            ], 400);
+        }
         // ! DRY with check student function
-        $student->supervisor_id = auth()->id();
+        $student->supervisor_id = auth()->user()->industrySupervisor->id;
+        $student->unevaluate();
         $student->save();
         return response()->json([
             'message' => 'دانشجو با موفقیت اضافه شد',

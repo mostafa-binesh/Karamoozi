@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use App\Notifications\PasswordReset;
+use App\Traits\CPaginationTrait;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, CPaginationTrait;
     /**
      * The attributes that are mass assignable.
      *

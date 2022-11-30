@@ -43,6 +43,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::controller(StudentController::class)->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
+
     // Route::put('pre-reg', 'post_pre_registration');
 });
 
@@ -67,4 +68,12 @@ Route::controller(TestController::class)->group(function () {
     Route::get('user-function', function (Request $req) {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
     });
+    Route::get('userCount', function (Request $req) {
+        $user = User::where('email','like','%example.com%')->cpagination($req);
+        return $user;
+        //  return $x;
+    });
+    Route::get('studentProperties', [TestController::class,'studentProperties']);
+    Route::get('reqConvert', [TestController::class,'reqConvert']);
+    Route::get('hash/{id}', [TestController::class,'hash']);
 });
