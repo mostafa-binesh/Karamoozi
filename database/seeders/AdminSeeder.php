@@ -94,5 +94,7 @@ class AdminSeeder extends Seeder
             'phone_number' => '09390565605',
             'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
         ])->assignRole('master');
+        User::factory()->count(5000)->create();  
+        Student::factory()->count(5000)->create();  
     }
 }
