@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\DevToolController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,7 +16,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('home');
 });
-Route::get('/devTool', function () {
-    return view('dev.dev');
-});
-Route::post('/devTool',[DevToolController::class,'handler'])->name('devTool');

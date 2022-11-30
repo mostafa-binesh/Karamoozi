@@ -74,7 +74,7 @@ class AuthController extends Controller
     }
     public function login(Request $req)
     {
-        reqConvert($req,'username','password');
+        // return 'hello world';
         $validator = Validator::make($req->all(), [
             'username' => 'required',
             // 'national_code' => 'required',
@@ -85,11 +85,7 @@ class AuthController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        // $x =  User::where('username','۳۹۸۱۲۳۱۰۲۰')->first();
-        // return Hash::check($x->password,'۵۳۰۰۰۵۳۲۶۰');
-
-        // $credentials = $req->only('username', 'password');
-        $credentials = ['username' => $req->username, 'password' => $req->password];
+        $credentials = $req->only('username', 'password');
         $token = Auth::attempt($credentials);
         if (!$token) {
             return response()->json([

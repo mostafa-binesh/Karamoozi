@@ -29,7 +29,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('supervisor_id')->nullable(); // it means industrySupervisor id
+            $table->unsignedBigInteger('supervisor_id')->nullable();
             // $table->foreign('supervisor_id')->references('employee_id') // QUESTION: does this mean industry supervisor or faculty supervisor?
             // ->on('employees')->onDelete('cascade'); 
             $table->float('grade')->nullable(); // FIX: there is no value for it in pre-reg
