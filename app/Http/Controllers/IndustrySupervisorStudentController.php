@@ -95,7 +95,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_start_date' => 'required|date',
             'internship_website' => 'required',
             'description' => 'nullable',
-            'schedule_table' => 'required|array|size:6',
+            'schedule_table' => 'sometimes|array|size:6',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -107,8 +107,8 @@ class IndustrySupervisorStudentController extends Controller
         $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
         if ($form2 != null) {
             return response()->json([
-                'message' => 'این دانشجو از قبل توسط یک سرپرست ثبت نام شده است',
-            ], 400);
+                'message' => 'این دانشجو یا وجود ندارد یا توسط یک سرپرست دیگر ثبت نام شده است',
+            ], 404);
         }
         $form2 = form2s::create([
             'industry_supervisor_id' => auth()->user()->id,
@@ -122,7 +122,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_start_date' => $req->internship_start_date,
             'internship_website' => $req->internship_website,
             'description' => $req->description,
-            'schedule_table' => $req->schedule_table,
+            'schedule_table' => $req->schedule_table ?? null,
         ]);
         return $form2;
     }
@@ -233,7 +233,6 @@ class IndustrySupervisorStudentController extends Controller
     {
         // ! FIX: two queries for same purpose!
         // ! FIX: internship_finish_date doesn't have a column on student table
-        // ! FIX: array id should be checked, 
         $validator = Validator::make($req->all(), [
             // 'data' => 'required|array|size:8',
             'student_number' => 'required|exists:students,student_number',
@@ -260,6 +259,7 @@ class IndustrySupervisorStudentController extends Controller
         // $student->evaluations = implode(',', $req->data);
         $student->evaluations = $req->data;
         $student->internship_finished_at = $req->internship_finished_at;
+        $student->internship_status = 3;
         $student->save();
         return [
             'message' => 'عملیات با موفقیت انجام شد',

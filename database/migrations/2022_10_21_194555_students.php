@@ -16,13 +16,6 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             // https://www.figma.com/file/bWf9Ptmonm5qIUBZl4v8tc/%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87-%DA%A9%D8%A7%D8%B1%D8%A7%D9%85%D9%88%D8%B2%DB%8C-%D8%AF%D8%A7%D9%86%D8%B4%DA%AF%D8%A7%D9%87-%D8%B4%D9%87%DB%8C%D8%AF-%D8%B1%D8%AC%D8%A7%DB%8C%DB%8C?node-id=407%3A1527
             // FIX: some of these fields should be unique
-            // These commented attributes are available in user table
-            // $table->string('first_name');
-            // $table->string('last_name');
-            // $table->id('student_number');
-            // $table->string('national_code',10);
-            // $table->string('phone_number',11);
-            // $table->string('email');
             $table->id();
             // $table->bigInteger('student_number')->nullable();
             $table->string('student_number')->nullable();

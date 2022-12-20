@@ -129,7 +129,14 @@ class Student extends Model
     public function scopeUnevaluated($query) {
         return $query->whereNull('evaluations');
     }
-    // public function req() {
-    //     return 
-    // }
+    public function evaluate() {
+        $this->internship_status = 'به اتمام رسیده';
+        $this->internship_finished_at = now();
+        $this->save();
+    }
+    public function unevaluate() {
+        $this->internship_status = 'شروع نشده';
+        $this->internship_finished_at = null;
+        $this->save();
+    }
 }
