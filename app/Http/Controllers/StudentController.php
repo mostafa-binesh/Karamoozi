@@ -34,7 +34,7 @@ class StudentController extends Controller
         $student = Student::where('user_id', auth::id())->first();
         if ($student->verified) {
             return response()->json([
-                'message' => 'پیش ثبت نام شما قبلا انجام شده است'
+                'message' => 'پیش ثبت نام شما از قبل انجام شده است'
             ], 400);
         }
         $validator = Validator::make($req->all(), [

@@ -27,7 +27,6 @@ class Student extends Model
      * @var array
      */
     // it uses EnumTrait
-    // INTERNSHIP_STATUS enum has been assigned to internship_status attribute of a student
     protected static $enums = [
         'ROLES' => 'role',
         'INTERNSHIP_TYPE' => 'internship_type',
@@ -60,8 +59,7 @@ class Student extends Model
     public const INTERNSHIP_STATUS = [
         1 => 'شروع نشده',
         2 => 'در حال اجرا',
-        3 => 'ارزیابی شده',
-        4 => 'به اتمام رسیده',
+        3 => 'به اتمام رسیده',
     ];
 
     /**
@@ -131,18 +129,15 @@ class Student extends Model
     public function scopeUnevaluated($query) {
         return $query->whereNull('evaluations');
     }
-    public function readyToEvaluate() {
-        return $this->internship_status == SELF::INTERNSHIP_STATUS[1]; 
-    }
-    public function evaluated() {
-        return $this->internship_status == SELF::INTERNSHIP_STATUS[3]; 
+    public function evaluate() {
+        $this->internship_status = 'به اتمام رسیده';
+        $this->internship_finished_at = now();
+        $this->save();
     }
     public function unevaluate() {
-        // i think it will work with only giving the number of internship status, for example $this->is = 2
-        return $this->internship_status = SELF::INTERNSHIP_STATUS[2]; 
-    }
-    public function evaluate() {
-        return $this->internship_status = SELF::INTERNSHIP_STATUS[3]; 
+        $this->internship_status = 'شروع نشده';
+        $this->internship_finished_at = null;
+        $this->save();
     }
     public function editable() { // can be edited by industry supervisor
         return $this->internship_status == SELF::INTERNSHIP_STATUS[1]; 

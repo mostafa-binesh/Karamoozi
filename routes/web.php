@@ -20,4 +20,4 @@ Route::get('/', function () {
 Route::get('/devTool', function () {
     return view('dev.dev');
 });
-Route::post('/devTool',[DevToolController::class,'handler'])->name('devTool');
+Route::post('/devTool', [DevToolController::class,'handler'])->name("devTool");

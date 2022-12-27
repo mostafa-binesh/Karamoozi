@@ -3,10 +3,7 @@
 // https://medium.com/@kiasaty/how-to-avoid-enum-data-type-in-laravel-eloquent-1c37ec908773
 
 namespace App\Traits;
-
-use Exception;
 use Illuminate\Support\Str;
-
 trait EnumTrait
 {
     /**
@@ -20,20 +17,16 @@ trait EnumTrait
     {
         if ($enum = self::getEnum($key)) {
             $value = Str::singular($value);
-            $array = constant("self::$enum");
-            $id = array_search($value, $array);
+            $id = array_search($value, constant("self::$enum"));
             if ($id) {
                 $this->attributes[$key] = $id;
                 return $this;
             }
-            if (isset($array[$value])) {
-                $this->attributes[$key] = (int)$value;
-                return $this;
-            }
-            throw new Exception("مقدار ورودی برای {$key} نادرست است");
         } else {
+            
             return parent::setAttribute($key, $value);
         }
+        
     }
     /**
      * Get an attribute from the model.
@@ -46,12 +39,12 @@ trait EnumTrait
         if ($enum = self::getEnum($key)) {
             return constant("self::$enum")[$this->attributes[$key]];
         }
-
+        
         $keyWithoutIdAtTheEnd = rtrim($key, '_id');
-        if (self::getEnum($keyWithoutIdAtTheEnd)) {
+        if(self::getEnum($keyWithoutIdAtTheEnd)) {
             return $this->attributes[$keyWithoutIdAtTheEnd];
         }
-
+        
         return parent::getAttribute($key);
     }
     /**
@@ -64,14 +57,14 @@ trait EnumTrait
     public static function __callStatic($method, $parameters)
     {
         $pattern = '/^get(([A-Z][a-z]+)+)I[dD]$/';
-        if (preg_match($pattern, $method, $matches)) {
-            $key = Str::snake($matches[1]);
-            if ($enum = self::getEnum($key)) {
-                $value = strtolower($parameters[0]);
-                $value = Str::singular($value);
-
-                return array_search($value, constant("self::$enum"));
-            }
+        if( preg_match($pattern, $method, $matches) ) {
+           $key = Str::snake($matches[1]);
+           if ($enum = self::getEnum($key)) {
+              $value = strtolower($parameters[0]);
+              $value = Str::singular($value);
+    
+              return array_search($value, constant("self::$enum") );
+           }
         }
         return parent::__callStatic($method, $parameters);
     }
