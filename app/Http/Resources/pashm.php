@@ -24,6 +24,7 @@ class pashm extends JsonResource
             'last_name' => $this->user->last_name,
             'internship_started_at' => $this->internship_started_at,
             'internship_status' => $this->internship_status,
+            'editable' => $this->editable(),
         ];
     }
 }

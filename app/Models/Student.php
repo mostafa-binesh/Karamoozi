@@ -144,4 +144,7 @@ class Student extends Model
     public function evaluate() {
         return $this->internship_status = SELF::INTERNSHIP_STATUS[3]; 
     }
+    public function editable() { // can be edited by industry supervisor
+        return $this->internship_status == SELF::INTERNSHIP_STATUS[1]; 
+    }
 }

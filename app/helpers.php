@@ -94,7 +94,7 @@ if (!function_exists('persianConvert')) {
     }
 }
 if (!function_exists('reqConvert')) {
-    function reqConvert(&$req,...$params)
+    function reqConvert(&$req, ...$params)
     {
         // $persinaDigits1 = array('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹');
         // $persinaDigits2 = array('٩', '٨', '٧', '٦', '٥', '٤', '٣', '٢', '١', '٠');

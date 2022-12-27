@@ -13,6 +13,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Resources\UserPaginationResource;
 use App\Models\form2s;
 use App\Models\Options;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -126,7 +127,8 @@ class IndustrySupervisorStudentController extends Controller
             'description' => $req->description,
             'schedule_table' => $req->schedule_table,
         ]);
-        return $form2;
+        return response()->json(['message' => 'دانشجو با موفقیت ثبت شد', 'student' => $form2]);
+        // return $form2;
     }
 
     /**
@@ -137,7 +139,7 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function show($id)
     {
-        //
+        return response()->json(['id' => $id]);
     }
 
     /**
@@ -148,7 +150,8 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function edit($id)
     {
-        //
+        return response()->json(['id' => $id]);
+        
     }
 
     /**
@@ -158,9 +161,49 @@ class IndustrySupervisorStudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $req, $id)
     {
-        //
+        // ! OPTIMIZATION queries in this request are not OPTIMIZED
+        $validator = Validator::make($req->all(), [
+            'student_number' => 'required|exists:students,student_number',
+            'national_code' => 'required|exists:users,national_code',
+            'introduction_letter_number' => 'required',
+            'introduction_letter_date' => 'required|date',
+            'internship_department' => 'required',
+            'supervisor_position' => 'required',
+            'internship_start_date' => 'required|date',
+            'internship_website' => 'required',
+            'description' => 'nullable',
+            // 'schedule_table' => 'required|array|size:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+            ], 400);
+        }
+        // return $req;
+        $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
+        if ($form2 == null) {
+            return response()->json([
+                'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
+            ], 400);
+        }
+        $form2->industry_supervisor_id = auth()->user()->id;
+        $form2->student_id = User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404);
+        // !! fix later, dry | theres two search in this page, one in form2 where student, and second is user where
+        $form2->schedule_table = $req->schedule_table;
+        $form2->introduction_letter_number = $req->introduction_letter_number;
+        $form2->introduction_letter_date = $req->introduction_letter_date;
+        $form2->internship_department = $req->internship_department;
+        $form2->supervisor_position = $req->supervisor_position;
+        $form2->internship_start_date = $req->internship_start_date;
+        $form2->internship_website = $req->internship_website;
+        $form2->description = $req->description;
+        $form2->schedule_table = $req->schedule_table;
+        $form2->save();
+        return response()->json(['message' => 'اطلاعات دانشجو با موفقیت ویرایش شد', 'student' => $form2]);
+        return $form2;
     }
 
     /**
@@ -171,7 +214,16 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $form2 = form2s::where('student_id', Student::where('student_number', $id)->first()->id)->first();
+        if ($form2 == null) {
+            return response()->json([
+                'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
+            ], 400);
+        }
+        $form2->delete();
+        return response()->json([
+            'message' => 'دانشجو با موفقیت حذف شد',
+        ]);
     }
     public function checkStudent(Request $req)
     {
