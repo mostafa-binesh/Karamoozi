@@ -22,7 +22,7 @@ class AdminSeeder extends Seeder
             'first_name' => 'حسن',
             'last_name' => 'جعفری',
             'username' => '5003',
-            'national_code' => '5300053264',
+            'national_code' => '5003',
             'email' => 'jafari@admin.com',
             'phone_number' => '09390565606',
             'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
