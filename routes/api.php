@@ -50,14 +50,17 @@ Route::controller(StudentController::class)->group(function () {
 // ################ INDUSTRY SUPERVISOR ##############
 // ###############                       #####
 Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
-    Route::get('home', 'industrySupervisorHome');
-    Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
-    Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
-    Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
-    Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
-    Route::apiResource('students', IndustrySupervisorStudentController::class);
-    Route::resource('messages', MessageController::class);
     Route::put('profile', 'industrySupervisorProfile');
+    Route::get('home', 'industrySupervisorHome');
+    // ########### STUDENT RELATED ########
+    Route::middleware("verifiedIndustrySupervisor")->group(function() {
+        Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
+        Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
+        Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
+        Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
+        Route::apiResource('students', IndustrySupervisorStudentController::class);
+        Route::resource('messages', MessageController::class);
+    });
 });
 // // // 
 // TEST CONTROLLER

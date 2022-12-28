@@ -64,10 +64,12 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'cors'          => \App\Http\Middleware\Cors::class, // added
+        // manual ones
         // these three below middlewares were added for spatie
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+        'cors'          => \App\Http\Middleware\Cors::class, // added
+        'verifiedIndustrySupervisor' => \App\Http\Middleware\VerifiedIndustrySupervisor::class, // check if industrySupervisor is verified or not
     ];
 }

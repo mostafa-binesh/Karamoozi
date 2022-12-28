@@ -72,6 +72,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    // ######### RELATIONSHIPS #####
     public function student()
     {
         return $this->hasOne(Student::class);
@@ -92,6 +93,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(IndustrySupervisor::class);
     }
+    // ######### Other functions #####
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new PasswordReset($token, $this->email));
