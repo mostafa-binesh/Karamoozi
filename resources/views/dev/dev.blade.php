@@ -92,7 +92,7 @@
                         @csrf
                         <input type="hidden" name="deleteIndustryOfStudent" value="1">
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">نام کاربری</label>
+                            <label for="exampleInputEmail1" class="form-label">شماره دانشجویی</label>
                             <input type="text" class="form-control" id="exampleInputEmail2"
                                 aria-describedby="emailHelp" placeholder="شماره دانشجویی" name="in">
                             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
@@ -118,7 +118,7 @@
                         @csrf
                         <input type="hidden" name="unevaluateStudent" value="1">
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">نام کاربری</label>
+                            <label for="exampleInputEmail1" class="form-label">شماره دانشجویی</label>
                             <input type="text" class="form-control" id="exampleInputEmail2"
                                 aria-describedby="emailHelp" placeholder="شماره دانشجویی" name="in">
                             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
@@ -142,7 +142,7 @@
                         @csrf
                         <input type="hidden" name="evaluateStudent" value="1">
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">نام کاربری</label>
+                            <label for="exampleInputEmail1" class="form-label">شماره دانشجویی</label>
                             <input type="text" class="form-control" id="exampleInputEmail2"
                                 aria-describedby="emailHelp" placeholder="شماره دانشجویی" name="in">
                             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
