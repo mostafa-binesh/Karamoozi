@@ -9,7 +9,9 @@ class IndustrySupervisor extends Model
 {
     use HasFactory;
     protected $guarded = [];
-
+    protected $casts = [
+        'verified' => 'boolean',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -21,7 +23,6 @@ class IndustrySupervisor extends Model
 
     public function industrySupervisorStudents()
     {
-        // return $this->hasMany(Student::class, 'supervisor_id')->where('supervisor_id', $this->id);
         return $this->hasMany(Student::class, 'supervisor_id');
     }
     public function industrySupervisorUnevaluatedStudents()
