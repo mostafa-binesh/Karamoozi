@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Student;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\IndustrySupervisorStudentsList;
-use App\Http\Resources\IndustrySupervisor\CheckStudent;
-use App\Http\Resources\pashm;
-use App\Http\Resources\StudentResource;
-use App\Http\Resources\UserPaginationResource;
 use App\Models\form2s;
 use App\Models\Options;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use App\Http\Resources\pashm;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\StudentResource;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserPaginationResource;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use App\Http\Resources\IndustrySupervisorStudentsList;
+use App\Http\Resources\IndustrySupervisor\CheckStudent;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -26,7 +27,7 @@ class IndustrySupervisorStudentController extends Controller
     {
         // return Student::find(1)->user;
         // return Student::all()->filter($req->all())->get();
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class);//->get();
+        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class); //->get();
         $h = auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5);
         // return $hgf;
         return new IndustrySupervisorStudentsList(auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5));
@@ -98,6 +99,7 @@ class IndustrySupervisorStudentController extends Controller
             'description' => 'nullable',
             'schedule_table' => 'sometimes|array|size:6',
         ]);
+        // return Auth::id();
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
@@ -125,6 +127,10 @@ class IndustrySupervisorStudentController extends Controller
             'description' => $req->description,
             'schedule_table' => $req->schedule_table ?? null,
         ]);
+        $student = Student::where("student_number", $req->student_number)->first();
+        $student->supervisor_id = Auth::id();
+        $student->unevaluate();
+        $student->save();
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد', 'student' => $form2]);
         // return $form2;
     }
@@ -149,7 +155,6 @@ class IndustrySupervisorStudentController extends Controller
     public function edit($id)
     {
         return response()->json(['id' => $id]);
-        
     }
 
     /**
@@ -200,7 +205,7 @@ class IndustrySupervisorStudentController extends Controller
         $form2->description = $req->description;
         $form2->schedule_table = $req->schedule_table;
         $form2->save();
-        return response()->json(['message' => 'اطلاعات دانشجو با موفقیت ویرایش شد', 'student' => $form2]);
+        return response()->json(['message' => 'اطلاعات دانشجو با موفقیت ویرایش شد', 'data' => ['student' => $form2]]);
         return $form2;
     }
 
@@ -212,13 +217,28 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function destroy($id)
     {
-        $form2 = form2s::where('student_id', Student::where('student_number', $id)->first()->id)->first();
+        // $form2 = form2s::where('student_id', Student::where('student_number', $id)->first()->id)->first();
+        $student = Student::where("student_number",$id)->first();
+        if ($student == null) {
+            // dd($form2);
+            // return $form2->student_id;
+            return response()->json([
+                'message' => 'این دانشجو وجود ندارد',
+            ], 400);
+        }
+        $form2 = form2s::where('student_id', $student->id)->first();
         if ($form2 == null) {
+            // dd($form2);
+            // return $form2->student_id;
             return response()->json([
                 'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
             ], 400);
         }
         $form2->delete();
+        // $student = Student::find($id);
+        $student->supervisor_id = null;
+        $student->save();
+
         return response()->json([
             'message' => 'دانشجو با موفقیت حذف شد',
         ]);
@@ -329,11 +349,11 @@ class IndustrySupervisorStudentController extends Controller
                 // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
-        $user = User::where('national_code',$req->national_code)->first();
-        if($user == null) {
+        $user = User::where('national_code', $req->national_code)->first();
+        if ($user == null) {
             return response()->json([
                 'message' => 'دانشجویی با چنین شماره دانشجویی یافت نشد'
-            ],404);
+            ], 404);
         }
         $student = $user->student->where('student_number', $req->student_number)->first();
         // $user = User::where('national_code',$req->national_code)->firstorfail();
@@ -342,11 +362,11 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 404);
         }
-        if($student->supervisor_id !== null) {
+        if ($student->supervisor_id !== null) {
             return response()->json([
                 'message' => 'این دانشجو از قبل سرپرست دارد',
-            ],400);
-        } 
+            ], 400);
+        }
         // ! DRY with check student function
         $student->supervisor_id = auth()->id();
         $student->save();

@@ -53,14 +53,14 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
     Route::put('profile', 'industrySupervisorProfile');
     Route::get('home', 'industrySupervisorHome');
     // ########### STUDENT RELATED ########
-    Route::middleware("verifiedIndustrySupervisor")->group(function() {
+    Route::middleware("verifiedIndustrySupervisor")->group(function () {
         Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
         Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
         Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
         Route::apiResource('students', IndustrySupervisorStudentController::class);
-        Route::resource('messages', MessageController::class);
     });
+    Route::resource('messages', MessageController::class);
 });
 // // // 
 // TEST CONTROLLER
