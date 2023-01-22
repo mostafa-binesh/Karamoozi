@@ -131,7 +131,7 @@ class IndustrySupervisorStudentController extends Controller
         $student->supervisor_id = Auth::id();
         $student->unevaluate();
         $student->save();
-        return response()->json(['message' => 'دانشجو با موفقیت ثبت شد', 'student' => $form2]);
+        return response()->json(['message' => 'دانشجو با موفقیت ثبت شد', 'data' => ['student' => $form2]]);
         // return $form2;
     }
 
