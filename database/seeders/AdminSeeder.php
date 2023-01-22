@@ -6,7 +6,7 @@ use App\Models\IndustrySupervisor;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\student;
+use App\Models\Student;
 
 class AdminSeeder extends Seeder
 {

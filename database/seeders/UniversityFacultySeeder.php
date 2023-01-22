@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\university_faculty;
+use App\Models\University_faculty;
 class UniversityFacultySeeder extends Seeder
 {
     /**
@@ -14,7 +14,7 @@ class UniversityFacultySeeder extends Seeder
      */
     public function run()
     {
-        university_faculty::insert([
+        University_faculty::insert([
             [
                 'faculty_name' => 'دانشکده کامپیوتر'
             ],

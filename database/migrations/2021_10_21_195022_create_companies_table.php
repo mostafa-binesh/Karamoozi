@@ -15,13 +15,10 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            // $table->string('company_name')->nullable();
             $table->string('company_name');
             $table->text('caption')->nullable();
             $table->float("company_grade")->nullable();
-            $table->bigInteger("company_boss_id")->unsigned();
-            // $table->foreign('company_boss_id')->references('employee_id')
-            // ->on('employees')->onDelete('cascade');
+            $table->bigInteger("company_boss_id")->unsigned()->nullable();
             $table->string('company_number',11)->nullable();
             $table->string("company_registry_code")->nullable(); // FIX LATER
             $table->string('company_phone')->nullable();
@@ -32,6 +29,8 @@ return new class extends Migration
             $table->boolean("company_is_registered")->nullable();
             $table->unsignedTinyInteger("company_type");
             $table->boolean('verified');
+            // TODO: NEED TO KNOW WHICH STUDENT SUBMITTED THIS COMPANY 
+            $table->boolean("submitted_by_student");
             $table->timestamps();
 
             

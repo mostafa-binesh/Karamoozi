@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Mail\send_code_reset_password;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\MessageController;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StudentController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
+use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Mime\MessageConverter;
 
 // NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
@@ -43,6 +45,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::controller(StudentController::class)->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
+    Route::post("student/company", 'submitCompany');
     // Route::put('pre-reg', 'post_pre_registration');
 });
 
@@ -61,6 +64,16 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
         Route::apiResource('students', IndustrySupervisorStudentController::class);
     });
     Route::resource('messages', MessageController::class);
+});
+// ###############                        #####
+// ################ DEVELOPER ONLY ##############
+// ###############                       #####
+// ! DELETE ON PRODUCTION
+Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
+    Route::get("migrate", function () {
+        Artisan::call("migrate:reset");
+        Artisan::call("migrate:fresh --seed");
+    });
 });
 // // // 
 // TEST CONTROLLER

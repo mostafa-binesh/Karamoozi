@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             OptionsSeeder::class,
             AdminSeeder::class,
             UniversityFacultySeeder::class,
+            CompanySeeder::class,
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Students\CompanyResource;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Student;
@@ -26,6 +27,8 @@ class StudentController extends Controller
         return response()->json([
             'masters' => $returnMasters,
             'faculties' => University_faculty::all(),
+            // TODO: show only verified companies here
+            'companies' => CompanyResource::collection(Company::all()),
         ]);
     }
     public function post_pre_registration(Request $req)
@@ -88,5 +91,33 @@ class StudentController extends Controller
             'message' => $req->isMethod('post') ?
                 'انجام پیش ثبت نام با موفقیت انجام شد' : 'ویرایش پیش ثبت نام با موفقیت انجام شد',
         ]);
+    }
+    public function submitCompany(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            // 15 fields
+            'name' => 'required|max:255',
+            'type' => 'required|max:255',
+            'phone_number' => 'required|max:255|regex:/^(09)+[0-9]{9}$/',
+            'postal_code' => 'required|numeric|digits:10',
+            'address' => 'required|max:255',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        Company::create([
+            'company_name' => $req->name,
+            'company_type' => $req->type,
+            'company_number' => $req->phone_number,
+            'company_postal_code' => $req->postal_code,
+            'company_address' => $req->address,
+            'verified' => false,
+            'submitted_by_student' => true,
+        ]);
+        return response()->json([
+            'message' => 'شرکت با موفقیت ثبت شد',
+        ],200);
     }
 }

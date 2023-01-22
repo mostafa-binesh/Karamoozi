@@ -18,7 +18,10 @@ class Company extends Model
     //     'company_address',
     // ];
     protected $guarded = [];
-
+    protected $casts = [
+        'verified' => 'boolean',
+        'submitted_by_student' => 'boolean',
+    ];
     public function user() {
         return $this->belongsTo(User::class);
     }
