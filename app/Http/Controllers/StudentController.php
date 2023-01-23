@@ -29,12 +29,16 @@ class StudentController extends Controller
             'faculties' => University_faculty::all(),
             // TODO: show only verified companies here
             'companies' => CompanyResource::collection(Company::all()),
+            'student_company' => [
+                'name' => Company::where('student_id',Auth::user()->student->id)->first()->company_name ?? null,
+            ]
         ]);
     }
     public function post_pre_registration(Request $req)
     {
         // check pre-reg was not done already
-        $student = Student::where('user_id', auth::id())->first();
+        // $student = Student::where('user_id', auth::id())->first();
+        $student = Auth::user()->student;
         if ($student->verified) {
             return response()->json([
                 'message' => 'پیش ثبت نام شما از قبل انجام شده است'
@@ -49,30 +53,23 @@ class StudentController extends Controller
             'passed_units' => 'required|numeric',
             'intership_master' => 'required|numeric',
             'midterm' => 'required',
-            'intership_year' => 'required',
-            'intership_type' => 'required',
-            'company_is_registered' => 'required',
-            'company_name' => 'required',
-            'company_type' => 'required|numeric',
-            'company_phone' => 'required',
-            'company_postal' => 'required',
-            'company_address' => 'required',
+            'internship_year' => 'required',
+            'internship_type' => 'required',
+            'company_id' => 'nullable'
         ]);
         if ($validator->fails()) {
             return response()->json([
-                'message' => $validator->errors()
+                'message' => $validator->errors(),
             ], 400);
         }
-        // create company 
-        Company::create([
-            'company_name' => $req->company_name,
-            'company_type' => $req->company_type,
-            'company_phone' => $req->company_phone,
-            'company_postal_code' => $req->company_postal,
-            'company_address' => $req->company_address,
-            'company_is_registered' => $req->company_is_registered,
-        ]);
-        $user = User::find(Auth::id());
+        if (!(isset($req->company_id) || isset($student->company->id))) {
+            return response()->json([
+                'message' => 'شرکتی برای شما معرفی نشده است',
+            ], 400);
+        } else {
+            $company_id = $req->company_id ?? $student->company->id;
+        }
+        $user = Auth::user();
         $user->first_name = $req->first_name;
         $user->last_name = $req->last_name;
         $user->save();
@@ -81,9 +78,9 @@ class StudentController extends Controller
         $student->faculty_id = $req->faculty_id;
         $student->passed_units = $req->passed_units;
         $student->professor_id = $req->professor_id;
-        $student->intership_year = $req->intership_year;
-        $student->intership_type = $req->intership_type;
-        $student->company_id = $req->company_id;
+        $student->internship_year = $req->internship_year;
+        $student->internship_type = $req->internship_type;
+        $student->company_id = $company_id;
         $student->grade = $req->degree;
         $student->verified = true;
         $student->save();
@@ -107,17 +104,18 @@ class StudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        Company::create([
+        Company::updateOrCreate([
+            'student_id' => Auth::user()->student->id
+        ], [
             'company_name' => $req->name,
             'company_type' => $req->type,
             'company_number' => $req->phone_number,
             'company_postal_code' => $req->postal_code,
             'company_address' => $req->address,
             'verified' => false,
-            'submitted_by_student' => true,
         ]);
         return response()->json([
             'message' => 'شرکت با موفقیت ثبت شد',
-        ],200);
+        ], 200);
     }
 }

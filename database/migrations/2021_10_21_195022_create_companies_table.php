@@ -30,7 +30,8 @@ return new class extends Migration
             $table->unsignedTinyInteger("company_type");
             $table->boolean('verified');
             // TODO: NEED TO KNOW WHICH STUDENT SUBMITTED THIS COMPANY 
-            $table->boolean("submitted_by_student");
+            // $table->boolean("submitted_by_student");
+            $table->unsignedBigInteger("student_id")->nullable(); // if user has submitted the company
             $table->timestamps();
 
             
