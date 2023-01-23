@@ -25,7 +25,7 @@ class AdminSeeder extends Seeder
             'national_code' => '5003',
             'email' => 'jafari@admin.com',
             'phone_number' => '09390565606',
-            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+            'password' => '$2y$10$gN91w/NwB5ivA/jLmJMZceDhwe0aQSNuLr5uLcnBKS22ZzgidiX7e',
         ])->assignRole('industry_supervisor');
         $industrySupervisor = IndustrySupervisor::create([
             'verified' => false,

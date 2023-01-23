@@ -20,7 +20,7 @@ class Company extends Model
     protected $guarded = [];
     protected $casts = [
         'verified' => 'boolean',
-        'submitted_by_student' => 'boolean',
+        // 'submitted_by_student' => 'boolean',
     ];
     public function user() {
         return $this->belongsTo(User::class);

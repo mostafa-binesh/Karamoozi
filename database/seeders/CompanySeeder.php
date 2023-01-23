@@ -20,17 +20,20 @@ class CompanySeeder extends Seeder
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
-        'submitted_by_student' => false],
+        // 'submitted_by_student' => false
+    ],
             ['company_name' => 'شرکت دوم',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
-        'submitted_by_student' => false],
+        // 'submitted_by_student' => false
+    ],
             ['company_name' => 'شرکت سوم',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
-            'submitted_by_student' => false]
+            // 'submitted_by_student' => false
+            ]
         ]);
     }
 }

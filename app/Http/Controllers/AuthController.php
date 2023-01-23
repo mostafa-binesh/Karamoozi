@@ -74,10 +74,9 @@ class AuthController extends Controller
     }
     public function login(Request $req)
     {
-        // return 'hello world';
+        // return Hash::make("5003");
         $validator = Validator::make($req->all(), [
             'username' => 'required',
-            // 'national_code' => 'required',
             'password' => 'required'
         ]);
         if ($validator->fails()) {
@@ -108,9 +107,6 @@ class AuthController extends Controller
                 # code...
                 break;
         }
-        // if ($user->role == 'student') {
-        // } else {
-        // }
         return response()->json([
             'user' => $user,
             'authorisation' => [
@@ -123,13 +119,6 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         $user->role = $user->getRoleNames()->first();
-        // if ($user->role == 'student') {
-        //     $user->load('student');
-        // } elseif($user->role == 'employee') {
-        //     $user->load('employee');
-        // } elseif ($user->role == 'industry_boss') {
-        //     $user->load('industryBoss');
-        // }
         switch ($user->role) {
             case 'student':
                 $user->load('student');
@@ -271,6 +260,7 @@ class AuthController extends Controller
             'company_boss_id' => $industrySupervisor->id,
             'company_type' => 1,
             'verified' => false,
+            // 'submitted_by_student' => false,
         ]); // ! FIX: company type is a dummy data
         IndustrySupervisor::create([
             'user_id' => $industrySupervisor->id,

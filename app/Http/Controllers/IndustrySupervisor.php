@@ -15,7 +15,6 @@ class IndustrySupervisor extends Controller
                 // tip: both is correct, first one returns collection, second one returns query
                 // 'unread_messages' => auth()->user()->receivedMessages->where('read',false)->count(),
                 'unread_messages' => auth()->user()->receivedMessages()->unread()->count(),
-                
             ]
         ],200);
     }
