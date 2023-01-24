@@ -21,6 +21,7 @@ class StudentController extends Controller
     {
         $masters = User::role('master')->get();
         $returnMasters = [];
+        // TODO: replace this foreach with a api resource collection
         foreach ($masters as $master) {
             array_push($returnMasters, ['id' => $master->id, 'name' => $master->first_name . " " . $master->last_name]);
         }
@@ -28,10 +29,15 @@ class StudentController extends Controller
             'masters' => $returnMasters,
             'faculties' => University_faculty::all(),
             // TODO: show only verified companies here
-            'companies' => CompanyResource::collection(Company::all()),
+            'companies' => CompanyResource::collection(Company::where('verified',true)),
             'student_company' => [
                 'name' => Company::where('student_id',Auth::user()->student->id)->first()->company_name ?? null,
+            ],
+            'academic_year' => [
+                'semester' => 'نیم سال اول',
+                'year' => '1401',
             ]
+
         ]);
     }
     public function post_pre_registration(Request $req)
@@ -51,7 +57,7 @@ class StudentController extends Controller
             'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
-            'intership_master' => 'required|numeric',
+            'internship_master' => 'required|numeric',
             'midterm' => 'required',
             'internship_year' => 'required',
             'internship_type' => 'required',
@@ -77,7 +83,7 @@ class StudentController extends Controller
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
         $student->passed_units = $req->passed_units;
-        $student->professor_id = $req->professor_id;
+        $student->professor_id = $req->internship_master;
         $student->internship_year = $req->internship_year;
         $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;

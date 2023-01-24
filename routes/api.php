@@ -43,8 +43,8 @@ Route::controller(AuthController::class)->group(function () {
 // ###############                     #####
 
 Route::controller(StudentController::class)->group(function () {
-    Route::get('pre-reg', 'get_pre_registration');
-    Route::post('pre-reg', 'post_pre_registration');
+    Route::get('student/pre-reg', 'get_pre_registration');
+    Route::post('student/pre-reg', 'post_pre_registration');
     Route::post("student/company", 'submitCompany');
     // Route::put('pre-reg', 'post_pre_registration');
 });
@@ -61,7 +61,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
         Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
         Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
-        Route::apiResource('students', IndustrySupervisorStudentController::class);
+        Route::Resource('students', IndustrySupervisorStudentController::class);
     });
     Route::resource('messages', MessageController::class);
 });
@@ -71,7 +71,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
 // ! DELETE ON PRODUCTION
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
     Route::get("migrate", function () {
-        Artisan::call("migrate:reset");
+        // Artisan::call("migrate:reset");
         Artisan::call("migrate:fresh --seed");
     });
 });

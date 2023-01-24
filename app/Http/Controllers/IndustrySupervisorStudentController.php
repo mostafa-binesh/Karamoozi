@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\form2s;
+use App\Models\Form2s;
 use App\Models\Options;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -15,6 +15,7 @@ use App\Http\Resources\UserPaginationResource;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use App\Http\Resources\IndustrySupervisorStudentsList;
 use App\Http\Resources\IndustrySupervisor\CheckStudent;
+use App\Http\Resources\IndustrySupervisor\IndustrySupervisorsStudent;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -107,13 +108,13 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // return $req;
-        $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
+        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
         if ($form2 != null) {
             return response()->json([
                 'message' => 'این دانشجو یا وجود ندارد یا توسط یک سرپرست دیگر ثبت نام شده است',
             ], 404);
         }
-        $form2 = form2s::create([
+        $form2 = Form2s::create([
             'industry_supervisor_id' => auth()->user()->id,
             'student_id' => User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404),
             // ! fix later, dry
@@ -154,7 +155,28 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function edit($id)
     {
-        return response()->json(['id' => $id]);
+        // return response()->json(['id' => $id]);
+        // Form2s::find($id);
+        // // return Auth::id();
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'message' => $validator->errors()
+        //         // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+        //     ], 400);
+        // }
+        $student = Student::where('student_number',$id)->first();
+        if(!$student) {
+            return response()->json([
+                'message' => 'چنین دانشجویی یافت نشد', 
+            ],400);
+        }
+        $form2 = Form2s::where('student_id',$student->id)->first();
+        if(!$form2) {
+            return response()->json([
+                'message' => 'شما این دانشجو را ثبت نکرده اید', 
+            ],400);
+        }
+        return IndustrySupervisorsStudent::make($form2);
     }
 
     /**
@@ -186,7 +208,7 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // return $req;
-        $form2 = form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
+        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
         if ($form2 == null) {
             return response()->json([
                 'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
@@ -226,7 +248,7 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'این دانشجو وجود ندارد',
             ], 400);
         }
-        $form2 = form2s::where('student_id', $student->id)->first();
+        $form2 = Form2s::where('student_id', $student->id)->first();
         if ($form2 == null) {
             // dd($form2);
             // return $form2->student_id;

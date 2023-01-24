@@ -134,6 +134,11 @@ class Student extends Model
         $this->internship_finished_at = now();
         $this->save();
     }
+    public function working() {
+        $this->internship_status = 'در حال اجرا';
+        $this->internship_finished_at = null;
+        $this->save();
+    }
     public function unevaluate() {
         $this->internship_status = 'شروع نشده';
         $this->internship_finished_at = null;
