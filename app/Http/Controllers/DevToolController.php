@@ -91,6 +91,21 @@ class DevToolController extends Controller
             }
             return $this->successful();
         }
+        if (isset($req->workingStudent)) {
+            // return 'delete';
+            $i = Student::where('student_number', $req->in)->first();
+            // $i ?? notFound();
+            if (!isset($i) || $i == null) return $this->notFound();
+            // $i = $i->student;
+            // if (!isset($i) || $i == null) return $this->notFound();
+            try {
+                $i->working();
+                $i->save();
+            } catch (Exception $e) {
+                return $this->error($e->getMessage());
+            }
+            return $this->successful();
+        }
         if (isset($req->evaluateStudent)) {
             // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
