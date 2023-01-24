@@ -155,15 +155,6 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function edit($id)
     {
-        // return response()->json(['id' => $id]);
-        // Form2s::find($id);
-        // // return Auth::id();
-        // if ($validator->fails()) {
-        //     return response()->json([
-        //         'message' => $validator->errors()
-        //         // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
-        //     ], 400);
-        // }
         $student = Student::where('student_number',$id)->first();
         if(!$student) {
             return response()->json([

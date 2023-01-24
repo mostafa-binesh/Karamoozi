@@ -19,7 +19,7 @@ return new class extends Migration
             ->on("students")->onDelete("cascade");
             $table->integer("form_id");
             $table->unsignedBigInteger('employee_id');
-           $table->foreign('employee_id')->references('employee_id')
+           $table->foreign('employee_id')->references('id')
             ->on('employees')->onDelete('cascade');
             $table->float("grade");
             $table->id("evaluation_communications_id");

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
 use App\Models\IndustrySupervisor;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,7 +29,7 @@ class AdminSeeder extends Seeder
             'password' => '$2y$10$gN91w/NwB5ivA/jLmJMZceDhwe0aQSNuLr5uLcnBKS22ZzgidiX7e',
         ])->assignRole('industry_supervisor');
         $industrySupervisor = IndustrySupervisor::create([
-            'verified' => false,
+            'verified' => true,
             'user_id' => $industrySupervisorUser->id,
         ]);
         $firstStudent = User::create([
@@ -76,7 +77,22 @@ class AdminSeeder extends Seeder
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
         ]);
-        User::create([
+        $fourthStudent = User::create([
+            'first_name' => 'محسن',
+            'last_name' => 'نوری',
+            'username' => '3981231111',
+            'national_code' => '1234',
+            'email' => 'mohsen@admin.com',
+            'phone_number' => '09852145',
+            'password' => '$2y$10$GZG/xGdZ1QuEeiWgpbI8BecvE5VQeo0GJV5ksiv3DctY8D06XhdK.', // 1234
+        ])->assignRole('student');
+        Student::create([
+            'user_id' => $fourthStudent->id,
+            'student_number' => $fourthStudent->username,
+            'supervisor_id' => $fourthStudent->id,
+            'internship_type' => 1,
+        ]);
+        $firstEmployee = User::create([
             'first_name' => 'زهرا',
             'last_name' => 'شیرمحمدی',
             'username' => '5000',
@@ -85,7 +101,11 @@ class AdminSeeder extends Seeder
             'phone_number' => '09390565603',
             'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
         ])->assignRole('master');
-        User::create([
+        Employee::create([
+            'user_id' => $firstEmployee->id,
+            'faculty_id' => 1,
+        ]);
+        $secondEmployee = User::create([
             'first_name' => 'حامد',
             'last_name' => 'درستی',
             'username' => '5001',
@@ -94,5 +114,9 @@ class AdminSeeder extends Seeder
             'phone_number' => '09390565605',
             'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
         ])->assignRole('master');
+        Employee::create([
+            'user_id' => $secondEmployee->id,
+            'faculty_id' => 1,
+        ]);
     }
 }

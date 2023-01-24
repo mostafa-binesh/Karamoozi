@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
             RoleAndPermissionSeeder::class,
             CarsSeeder::class,
             OptionsSeeder::class,
-            AdminSeeder::class,
             UniversityFacultySeeder::class,
+            AdminSeeder::class,
             CompanySeeder::class,
         ]);
     }

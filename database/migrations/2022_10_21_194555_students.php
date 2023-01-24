@@ -31,7 +31,7 @@ return new class extends Migration
             $table->foreign('faculty_id')->references('id')
                 ->on('university_faculties')->onDelete('cascade');
             $table->bigInteger('professor_id')->unsigned()->nullable();
-            $table->foreign('professor_id')->references('employee_id')
+            $table->foreign('professor_id')->references('id')
                 ->on('employees')->onDelete('cascade');
             $table->unsignedInteger('internship_year')->nullable();
             $table->unsignedInteger('internship_type')->nullable();
