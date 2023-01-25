@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\CPaginationTrait;
 use App\Traits\EnumTrait;
 use EloquentFilter\Filterable;
+use App\Traits\CPaginationTrait;
+use Illuminate\Support\Facades\Auth;
 use function PHPUnit\Framework\isEmpty;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -19,7 +20,9 @@ class Student extends Model
     use HasFactory, Notifiable, EnumTrait, Filterable;
     use CPaginationTrait;
     protected $casts = [
-        'evaluations' => 'array'
+        'evaluations' => 'array',
+        'verified' => 'boolean',
+        'pre_reg_verified' => 'boolean',
     ];
     /**
      * The attributes that are enum, these are using EnumTrait.
@@ -76,10 +79,18 @@ class Student extends Model
         'student_number',
         'national_code',
     ];
+    // ###############################################
+    // ################## RELATIONSHIPS ###################
+    // ###############################################
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+    public function form2() {
+        return $this->hasOne(Form2s::class);
+    }
+
+
     public function status()
     {   //  !!  NOT COMPLETED !!
         // ! bayad baraxe in code bezanam. yani avval az marhaleye akhar shooroo konam biam paiin
@@ -144,7 +155,12 @@ class Student extends Model
         $this->internship_finished_at = null;
         $this->save();
     }
+    // * i guess it would be better to the name of editable be isEditable
     public function editable() { // can be edited by industry supervisor
         return $this->internship_status == SELF::INTERNSHIP_STATUS[1]; 
+    }
+    public function IndustrySupervisorVerified() {
+        $form2 = Form2s::where('student_id',Auth::user()->student->id)->first();
+        return isset($form2);
     }
 }

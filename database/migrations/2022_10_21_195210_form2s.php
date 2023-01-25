@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('internship_website');
             $table->json('schedule_table');
             $table->text('description')->nullable();
+            $table->boolean("university_approval")->default(false);
             // $table->string("saturday");
             // $table->string("sunday");
             // $table->string("monday");
@@ -45,7 +46,6 @@ return new class extends Migration
             //     ->on("FormatReports")->onDelete("cascade");
             $table->boolean("company_approval")->default(false);
             $table->boolean("supervisor_approval")->default(false);
-            $table->boolean("university_approval")->default(false);
             $table->timestamps();
         });
     }

@@ -17,6 +17,7 @@ use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\WeeklyReportController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Mime\MessageConverter;
@@ -42,10 +43,13 @@ Route::controller(AuthController::class)->group(function () {
 // ################### STUDENT ###################
 // ###############                     #####
 
-Route::controller(StudentController::class)->group(function () {
-    Route::get('student/pre-reg', 'get_pre_registration');
-    Route::post('student/pre-reg', 'post_pre_registration');
-    Route::post("student/company", 'submitCompany');
+Route::controller(StudentController::class)->prefix('student')->group(function () {
+    Route::get('pre-reg', 'get_pre_registration');
+    Route::post('pre-reg', 'post_pre_registration');
+    Route::post("company", 'submitCompany');
+    Route::resource("weeklyReports",WeeklyReportController::class);
+
+    Route::get('internshipStatus', 'internshipStatus');
     // Route::put('pre-reg', 'post_pre_registration');
 });
 

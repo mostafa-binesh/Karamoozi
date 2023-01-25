@@ -155,6 +155,15 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function edit($id)
     {
+        // return response()->json(['id' => $id]);
+        // Form2s::find($id);
+        // // return Auth::id();
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'message' => $validator->errors()
+        //         // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
+        //     ], 400);
+        // }
         $student = Student::where('student_number',$id)->first();
         if(!$student) {
             return response()->json([
@@ -182,7 +191,7 @@ class IndustrySupervisorStudentController extends Controller
         // ! OPTIMIZATION queries in this request are not OPTIMIZED
         $validator = Validator::make($req->all(), [
             'student_number' => 'required|exists:students,student_number',
-            'national_code' => 'required|exists:users,national_code',
+            // 'national_code' => 'required|exists:users,national_code',
             'introduction_letter_number' => 'required',
             'introduction_letter_date' => 'required|date',
             'internship_department' => 'required',
@@ -206,7 +215,8 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         $form2->industry_supervisor_id = auth()->user()->id;
-        $form2->student_id = User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404);
+        // $form2->student_id = User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404);
+        $form2->student_id = Student::where('student_number',$req->student_number)->first()->id;
         // !! fix later, dry | theres two search in this page, one in form2 where student, and second is user where
         $form2->schedule_table = $req->schedule_table;
         $form2->introduction_letter_number = $req->introduction_letter_number;

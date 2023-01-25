@@ -31,10 +31,7 @@ class StudentController extends Controller
             'masters' => $returnMasters,
             'faculties' => University_faculty::all(),
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
-            // 'student_company' => [
-            //     'name' => Company::where('student_id', Auth::user()->student->id)->first()->company_name ?? null,
-            // ],
-            'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make(Company::where('student_id', Auth::user()->student->id)->first()) : null,
+            'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
             'academic_year' => [
                 'semester' => 'نیم سال اول',
                 'year' => '1401',
@@ -101,10 +98,18 @@ class StudentController extends Controller
     {
         $student = Auth::user()->student;
         $stage = 1;
-        if (!$student->IndustrySupervisorVerified() || !$student->pre_reg_verified || !$student->verified) {
+        if (
+            !$student->IndustrySupervisorVerified()
+            || !$student->pre_reg_verified
+            || !$student->verified
+            || !$student->form2->university_approval
+        ) {
+            // return 'this';
+            // return isset($student->form2->university_approval);
+            // return isset($student->form2);
             $stage = 1;
             return response()->json([
-                'stage' => $stage,  
+                'stage' => $stage,
                 'data' => [
                     [
                         'name' => 'تاییدیه سرپرست دانشکده',
@@ -120,7 +125,7 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'تاییدیه سرپرست',
-                        'done' => $student->form2->university_approval,
+                        'done' => $student->form2->university_approval ?? false,
                     ],
                 ]
             ]);
