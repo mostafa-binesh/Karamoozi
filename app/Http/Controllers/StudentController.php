@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\Students\CompanyResource;
+use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Student;
@@ -23,16 +24,17 @@ class StudentController extends Controller
         $returnMasters = [];
         // TODO: replace this foreach with a api resource collection
         foreach ($masters as $master) {
-            array_push($returnMasters, ['id' => $master->id, 'name' => $master->first_name . " " . $master->last_name]);
+            array_push($returnMasters, ['id' => $master->employee->id, 'name' => $master->first_name . " " . $master->last_name]);
         }
+        $studentSubmittedCompany = Company::where('student_id', Auth::user()->student->id)->first();
         return response()->json([
             'masters' => $returnMasters,
             'faculties' => University_faculty::all(),
-            // TODO: show only verified companies here
-            'companies' => CompanyResource::collection(Company::where('verified',true)),
-            'student_company' => [
-                'name' => Company::where('student_id',Auth::user()->student->id)->first()->company_name ?? null,
-            ],
+            'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
+            // 'student_company' => [
+            //     'name' => Company::where('student_id', Auth::user()->student->id)->first()->company_name ?? null,
+            // ],
+            'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make(Company::where('student_id', Auth::user()->student->id)->first()) : null,
             'academic_year' => [
                 'semester' => 'نیم سال اول',
                 'year' => '1401',
@@ -88,12 +90,42 @@ class StudentController extends Controller
         $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;
         $student->grade = $req->degree;
-        $student->verified = true;
+        $student->pre_reg_verified = true;
         $student->save();
         return response()->json([
             'message' => $req->isMethod('post') ?
                 'انجام پیش ثبت نام با موفقیت انجام شد' : 'ویرایش پیش ثبت نام با موفقیت انجام شد',
         ]);
+    }
+    public function internshipStatus()
+    {
+        $student = Auth::user()->student;
+        $stage = 1;
+        if (!$student->IndustrySupervisorVerified() || !$student->pre_reg_verified || !$student->verified) {
+            $stage = 1;
+            return response()->json([
+                'stage' => $stage,  
+                'data' => [
+                    [
+                        'name' => 'تاییدیه سرپرست دانشکده',
+                        'done' => $student->verified,
+                    ],
+                    [
+                        'name' => 'انجام پیش ثبت نام',
+                        'done' => $student->pre_reg_verified,
+                    ],
+                    [
+                        'name' => 'تاییدیه سرپرست صنعت',
+                        'done' => $student->IndustrySupervisorVerified(),
+                    ],
+                    [
+                        'name' => 'تاییدیه سرپرست',
+                        'done' => $student->form2->university_approval,
+                    ],
+                ]
+            ]);
+        } elseif (false) {
+        }
     }
     public function submitCompany(Request $req)
     {
