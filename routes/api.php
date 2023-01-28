@@ -43,7 +43,7 @@ Route::controller(AuthController::class)->group(function () {
 // ################### STUDENT ###################
 // ###############                     #####
 
-Route::controller(StudentController::class)->prefix('student')->group(function () {
+Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
     Route::post("company", 'submitCompany');
@@ -51,6 +51,8 @@ Route::controller(StudentController::class)->prefix('student')->group(function (
 
     Route::get('internshipStatus', 'internshipStatus');
     // Route::put('pre-reg', 'post_pre_registration');
+    Route::get('profile', 'getStudentProfile');
+    Route::put('profile/edit', 'editStudentProfile');
 });
 
 // ###############                        #####

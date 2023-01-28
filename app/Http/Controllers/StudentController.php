@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentProfile;
 use App\Http\Resources\Students\CompanyResource;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Models\User;
@@ -11,12 +12,13 @@ use Illuminate\Http\Request;
 use App\Models\University_faculty;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth:api', 'role:student']);
+        // $this->middleware(['auth:api', 'role:student']);
     }
     public function get_pre_registration()
     {
@@ -74,6 +76,7 @@ class StudentController extends Controller
         } else {
             $company_id = $req->company_id ?? $student->company->id;
         }
+        // TODO: check: submitted company must be verified
         $user = Auth::user();
         $user->first_name = $req->first_name;
         $user->last_name = $req->last_name;
@@ -87,7 +90,8 @@ class StudentController extends Controller
         $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;
         $student->grade = $req->degree;
-        $student->pre_reg_verified = true;
+        // TODO: pre_reg_verified needs to be renamed to pre_reg_done
+        $student->pre_reg_verified = true; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => $req->isMethod('post') ?
@@ -97,16 +101,12 @@ class StudentController extends Controller
     public function internshipStatus()
     {
         $student = Auth::user()->student;
-        $stage = 1;
         if (
             !$student->IndustrySupervisorVerified()
             || !$student->pre_reg_verified
             || !$student->verified
             || !$student->form2->university_approval
         ) {
-            // return 'this';
-            // return isset($student->form2->university_approval);
-            // return isset($student->form2);
             $stage = 1;
             return response()->json([
                 'stage' => $stage,
@@ -124,7 +124,8 @@ class StudentController extends Controller
                         'done' => $student->IndustrySupervisorVerified(),
                     ],
                     [
-                        'name' => 'تاییدیه سرپرست',
+                        // 'name' => 'تاییدیه سرپرست',
+                        'name' => 'تاییدیه مراحل توسط دانشکده',
                         'done' => $student->form2->university_approval ?? false,
                     ],
                 ]
@@ -135,7 +136,6 @@ class StudentController extends Controller
     public function submitCompany(Request $req)
     {
         $validator = Validator::make($req->all(), [
-            // 15 fields
             'name' => 'required|max:255',
             'type' => 'required|max:255',
             'phone_number' => 'required|max:255|regex:/^(09)+[0-9]{9}$/',
@@ -159,6 +159,49 @@ class StudentController extends Controller
         ]);
         return response()->json([
             'message' => 'شرکت با موفقیت ثبت شد',
+        ], 200);
+    }
+    public function getStudentProfile()
+    {
+        return StudentProfile::make(Auth::user()->student);
+    }
+    public function editStudentProfile(Request $req)
+    {
+        // ! parameters? 
+        // password
+        // email
+        // phone number
+        // #
+        $validator = Validator::make($req->all(), [
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|max:255|regex:/^(09)+[0-9]{9}$/',
+            'current_password' => 'required|max:255',
+            'new_password' => 'nullable|max:255',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        // check if currentPassword param. is equal to user's database password
+        if ($req->current_password) {
+            if (!Hash::check($req->current_password, Auth::user()->password)) {
+                return response()->json([
+                    'message' => 'رمز عبور فعلی وارد شده با رمز حساب مطابقت ندارد',
+                ], 400);
+            }
+        }
+        // change user info
+        $user = Auth::user();
+        $user->email = $req->email;
+        $user->phone_number = $req->phone_number;
+        if (isset($req->new_password)) {
+            $user->password = Hash::make($req->new_password);
+        }
+        $user->save();
+        // show success message
+        return response()->json([
+            'message' => 'پروفایل با موفقیت ویرایش شد',
         ], 200);
     }
 }

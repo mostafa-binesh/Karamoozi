@@ -89,8 +89,23 @@ class Student extends Model
     public function form2() {
         return $this->hasOne(Form2s::class);
     }
-
-
+    public function universityFaculty() {
+        return $this->belongsTo(University_faculty::class);
+    }
+    public function industrySupervisor() {
+        return $this->belongsTo(IndustrySupervisor::class,'id','supervisor_id');
+    }
+    public function professor() {
+        return $this->belongsTo(Employee::class);
+    }
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
+    // ###############################################
+    // ################## FUNCTIONS ###################
+    // ###############################################
+    
     public function status()
     {   //  !!  NOT COMPLETED !!
         // ! bayad baraxe in code bezanam. yani avval az marhaleye akhar shooroo konam biam paiin
@@ -130,10 +145,8 @@ class Student extends Model
     {
         return null;
     }
-    public function company()
-    {
-        return $this->hasOne(Company::class);
-    }
+    
+    
     public function industrySupervisorEvaluated() {
         return isEmpty($this->evaluations);
     }
@@ -156,7 +169,7 @@ class Student extends Model
         $this->save();
     }
     // * i guess it would be better to the name of editable be isEditable
-    public function editable() { // can be edited by industry supervisor
+    public function editable() { // can be edited by industry supervisor or not
         return $this->internship_status == SELF::INTERNSHIP_STATUS[1]; 
     }
     public function IndustrySupervisorVerified() {
