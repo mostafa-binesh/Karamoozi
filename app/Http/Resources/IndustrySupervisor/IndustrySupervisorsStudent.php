@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\IndustrySupervisor;
 
+use App\Http\Resources\ReportResource;
+use App\Models\Report;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class IndustrySupervisorsStudent extends JsonResource
@@ -25,6 +27,7 @@ class IndustrySupervisorsStudent extends JsonResource
             'internship_website' => $this->internship_website,
             'description' => $this->description,
             'schedule_table' => $this->schedule_table,
+            'reports' => ReportResource::collection(Report::where('form2_id',$this->id)->get()),
         ];
     }
 }

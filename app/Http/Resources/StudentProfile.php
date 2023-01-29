@@ -21,6 +21,7 @@ class StudentProfile extends JsonResource
             'last_name' => $this->user->last_name,
             'student_number' => $this->student_number,
             'national_code' => $this->user->national_code,
+            'passed_units' => $this->user->passed_units,
             'email' => $this->user->email,
             'phone_number' => $this->user->phone_number,
             'faculty_name' => optional($this->universityFaculty)->faculty_name,

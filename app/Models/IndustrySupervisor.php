@@ -9,9 +9,6 @@ class IndustrySupervisor extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    // protected $casts = [ 
-    //     'verified' => 'boolean',
-    // ];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -20,7 +17,7 @@ class IndustrySupervisor extends Model
     {
         return $this->hasMany(Student::class,'supervisor_id');
     }
-
+    // TODO:  could rename them to a shorter name
     public function industrySupervisorStudents()
     {
         return $this->hasMany(Student::class, 'supervisor_id');
