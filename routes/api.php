@@ -76,9 +76,17 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
 // ###############                       #####
 // ! DELETE ON PRODUCTION
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
-    Route::get("migrate", function () {
+    Route::get("freshMigrate", function () {
         // Artisan::call("migrate:reset");
         Artisan::call("migrate:fresh --seed");
+    });
+    Route::get("migrate", function () {
+        // Artisan::call("migrate:reset");
+        Artisan::call("migrate");
+    });
+    Route::get("migrateSeed", function () {
+        // Artisan::call("migrate:reset");
+        Artisan::call("migrate --seed");
     });
 });
 // // // 
