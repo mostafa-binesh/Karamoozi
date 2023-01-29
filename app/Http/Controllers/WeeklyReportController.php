@@ -14,9 +14,43 @@ class WeeklyReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public const DAYSOFWEEK = [
+        0 => 'شنبه',
+        1 => 'یکشنبه',
+        2 => 'دوشنبه',
+        3 => 'سه شنبه',
+        4 => 'چهار شنبه',
+        5 => 'پنج شنبه',
+        6 => 'جمعه',
+    ];
     public function index()
     {
-        //
+        $studentSchedule = Auth::user()->student->schedule();
+        // return $studentSchedule;
+        $datetime = verta('2023-01-7');
+        $datetime2 = verta('2023-01-7')->copy();
+        // return $datetime->addDays(3);
+        $i = 0;
+        $lasti = 0;
+        $allowedDays = [];
+        foreach ($studentSchedule as $schedule) {
+            // return $schedule;
+            if ($schedule != '00:00,00:00,00:00,00:00') {
+                array_push($allowedDays,[
+                    'title' => self::DAYSOFWEEK[$i],
+                    // 'property' => $i,
+                    'date' => $datetime->addDays($i - $lasti)->format('Y/n/j'), 
+                ]);
+                $lasti = $i;
+            } 
+            $i++;
+        }
+        return [
+            'data' => [
+                'start_date' => $datetime2->format('Y/n/j'),
+                'allowed_days' => $allowedDays,
+            ]
+        ];
     }
 
     /**
@@ -65,7 +99,6 @@ class WeeklyReportController extends Controller
             return response()->json([
                 'message' => 'خطا در ثبت گزارشات'
             ], 400);
-
         }
     }
 
