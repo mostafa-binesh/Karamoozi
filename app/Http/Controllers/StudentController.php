@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\StudentProfile;
-use App\Http\Resources\Students\CompanyResource;
-use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\Options;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\University_faculty;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\StudentProfile;
+use App\Http\Resources\StudentPreRegInfo;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Students\CompanyResource;
+use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 
 class StudentController extends Controller
 {
@@ -22,6 +24,9 @@ class StudentController extends Controller
     }
     public function get_pre_registration()
     {
+        // before submitting the pre reg form,
+        // we need to send some data
+        // such as masters name, 'sarterm' and ...
         $masters = User::role('master')->get();
         $returnMasters = [];
         // TODO: replace this foreach with a api resource collection
@@ -44,7 +49,6 @@ class StudentController extends Controller
     public function post_pre_registration(Request $req)
     {
         // check pre-reg was not done already
-        // $student = Student::where('user_id', auth::id())->first();
         $student = Auth::user()->student;
         if ($student->verified) {
             return response()->json([
@@ -59,9 +63,9 @@ class StudentController extends Controller
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
             'internship_master' => 'required|numeric',
-            'midterm' => 'required',
-            'internship_year' => 'required',
-            'internship_type' => 'required',
+            // 'midterm' => 'required', // nim saale avval
+            // 'internship_year' => 'required', // 1401
+            'internship_type' => 'required|numeric',
             'company_id' => 'nullable'
         ]);
         if ($validator->fails()) {
@@ -86,7 +90,9 @@ class StudentController extends Controller
         $student->faculty_id = $req->faculty_id;
         $student->passed_units = $req->passed_units;
         $student->professor_id = $req->internship_master;
-        $student->internship_year = $req->internship_year;
+        // ! fix semester and internship year later
+        $student->semester = 1;
+        $student->internship_year = 1401;
         $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;
         $student->grade = $req->degree;
@@ -97,6 +103,10 @@ class StudentController extends Controller
             'message' => $req->isMethod('post') ?
                 'انجام پیش ثبت نام با موفقیت انجام شد' : 'ویرایش پیش ثبت نام با موفقیت انجام شد',
         ]);
+    }
+    public function studentPreRegInfo()
+    {
+        return StudentPreRegInfo::make(Auth::user());
     }
     public function internshipStatus()
     {

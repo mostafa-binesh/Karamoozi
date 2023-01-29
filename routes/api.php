@@ -46,6 +46,9 @@ Route::controller(AuthController::class)->group(function () {
 Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
+    // after student submitted pre reg, can see it's data with: 
+    Route::get('preRegInfo', 'studentPreRegInfo');
+    
     Route::post("company", 'submitCompany');
     Route::resource("weeklyReports",WeeklyReportController::class);
 
@@ -92,9 +95,11 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
 // // // 
 // TEST CONTROLLER
 // // // 
-Route::controller(TestController::class)->group(function () {
+Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('pagination', 'usersPagination');
     Route::get('user-function', function (Request $req) {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
     });
+    Route::get('verta', 'verta');
+
 });

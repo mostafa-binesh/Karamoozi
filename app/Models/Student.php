@@ -32,7 +32,7 @@ class Student extends Model
     // it uses EnumTrait
     protected static $enums = [
         'ROLES' => 'role',
-        'INTERNSHIP_TYPE' => 'internship_type',
+        // 'INTERNSHIP_TYPE' => 'internship_type',
         'INTERNSHIP_STATUS' => 'internship_status',
     ];
     /**
@@ -44,14 +44,15 @@ class Student extends Model
         1 => 'admin',
         2 => 'author'
     ];
-    // public const STATUS = [
-    //     ''
-    // ];
-    /**
-     * Internship Types
-     * 
-     * @var array
-     */
+    public const SEMESTER = [
+        1 => 'نیم سال اول',
+        2 => 'نیم سال دوم'
+    ];
+    // maghate' tahsili
+    public const DEGREE = [ 
+        1 => 'کارشناسی',
+        2 => 'کارشناسی ارشد'
+    ];
     public const INTERNSHIP_TYPE = [
         1 => 'x',
         2 => 'y'
@@ -90,7 +91,7 @@ class Student extends Model
         return $this->hasOne(Form2s::class);
     }
     public function universityFaculty() {
-        return $this->belongsTo(University_faculty::class);
+        return $this->belongsTo(University_faculty::class,'faculty_id','id');
     }
     public function industrySupervisor() {
         return $this->belongsTo(IndustrySupervisor::class,'id','supervisor_id');
@@ -100,12 +101,26 @@ class Student extends Model
     }
     public function company()
     {
-        return $this->hasOne(Company::class);
+        return $this->belongsTo(Company::class);
     }
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################
-    
+    public function facultyName() {
+        return $this->universityFaculty->faculty_name;
+    }
+    public function professorName() {
+        return $this->professor->fullName();
+    }
+    public function companyName() {
+        return $this->company->company_name;
+    }
+    public function schedule() {
+        return $this->form2->schedule_table;
+    }
+
+
+
     public function status()
     {   //  !!  NOT COMPLETED !!
         // ! bayad baraxe in code bezanam. yani avval az marhaleye akhar shooroo konam biam paiin

@@ -23,16 +23,18 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('supervisor_id')->nullable(); // this is for industry supervisor
-            // $table->foreign('supervisor_id')->references('employee_id') 
-            // ->on('employees')->onDelete('cascade'); 
-            $table->float('grade')->nullable(); // FIX: there is no value for it in pre-reg
-            $table->unsignedTinyInteger('passed_units')->nullable(); // FIX: there is no value for it in pre-reg
+            // ! manzoor az grade, degree (maghta' tahisilie :) )
+            // $table->float('grade')->nullable(); 
+            $table->unsignedInteger('grade')->nullable(); 
+            // ! FIX: there is no value for grade in pre-reg
+            $table->unsignedTinyInteger('passed_units')->nullable();
             $table->bigInteger('faculty_id')->unsigned()->nullable();
             $table->foreign('faculty_id')->references('id')
                 ->on('university_faculties')->onDelete('cascade');
             $table->bigInteger('professor_id')->unsigned()->nullable();
             $table->foreign('professor_id')->references('id')
                 ->on('employees')->onDelete('cascade');
+            $table->unsignedTinyInteger('semester')->nullable();
             $table->unsignedInteger('internship_year')->nullable();
             $table->unsignedInteger('internship_type')->nullable();
             $table->bigInteger('company_id')->unsigned()->nullable();
