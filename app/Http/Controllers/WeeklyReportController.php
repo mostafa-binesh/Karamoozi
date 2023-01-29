@@ -27,8 +27,8 @@ class WeeklyReportController extends Controller
     {
         $studentSchedule = Auth::user()->student->schedule();
         // return $studentSchedule;
-        $datetime = verta('2023-01-7');
-        $datetime2 = verta('2023-01-7')->copy();
+        $datetime = verta()::now();
+        $datetime2 = $datetime->copy();
         // return $datetime->addDays(3);
         $i = 0;
         $lasti = 0;
