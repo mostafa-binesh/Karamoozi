@@ -15,6 +15,7 @@ use App\Http\Resources\StudentPreRegInfo;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Students\CompanyResource;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
+use App\Models\CompanyEvaluation;
 
 class StudentController extends Controller
 {
@@ -48,13 +49,14 @@ class StudentController extends Controller
     }
     public function post_pre_registration(Request $req)
     {
+        // ! REWORK THIS PRE REG CHECK SECTION
         // check pre-reg was not done already
         $student = Auth::user()->student;
-        if ($student->verified) {
-            return response()->json([
-                'message' => 'پیش ثبت نام شما از قبل انجام شده است'
-            ], 400);
-        }
+        // if ($student->verified) {
+        //     return response()->json([
+        //         'message' => 'پیش ثبت نام شما از قبل انجام شده است'
+        //     ], 400);
+        // }
         $validator = Validator::make($req->all(), [
             // 15 fields
             'first_name' => 'required',
@@ -213,5 +215,57 @@ class StudentController extends Controller
         return response()->json([
             'message' => 'پروفایل با موفقیت ویرایش شد',
         ], 200);
+    }
+    public function evaluateCompany()
+    {
+        return response()->json([
+            'data' => [
+                'options' => Options::where('type', 'student_company_evaluation')->get(),
+            ],
+        ]);
+    }
+    public function submitEvaluateCompany(Request $req)
+    {
+        // ! TODO: add description to the database
+        // this id refers to an options row
+        $validator = Validator::make($req->all(), [
+            'data' => 'required|array|max:20', // max 20 items
+            'data.*.id' => 'required|exists:options,id',
+            'data.*.value' => 'required',
+            'comment' => 'present', // description
+        ], [
+            'data.*.id.exists' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
+            'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
+        ]);
+        $student = Auth::user()->student;
+        // $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
+        // if (isset($studentEvalution)) {
+        //     return response()->json([
+        //         'message' => 'شما ارزیابی را قبلا انجام داده اید',
+        //     ], 400);
+        // }
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        foreach ($req->data as $data) {
+            CompanyEvaluation::create([
+                'company_id' => $student->company_id,
+                'student_id' => $student->id,
+                'option_id' => $data['id'],
+                'evaluation' => $data['value'],
+            ]);
+        }
+        // creating the comment
+        // CompanyEvaluation::create([
+        //     'company_id' => $student->company_id,
+        //     'student_id' => $student->id,
+        //     'option_id' => $data['id'],
+        //     'evaluation' => $data['value'],
+        // ]);
+        return response()->json([
+            'message' => 'ارزیابی شرکت با موفقیت ثبت شد',
+        ]);
     }
 }

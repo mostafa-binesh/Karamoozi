@@ -16,19 +16,19 @@ class CompanySeeder extends Seeder
     public function run()
     {
         Company::insert([
-            ['company_name' => 'شرکت اول',
+            ['company_name' => 'مه پویا',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
         // 'submitted_by_student' => false
     ],
-            ['company_name' => 'شرکت دوم',
+            ['company_name' => 'رایان اندیش',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
         // 'submitted_by_student' => false
     ],
-            ['company_name' => 'شرکت سوم',
+            ['company_name' => 'خندق کاران',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,

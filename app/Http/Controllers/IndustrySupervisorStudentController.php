@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use App\Http\Resources\IndustrySupervisorStudentsList;
 use App\Http\Resources\IndustrySupervisor\CheckStudent;
 use App\Http\Resources\IndustrySupervisor\IndustrySupervisorsStudent;
+use App\Models\WeeklyReport;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -89,6 +90,10 @@ class IndustrySupervisorStudentController extends Controller
     public function store(Request $req)
     {
         // ! OPTIMIZATION queries in this request are not OPTIMIZED
+        // in this request, we need both studentNumber and nationalCode for security reasons,
+        // -- because ind. supervisor 
+        // TODO: add check that schedule table should be written correctly
+        // -- for example, first hours cannot be 11:00 and second one 8:00
         $validator = Validator::make($req->all(), [
             'student_number' => 'required|exists:students,student_number',
             'national_code' => 'required|exists:users,national_code',
@@ -116,7 +121,6 @@ class IndustrySupervisorStudentController extends Controller
         if ($form2 != null) {
             return response()->json([
                 'message' => 'اطلاعات این دانشجو قبلا ثبت شده است',
-                // 'message' => 'این دانشجو یا وجود ندارد یا توسط یک سرپرست دیگر ثبت نام شده است',
             ], 404);
         }
         $form2 = Form2s::create([
@@ -137,17 +141,19 @@ class IndustrySupervisorStudentController extends Controller
         $student->supervisor_id = Auth::id();
         $student->unevaluate();
         $student->save();
-        // create the reports
-        // return $req->report[0]->date;
-        // dd($req->reports);
         foreach ($req->reports as $report) {
-            // $form2->delete();
             Report::create([
                 'form2_id' => $form2->id,
                 'date' => $report['date'],
                 'description' => $report['desc'],
             ]);
         }
+        // set the reports attr. of the weeklyReports table for this student
+        $studentWeeklyReport = $student->weeklyReport;
+        WeeklyReport::create([
+            'student_id' => $student->id,
+            'reports' => $student->calculateAllWorkingDaysDate()
+        ]);
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
         // return $form2;
     }
@@ -219,8 +225,8 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // return $req;
-        $studentId = Student::where('student_number', $req->student_number)->first()->id;
-        $form2 = Form2s::where('student_id', $studentId)->first();
+        $student = Student::where('student_number', $req->student_number)->first();
+        $form2 = Form2s::where('student_id', $student->id)->first();
         if ($form2 == null) {
             return response()->json([
                 'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
@@ -245,14 +251,17 @@ class IndustrySupervisorStudentController extends Controller
         $industrySupervisorReports = [];
         foreach ($req->reports as $report) {
             $id =  Report::updateOrCreate(
-                ['id' =>$report['id']],['form2_id' => $form2->id,'date' => $report['date'], 'description' => $report['desc']],
+                ['id' => $report['id']],
+                ['form2_id' => $form2->id, 'date' => $report['date'], 'description' => $report['desc']],
             );
-            array_push($industrySupervisorReports,$id->id);
+            array_push($industrySupervisorReports, $id->id);
         }
         // delete the reports where ind. supervisor deleted
-        Report::where('form2_id',$form2->id)->whereNotIn('id',$industrySupervisorReports)->delete();
+        Report::where('form2_id', $form2->id)->whereNotIn('id', $industrySupervisorReports)->delete();
+        // set the reports attr. of the weeklyReports table for this student
+        $studentWeeklyReport = $student->weeklyReport;
+        $studentWeeklyReport->reports = $student->calculateAllWorkingDaysDate();
         return response()->json(['message' => 'اطلاعات دانشجو با موفقیت ویرایش شد']);
-        return $form2;
     }
 
     /**

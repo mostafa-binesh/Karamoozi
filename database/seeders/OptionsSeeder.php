@@ -49,6 +49,38 @@ class OptionsSeeder extends Seeder
                 [
                     'type' => 'industry_supervisor_evaluation',
                     'name' => 'رعایت شئونات اسلامی',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'استفاده از توان علمی در کار های علمی',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'استعداد و علاقه به یادگیری',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'سرعت و دقت در انجام کار های محوله',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'کارآفرین بودن، خلاقیت و نوآوری',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'پشتکار و پیگیری وظایف و امور محوله',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'حضور به موقع و نظم',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'هماهنگی و همکاری با تیم',
+                ],
+                [
+                    'type' => 'student_company_evaluation',
+                    'name' => 'رعایت شئونات اسلامی',
                 ]
             ],
         );

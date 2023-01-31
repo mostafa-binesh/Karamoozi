@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\WeeklyReportController;
+use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Mime\MessageConverter;
@@ -44,16 +45,22 @@ Route::controller(AuthController::class)->group(function () {
 // ###############                     #####
 
 Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
+    // ######### PRE REGISTRATION #########
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
     // after student submitted pre reg, can see it's data with: 
     Route::get('preRegInfo', 'studentPreRegInfo');
     
+    // ######### EVALUATE COMPANY #########
+    Route::get('evaluateCompany', 'evaluateCompany');
+    Route::post('evaluateCompany', 'submitEvaluateCompany');
     Route::post("company", 'submitCompany');
-    Route::resource("weeklyReports",WeeklyReportController::class);
-
+    
+    // ######### EVALUATE COMPANY #########
+    Route::resource("weeklyReports", WeeklyReportController::class);
+    
     Route::get('internshipStatus', 'internshipStatus');
-    // Route::put('pre-reg', 'post_pre_registration');
+    // ######### PROFILE #########
     Route::get('profile', 'getStudentProfile');
     Route::put('profile/edit', 'editStudentProfile');
 });
@@ -89,7 +96,7 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
     });
     Route::get("migrateSeed", function () {
         // Artisan::call("migrate:reset");
-        Artisan::call("migrate --seed");
+        Artisan::call("migrate:fresh --seed");
     });
 });
 // // // 
@@ -101,5 +108,24 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
     });
     Route::get('verta', 'verta');
-
+    Route::get('studentTest', function () {
+        $student = Student::findorfail(1);
+        return $student->weeklyReport->reports;
+        // return $student->calculateAllWorkingDaysDate();
+        // return $student->howManyDaysMustWork($student->schedule());
+    });
+    Route::get('howManyDaysMustWork', function (Request $req) {
+        // $student = Student::findorfail();
+        $student = Student::where('student_number',$req->student_number)->firstorfail();
+        
+        return $student->howManyDaysMustWork($student->schedule());
+        // return $student->calculateAllWorkingDaysDate();
+        // return $student->howManyDaysMustWork($student->schedule());
+    });
+    Route::get('allStudents', function (Request $req) {
+        return Student::all();
+    });
+    Route::get('allForms', function (Request $req) {
+        return Form2s::all();
+    });
 });

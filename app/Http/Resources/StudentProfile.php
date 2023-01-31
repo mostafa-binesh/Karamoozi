@@ -15,7 +15,6 @@ class StudentProfile extends JsonResource
     public function toArray($request)
     {
         // $this is a object from student model
-        // TODO: nationalCode
         return [
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
@@ -26,7 +25,6 @@ class StudentProfile extends JsonResource
             'phone_number' => $this->user->phone_number,
             'faculty_name' => optional($this->universityFaculty)->faculty_name,
             'professor' => optional($this->professor)->fullName(),
-            // 'first_name' => $this->first_name,
         ];
     }
 }

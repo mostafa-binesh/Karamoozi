@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\WeeklyReportResource;
+use App\Models\Report;
 use App\Models\WeeklyReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,7 @@ class WeeklyReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // ! maybe add this to trait, because it's been used in here and in student model as well
     public const DAYSOFWEEK = [
         0 => 'شنبه',
         1 => 'یکشنبه',
@@ -25,32 +28,8 @@ class WeeklyReportController extends Controller
     ];
     public function index()
     {
-        $studentSchedule = Auth::user()->student->schedule();
-        // return $studentSchedule;
-        $datetime = verta()::now();
-        $datetime2 = $datetime->copy();
-        // return $datetime->addDays(3);
-        $i = 0;
-        $lasti = 0;
-        $allowedDays = [];
-        foreach ($studentSchedule as $schedule) {
-            // return $schedule;
-            if ($schedule != '00:00,00:00,00:00,00:00') {
-                array_push($allowedDays,[
-                    'title' => self::DAYSOFWEEK[$i],
-                    // 'property' => $i,
-                    'date' => $datetime->addDays($i - $lasti)->format('Y/n/j'), 
-                ]);
-                $lasti = $i;
-            } 
-            $i++;
-        }
-        return [
-            'data' => [
-                'start_date' => $datetime2->format('Y/n/j'),
-                'allowed_days' => $allowedDays,
-            ]
-        ];
+        $student = Auth::user()->student;
+        return WeeklyReportResource::make($student->getLatestUncompletedReportWeek());
     }
 
     /**
@@ -84,22 +63,35 @@ class WeeklyReportController extends Controller
         }
         // make sure every object only has date and description
         $req2 = [];
+        $student = Auth::user()->student;
+        $errors = [];
+        $reports = $student->weeklyReport->reports;
         foreach ($req->report as $re) {
-            // dd($re);
-            // return $re['description'];
-            array_push($req2, ['date' => $re['date'], 'description' => $re['description'], 'student_id' => Auth::user()->student->id]);
+            $found = false;
+
+            for ($i = 0; $i < count($reports); $i++) {
+                for ($j = 0; $j < count($reports[$i]['days']); $j++) {
+                    // return $re['date'];
+                    if ($re['date'] == $reports[$i]['days'][$j]['date']) {
+                        $reports[$i]['days'][$j]['is_done'] = true;
+                        // return var_dump($reports[$i]['days'][$j]['is_done']);
+                        $found = true;
+                    }
+                }
+            }
+            if (!$found) {
+                array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
+            }
+            Report::insert($req2);
         }
-        $req = $req2;
-        try {
-            WeeklyReport::insert($req);
-            return response()->json([
-                'message' => 'گزارشات با موفقیت ثبت شد',
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'message' => 'خطا در ثبت گزارشات'
-            ], 400);
-        }
+        // return $reports;
+        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
+        $weeklyReport->reports = $reports;
+        $weeklyReport->save();
+        return response()->json([
+            'message' => 'گزارشات با موفقیت ثبت شد',
+            'possibleErrors' => $errors,
+        ]);
     }
 
     /**

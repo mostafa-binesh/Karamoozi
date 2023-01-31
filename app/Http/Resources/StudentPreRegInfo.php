@@ -21,13 +21,29 @@ class StudentPreRegInfo extends JsonResource
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'student_number' => $student->student_number,
-            'faculty_name' => $student->facultyName(),
-            'degree' => Student::DEGREE[$student->grade],
+            'faculty' => [
+                'id' => $student->faculty_id,
+                'faculty_name' => $student->facultyName(),
+            ],
+            'degree' => [
+                'id' => $student->grade,
+                'degree' => Student::DEGREE[$student->grade],
+            ],
             'passed_units' => $student->passed_units,
             'semester' => Student::SEMESTER[1],
             'academic_year' => 1401,
-            'master_name' => $student->professorName(),
-            'company_name' => $student->companyName(),
+            'master' => [
+                'id' => $student->professor->id,
+                'name' => $student->professorName(),
+            ],
+            'company' => [
+                'id' => $student->company_id,
+                'company_name' => $student->companyName(),
+            ],
+            'internship' => [
+                'id' => $student->internship_type,
+                'internship_type' => Student::INTERNSHIP_TYPE[$student->internship_type],
+            ],
         ];
     }
 }

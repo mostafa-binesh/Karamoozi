@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Employee;
+use App\Models\Form2s;
 use App\Models\IndustrySupervisor;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -77,6 +78,7 @@ class AdminSeeder extends Seeder
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
         ]);
+        // Mohsen Nouri
         $fourthStudent = User::create([
             'first_name' => 'محسن',
             'last_name' => 'نوری',
@@ -86,12 +88,33 @@ class AdminSeeder extends Seeder
             'phone_number' => '09852145',
             'password' => '$2y$10$GZG/xGdZ1QuEeiWgpbI8BecvE5VQeo0GJV5ksiv3DctY8D06XhdK.', // 1234
         ])->assignRole('student');
-        Student::create([
+        // ? should i remove supervisorID for $fs
+        $fs = Student::create([
             'user_id' => $fourthStudent->id,
             'student_number' => $fourthStudent->username,
-            'supervisor_id' => $fourthStudent->id,
+            'supervisor_id' => $industrySupervisorUser->id,
             'internship_type' => 1,
         ]);
+        // $form2 = Form2s::create([
+        //     'industry_supervisor_id' => $industrySupervisor->id,
+        //     'student_id' => $fs->id,
+        //     // ! fix later, dry
+        //     'schedule_table' =>  [
+        //         "04:00,04:00,04:00,04:00",
+        //         "00:00,00:00,00:00,00:00",
+        //         "04:00,04:00,04:00,04:00",
+        //         "00:00,00:00,00:00,00:00",
+        //         "04:00,04:00,04:00,04:00",
+        //         "04:00,04:00,04:00,04:00"
+        //     ],
+        //     'introduction_letter_number' => '5000',
+        //     'introduction_letter_date' => '2020/5/12',
+        //     'internship_department' => 'sadas',
+        //     'supervisor_position' => 'sadasd',
+        //     'internship_start_date' => '2020/5/12',
+        //     'internship_website' => 'http://google.com',
+        //     'description' => '5000',
+        // ]);
         $firstEmployee = User::create([
             'first_name' => 'زهرا',
             'last_name' => 'شیرمحمدی',
