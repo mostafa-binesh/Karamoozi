@@ -125,6 +125,7 @@ class Student extends Model
     // ###############################################
     public function facultyName()
     {
+        return $this->universityFaculty->faculty_name;
     }
     public function professorName()
     {
