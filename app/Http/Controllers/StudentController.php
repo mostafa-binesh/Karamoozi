@@ -107,6 +107,64 @@ class StudentController extends Controller
                 'انجام پیش ثبت نام با موفقیت انجام شد' : 'ویرایش پیش ثبت نام با موفقیت انجام شد',
         ]);
     }
+    public function put_pre_registration(Request $req)
+    {
+        // ! REWORK THIS PRE REG CHECK SECTION
+        // check pre-reg was not done already
+        $student = Auth::user()->student;
+        // if ($student->verified) {
+        //     return response()->json([
+        //         'message' => 'پیش ثبت نام شما از قبل انجام شده است'
+        //     ], 400);
+        // }
+        $validator = Validator::make($req->all(), [
+            // 15 fields
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
+            'degree' => 'required|numeric', // maghta'e tahsili
+            'passed_units' => 'required|numeric',
+            'internship_master' => 'required|numeric',
+            // 'midterm' => 'required', // nim saale avval
+            // 'internship_year' => 'required'  , // 1401
+            'internship_type' => 'required|numeric',
+            'company_id' => 'nullable'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors(),
+            ], 400);
+        }
+        if (!(isset($req->company_id) || isset($student->company->id))) {
+            return response()->json([
+                'message' => 'شرکتی برای شما معرفی نشده است',
+            ], 400);
+        } else {
+            $company_id = $req->company_id ?? $student->company->id;
+        }
+        // TODO: check: submitted company must be verified
+        $user = Auth::user();
+        $user->first_name = $req->first_name;
+        $user->last_name = $req->last_name;
+        $user->save();
+        // edit assigned student to this user
+        $student->student_number = $user->username;
+        $student->faculty_id = $req->faculty_id;
+        $student->passed_units = $req->passed_units;
+        $student->professor_id = $req->internship_master;
+        // ! fix semester and internship year later
+        $student->semester = 1;
+        $student->internship_year = 1401;
+        $student->internship_type = $req->internship_type;
+        $student->company_id = $company_id;
+        $student->grade = $req->degree;
+        // TODO: pre_reg_verified needs to be renamed to pre_reg_done
+        $student->pre_reg_verified = true; // this field shows pre reg has been done by student or not
+        $student->save();
+        return response()->json([
+            'message' => 'ویرایش پیش ثبت نام با موفقیت انجام شد',
+        ]);
+    }
     public function studentPreRegInfo()
     {
         return StudentPreRegInfo::make(Auth::user());

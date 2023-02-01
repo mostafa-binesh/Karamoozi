@@ -48,6 +48,7 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
     // ######### PRE REGISTRATION #########
     Route::get('pre-reg', 'get_pre_registration');
     Route::post('pre-reg', 'post_pre_registration');
+    Route::put('pre-reg', 'put_pre_registration');
     // after student submitted pre reg, can see it's data with: 
     Route::get('preRegInfo', 'studentPreRegInfo');
     
