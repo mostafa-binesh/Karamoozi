@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
+        // save an array of what days student should send report and their sent status
         Schema::create('weekly_reports', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id');

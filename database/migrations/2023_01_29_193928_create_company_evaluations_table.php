@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        // we have two types of company evaluations
+        // -- first one, has option id and evaluation and doesn't have description
+        // --- second one, only has description
         Schema::create('company_evaluations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id');
@@ -22,10 +25,11 @@ return new class extends Migration
             $table->foreign('student_id')->references('id')
                 ->on('students');
             // $table->text('evaluations'); // before implementation
-            $table->unsignedBigInteger('option_id');
+            $table->unsignedBigInteger('option_id')->nullable();
             $table->foreign('option_id')->references('id')
                 ->on('options')->onDelete('cascade');
-            $table->unsignedTinyInteger('evaluation');
+            $table->unsignedTinyInteger('evaluation')->nullable();;
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

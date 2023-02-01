@@ -15,7 +15,9 @@ use App\Http\Resources\StudentPreRegInfo;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Students\CompanyResource;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
+use App\Http\Resources\Students\SubmittedCompanyEvaluation;
 use App\Models\CompanyEvaluation;
+use Faker\Extension\CompanyExtension;
 
 class StudentController extends Controller
 {
@@ -44,7 +46,6 @@ class StudentController extends Controller
                 'semester' => 'نیم سال اول',
                 'year' => '1401',
             ]
-
         ]);
     }
     public function post_pre_registration(Request $req)
@@ -145,6 +146,7 @@ class StudentController extends Controller
         } elseif (false) {
         }
     }
+    // submit a custom company in pre reg. page
     public function submitCompany(Request $req)
     {
         $validator = Validator::make($req->all(), [
@@ -173,6 +175,7 @@ class StudentController extends Controller
             'message' => 'شرکت با موفقیت ثبت شد',
         ], 200);
     }
+
     public function getStudentProfile()
     {
         return StudentProfile::make(Auth::user()->student);
@@ -216,6 +219,9 @@ class StudentController extends Controller
             'message' => 'پروفایل با موفقیت ویرایش شد',
         ], 200);
     }
+    // ##########################################
+    // ########## COMPANY EVALUATIONS ###############
+    // ##########################################
     public function evaluateCompany()
     {
         return response()->json([
@@ -229,24 +235,25 @@ class StudentController extends Controller
         // ! TODO: add description to the database
         // this id refers to an options row
         $validator = Validator::make($req->all(), [
-            'data' => 'required|array|max:20', // max 20 items
+            'data' => 'required|array|max:20', // max 20 items , data means evaluations
             'data.*.id' => 'required|exists:options,id',
             'data.*.value' => 'required',
-            'comment' => 'present', // description
+            'comment' => 'present', // description in db
         ], [
             'data.*.id.exists' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
             'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
         ]);
-        $student = Auth::user()->student;
-        // $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
-        // if (isset($studentEvalution)) {
-        //     return response()->json([
-        //         'message' => 'شما ارزیابی را قبلا انجام داده اید',
-        //     ], 400);
-        // }
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
+            ], 400);
+        }
+        $student = Auth::user()->student;
+        // check if student have sent company evaluations
+        $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
+        if (isset($studentEvalution)) {
+            return response()->json([
+                'message' => 'شما ارزیابی را قبلا انجام داده اید',
             ], 400);
         }
         foreach ($req->data as $data) {
@@ -257,15 +264,58 @@ class StudentController extends Controller
                 'evaluation' => $data['value'],
             ]);
         }
-        // creating the comment
-        // CompanyEvaluation::create([
-        //     'company_id' => $student->company_id,
-        //     'student_id' => $student->id,
-        //     'option_id' => $data['id'],
-        //     'evaluation' => $data['value'],
-        // ]);
+        // create the comment
+        CompanyEvaluation::create([
+            'company_id' => $student->company_id,
+            'student_id' => $student->id,
+            'description' => $req->comment,
+        ]);
         return response()->json([
             'message' => 'ارزیابی شرکت با موفقیت ثبت شد',
+        ]);
+    }
+    public function studentCompanyEvaluations()
+    {
+        // ! not optimized (2 queries), i wanna give this structure, any idea?
+        // ! -- ideas: create two resources, or create the response data manually without using resources 
+        // get all company evaluations of the student + description
+        $student = Auth::user()->student;
+        $comment = CompanyEvaluation::where('student_id', $student->id)->whereNotNull('description')->first();
+        return response()->json([
+            'data' => [
+                'evaluations' => SubmittedCompanyEvaluation::collection(CompanyEvaluation::where('student_id', $student->id)->whereNull('description')->with(['option'])->get()),
+                'comment' => $comment->description,
+            ]
+        ]);
+    }
+    public function editEvaluateCompany(Request $req)
+    {
+        // this id refers to an options row
+        $validator = Validator::make($req->all(), [
+            'data' => 'required|array|max:20', // max 20 items , data means evaluations
+            'data.*.id' => 'required|exists:options,id',
+            'data.*.value' => 'required', // stored as evaluation in database
+            'comment' => 'required', // description in db
+        ], [
+            'data.*.id.required' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
+            'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        $student = Auth::user()->student;
+        // update the evaluation without comment
+        foreach ($req->data as $data) {
+            CompanyEvaluation::updateOrCreate(['id' => $data['id']], ['evaluation' => $data['value']]);
+        }
+        // update the evaluation with comment
+        $descriptionEvaluation = CompanyEvaluation::whereNotNull('description')->where('student_id', $student->id)->first();
+        $descriptionEvaluation->description = $req->comment;
+        return response()->json([
+            'message' => 'ویرایش با موفقیت انجام شد',
         ]);
     }
 }

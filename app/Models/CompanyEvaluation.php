@@ -9,4 +9,8 @@ class CompanyEvaluation extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    // relations
+    public function option() {
+        return $this->belongsTo(Options::class,'option_id','id');
+    }
 }

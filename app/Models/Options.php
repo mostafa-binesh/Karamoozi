@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Options extends Model
 {
-    use HasFactory,SoftDeletes;
-    protected $hidden = [
-        'deleted_at',
-        'type',
-    ];
+    use HasFactory;
+    use SoftDeletes;
 }

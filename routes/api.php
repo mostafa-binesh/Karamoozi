@@ -1,7 +1,7 @@
 <?php
 // use Melipayamak\MelipayamakApi;
 use App\Models\User;
-use App\Models\student;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\Password_reset;
 use Illuminate\Support\Facades\DB;
@@ -52,11 +52,16 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
     Route::get('preRegInfo', 'studentPreRegInfo');
     
     // ######### EVALUATE COMPANY #########
+    // get the options
     Route::get('evaluateCompany', 'evaluateCompany');
+    
     Route::post('evaluateCompany', 'submitEvaluateCompany');
+    Route::put('evaluateCompany', 'editEvaluateCompany');
+    // get the student company evaluations
+    Route::get('companyEvaluations', 'studentCompanyEvaluations');
     Route::post("company", 'submitCompany');
     
-    // ######### EVALUATE COMPANY #########
+    // ######### OTHERS #########
     Route::resource("weeklyReports", WeeklyReportController::class);
     
     Route::get('internshipStatus', 'internshipStatus');
