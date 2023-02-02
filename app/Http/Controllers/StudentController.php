@@ -14,6 +14,8 @@ use App\Http\Resources\StudentProfile;
 use App\Http\Resources\StudentPreRegInfo;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Students\CompanyResource;
+use App\Http\Resources\Students\evaluateCompanyOptions;
+use App\Http\Resources\Students\preRegFacultiesWithMasters;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Http\Resources\Students\SubmittedCompanyEvaluation;
 use App\Models\CompanyEvaluation;
@@ -25,28 +27,52 @@ class StudentController extends Controller
     {
         // $this->middleware(['auth:api', 'role:student']);
     }
+    // ##########################################
+    // ########## PRE REGISTRATIONS ###############
+    // ##########################################
     public function get_pre_registration()
     {
+        // return null;
         // before submitting the pre reg form,
         // we need to send some data
         // such as masters name, 'sarterm' and ...
-        $masters = User::role('master')->get();
-        $returnMasters = [];
+        // $masters = User::role('master')->get();
+        // $returnMasters = [];
         // TODO: replace this foreach with a api resource collection
-        foreach ($masters as $master) {
-            array_push($returnMasters, ['id' => $master->employee->id, 'name' => $master->first_name . " " . $master->last_name]);
-        }
+        // foreach ($masters as $master) {
+        //     array_push($returnMasters, ['id' => $master->employee->id, 'name' => $master->first_name . " " . $master->last_name]);
+        // }
         $studentSubmittedCompany = Company::where('student_id', Auth::user()->student->id)->first();
-        return response()->json([
-            'masters' => $returnMasters,
-            'faculties' => University_faculty::all(),
+        $x = [
+            // 'masters' => $returnMasters,
+            // ! one of the most complicated queries of this project
+            // https://stackoverflow.com/questions/71462515/nested-relation-wherehas-in-laravel
+            // 'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function($query) {
+            //     $query->with(['user' => function($query2) {
+            //         $query2->role('master');
+            //     }]);
+            // }])->get()),
+            // previous one with collection
+            // 'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function($query) {
+            //     $query->with(['user' => function($query2) {
+            //         $query2->role('master');
+            //     }]);
+            // }])->get()),
+            // ? this query's problem was i couldn't get the user and i needed to send a query to the database to get user for every employee
+            'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function ($query) {
+                $query->whereHas('user', function ($query2) {
+                    $query2->role('master');
+                });
+            }])->get()),
+            // 'faculties' => University_faculty::all(),
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
             'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
             'academic_year' => [
                 'semester' => 'نیم سال اول',
                 'year' => '1401',
             ]
-        ]);
+        ];
+        return response()->json($x);
     }
     public function post_pre_registration(Request $req)
     {
@@ -167,8 +193,15 @@ class StudentController extends Controller
     }
     public function studentPreRegInfo()
     {
+        $user = Auth::user();
+        if (!$user->student->pre_reg_verified) {
+            return response()->json([
+                'message' => 'شرکتی برای شما معرفی نشده است',
+            ], 400);
+        }
         return StudentPreRegInfo::make(Auth::user());
     }
+    // first student page api
     public function internshipStatus()
     {
         $student = Auth::user()->student;
@@ -195,7 +228,6 @@ class StudentController extends Controller
                         'done' => $student->IndustrySupervisorVerified(),
                     ],
                     [
-                        // 'name' => 'تاییدیه سرپرست',
                         'name' => 'تاییدیه مراحل توسط دانشکده',
                         'done' => $student->form2->university_approval ?? false,
                     ],
@@ -204,6 +236,9 @@ class StudentController extends Controller
         } elseif (false) {
         }
     }
+    // ##########################################
+    // ########## COMPANY RELATED FUNCTIONS ###############
+    // ##########################################
     // submit a custom company in pre reg. page
     public function submitCompany(Request $req)
     {
@@ -233,58 +268,12 @@ class StudentController extends Controller
             'message' => 'شرکت با موفقیت ثبت شد',
         ], 200);
     }
-
-    public function getStudentProfile()
-    {
-        return StudentProfile::make(Auth::user()->student);
-    }
-    public function editStudentProfile(Request $req)
-    {
-        // ! parameters? 
-        // password
-        // email
-        // phone number
-        // #
-        $validator = Validator::make($req->all(), [
-            'email' => 'required|email|max:255',
-            'phone_number' => 'required|max:255|regex:/^(09)+[0-9]{9}$/',
-            'current_password' => 'required|max:255',
-            'new_password' => 'nullable|max:255',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors()
-            ], 400);
-        }
-        // check if currentPassword param. is equal to user's database password
-        if ($req->current_password) {
-            if (!Hash::check($req->current_password, Auth::user()->password)) {
-                return response()->json([
-                    'message' => 'رمز عبور فعلی وارد شده با رمز حساب مطابقت ندارد',
-                ], 400);
-            }
-        }
-        // change user info
-        $user = Auth::user();
-        $user->email = $req->email;
-        $user->phone_number = $req->phone_number;
-        if (isset($req->new_password)) {
-            $user->password = Hash::make($req->new_password);
-        }
-        $user->save();
-        // show success message
-        return response()->json([
-            'message' => 'پروفایل با موفقیت ویرایش شد',
-        ], 200);
-    }
-    // ##########################################
-    // ########## COMPANY EVALUATIONS ###############
-    // ##########################################
+    // evaluation company options
     public function evaluateCompany()
     {
         return response()->json([
             'data' => [
-                'options' => Options::where('type', 'student_company_evaluation')->get(),
+                'options' => evaluateCompanyOptions::collection(Options::where('type', 'student_company_evaluation')->get()),
             ],
         ]);
     }
@@ -293,7 +282,7 @@ class StudentController extends Controller
         // ! TODO: add description to the database
         // this id refers to an options row
         $validator = Validator::make($req->all(), [
-            'data' => 'required|array|max:20', // max 20 items , data means evaluations
+            'data' => 'required|array|max:20', // max 20 items , data means evaluations, has id (evaluations table) and value (1-4)
             'data.*.id' => 'required|exists:options,id',
             'data.*.value' => 'required',
             'comment' => 'present', // description in db
@@ -338,6 +327,12 @@ class StudentController extends Controller
         // ! -- ideas: create two resources, or create the response data manually without using resources 
         // get all company evaluations of the student + description
         $student = Auth::user()->student;
+        $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
+        if (!isset($studentEvalution)) {
+            return response()->json([
+                'message' => 'شما ارزیابی را انجام نداده اید',
+            ], 400);
+        }
         $comment = CompanyEvaluation::where('student_id', $student->id)->whereNotNull('description')->first();
         return response()->json([
             'data' => [
@@ -366,8 +361,10 @@ class StudentController extends Controller
 
         $student = Auth::user()->student;
         // update the evaluation without comment
+        // ! data['id'] is evaluation table id ! 
+        // ! i wish i would handle it in companyEvaluation id way
         foreach ($req->data as $data) {
-            CompanyEvaluation::updateOrCreate(['id' => $data['id']], ['evaluation' => $data['value']]);
+            CompanyEvaluation::updateOrCreate(['option_id' => $data['id'], 'student_id' => $student->id, 'company_id' => $student->company_id], ['evaluation' => $data['value']]);
         }
         // update the evaluation with comment
         $descriptionEvaluation = CompanyEvaluation::whereNotNull('description')->where('student_id', $student->id)->first();
@@ -375,5 +372,51 @@ class StudentController extends Controller
         return response()->json([
             'message' => 'ویرایش با موفقیت انجام شد',
         ]);
+    }
+    // ##########################################
+    // ########## PROFILE ###############
+    // ##########################################
+    public function getStudentProfile()
+    {
+        return StudentProfile::make(Auth::user()->student);
+    }
+    public function editStudentProfile(Request $req)
+    {
+        // ! parameters? 
+        // password
+        // email
+        // phone number
+        // #
+        $validator = Validator::make($req->all(), [
+            'email' => 'required|email|max:255',
+            'phone_number' => 'required|max:255|regex:/^(09)+[0-9]{9}$/',
+            'current_password' => 'required|max:255',
+            'new_password' => 'nullable|max:255',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        // check if currentPassword param. is equal to user's database password
+        if ($req->current_password) {
+            if (!Hash::check($req->current_password, Auth::user()->password)) {
+                return response()->json([
+                    'message' => 'رمز عبور فعلی وارد شده با رمز حساب مطابقت ندارد',
+                ], 400);
+            }
+        }
+        // change user info
+        $user = Auth::user();
+        $user->email = $req->email;
+        $user->phone_number = $req->phone_number;
+        if (isset($req->new_password)) {
+            $user->password = Hash::make($req->new_password);
+        }
+        $user->save();
+        // show success message
+        return response()->json([
+            'message' => 'پروفایل با موفقیت ویرایش شد',
+        ], 200);
     }
 }
