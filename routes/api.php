@@ -3,25 +3,18 @@
 use App\Models\User;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use App\Models\Password_reset;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
-use App\Mail\send_code_reset_password;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TestController;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Mime\MessageConverter;
 
 // NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
 
@@ -51,20 +44,20 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
     Route::put('pre-reg', 'put_pre_registration');
     // after student submitted pre reg, can see it's data with: 
     Route::get('preRegInfo', 'studentPreRegInfo');
-    
+
     // ######### EVALUATE COMPANY #########
     // get the options
     Route::get('evaluateCompany', 'evaluateCompany');
-    
+
     Route::post('evaluateCompany', 'submitEvaluateCompany');
     Route::put('evaluateCompany', 'editEvaluateCompany');
     // get the student company evaluations
     Route::get('companyEvaluations', 'studentCompanyEvaluations');
     Route::post("company", 'submitCompany');
-    
-    // ######### OTHERS #########
+
+    // ######### WEEKLY REPORT #########
     Route::resource("weeklyReports", WeeklyReportController::class);
-    
+
     Route::get('internshipStatus', 'internshipStatus');
     // ######### PROFILE #########
     Route::get('profile', 'getStudentProfile');
@@ -81,6 +74,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
     Route::middleware("verifiedIndustrySupervisor")->group(function () {
         Route::get('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudentGET']);
         Route::post('students/evaluate', [IndustrySupervisorStudentController::class, 'industrySupervisorEvaluateStudent']);
+        // check if student exists
         Route::post('students/check', [IndustrySupervisorStudentController::class, 'checkStudent']);
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
         Route::Resource('students', IndustrySupervisorStudentController::class);
@@ -122,8 +116,8 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('howManyDaysMustWork', function (Request $req) {
         // $student = Student::findorfail();
-        $student = Student::where('student_number',$req->student_number)->firstorfail();
-        
+        $student = Student::where('student_number', $req->student_number)->firstorfail();
+
         return $student->howManyDaysMustWork($student->schedule());
         // return $student->calculateAllWorkingDaysDate();
         // return $student->howManyDaysMustWork($student->schedule());
@@ -133,5 +127,8 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('allForms', function (Request $req) {
         return Form2s::all();
+    });
+    Route::get('allUsersWithRole', function (Request $req) {
+        return User::find(1)->loadRoleInfo();
     });
 });

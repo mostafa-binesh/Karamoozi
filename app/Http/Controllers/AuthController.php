@@ -91,6 +91,7 @@ class AuthController extends Controller
                 'message' => 'اطلاعات نادرست است.',
             ], 400);
         }
+        // ! rewrited this piece in user model as role and loadRoleInfo
         $user = Auth::user();
         $user->role = $user->getRoleNames()->first();
         switch ($user->role) {
@@ -104,7 +105,7 @@ class AuthController extends Controller
             case 'industry_supervisor':
                 $user->load('industrySupervisor');
             default:
-                # code...
+                abort(400);
                 break;
         }
         return response()->json([
@@ -277,5 +278,4 @@ class AuthController extends Controller
             ]
         ], 201);
     }
-    // FIX: bayad tooye reg-getinfo, biaim o check konim ke aya in shomayreye telephone ghablan verify shode ya na
 }

@@ -17,7 +17,7 @@ class SubmittedCompanyEvaluation extends JsonResource
         // evaluation
         if (isset($this->option)) {
             return [
-                'id' => $this->id,
+                'id' => $this->option_id,
                 'evaluation' => $this->evaluation,
                 'option' => $this->option->name,
             ];

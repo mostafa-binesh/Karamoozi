@@ -141,5 +141,83 @@ class AdminSeeder extends Seeder
             'user_id' => $secondEmployee->id,
             'faculty_id' => 1,
         ]);
+        $thirdEmployee = User::create([
+            'first_name' => 'حسن علی',
+            'last_name' => 'باقری',
+            'username' => '4001',
+            'national_code' => '53230053265',
+            'email' => 'bagheri@admin.com',
+            'phone_number' => '09299565605',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('employee');
+        Employee::create([
+            'user_id' => $thirdEmployee->id,
+            'faculty_id' => 1,
+        ]);
+        $fourthEmployee = User::create([
+            'first_name' => 'علی',
+            'last_name' => 'علمداری',
+            'username' => '4002',
+            'national_code' => '53230053212',
+            'email' => 'alamdari@admin.com',
+            'phone_number' => '09291555605',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('master');
+        Employee::create([
+            'user_id' => $fourthEmployee->id,
+            'faculty_id' => 2,
+        ]);
+        $fifthEmployee = User::create([
+            'first_name' => 'مهدی',
+            'last_name' => 'شکری',
+            'username' => '4003',
+            'national_code' => '5323005313',
+            'email' => 'shekari@admin.com',
+            'phone_number' => '09299561205',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('master');
+        Employee::create([
+            'user_id' => $fifthEmployee->id,
+            'faculty_id' => 2,
+        ]);
+        $sixEmployee = User::create([
+            'first_name' => 'علیرضا',
+            'last_name' => 'منصوری',
+            'username' => '4005',
+            'national_code' => '53230054005',
+            'email' => 'mansouri@admin.com',
+            'phone_number' => '092995414005',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('master');
+        Employee::create([
+            'user_id' => $sixEmployee->id,
+            'faculty_id' => 3,
+        ]);
+        $seventhEmployee = User::create([
+            'first_name' => 'نجمه',
+            'last_name' => 'صباغیان',
+            'username' => '4006',
+            'national_code' => '53230054006',
+            'email' => 'sabbaghian@admin.com',
+            'phone_number' => '092995414006',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('master');
+        Employee::create([
+            'user_id' => $seventhEmployee->id,
+            'faculty_id' => 4,
+        ]);
+        $eighthEmployee = User::create([
+            'first_name' => 'هستی',
+            'last_name' => 'آزادمنش',
+            'username' => '4007',
+            'national_code' => '53230054007',
+            'email' => 'azadmanesh@admin.com',
+            'phone_number' => '092995414007',
+            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+        ])->assignRole('master');
+        Employee::create([
+            'user_id' => $eighthEmployee->id,
+            'faculty_id' => 4,
+        ]);
     }
 }

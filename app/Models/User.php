@@ -96,6 +96,27 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(IndustrySupervisor::class);
     }
     // ######### Other functions #####
+    // custom role function
+    public function cRole()
+    {
+        return $this->getRoleNames()->first();
+    }
+    public function loadRoleInfo()
+    {
+        switch ($this->role()) {
+            case 'student':
+                return $this->load('student');
+                break;
+            case 'employee':
+                return $this->load('employee');
+                break;
+            case 'industry_supervisor':
+                return $this->load('industrySupervisor');
+            default:
+                # code...
+                break;
+        }
+    }
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new PasswordReset($token, $this->email));
