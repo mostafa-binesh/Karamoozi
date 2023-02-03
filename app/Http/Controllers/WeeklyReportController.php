@@ -61,6 +61,7 @@ class WeeklyReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
+        // student must done his pre reg. to this step
         // make sure every object only has date and description
         $req2 = [];
         $student = Auth::user()->student;

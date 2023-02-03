@@ -126,7 +126,7 @@ class StudentController extends Controller
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
-        $student->pre_reg_verified = true; // this field shows pre reg has been done by student or not
+        $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => $req->isMethod('post') ?
@@ -185,7 +185,7 @@ class StudentController extends Controller
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
-        $student->pre_reg_verified = true; // this field shows pre reg has been done by student or not
+        $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => 'ویرایش پیش ثبت نام با موفقیت انجام شد',
@@ -207,9 +207,10 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         if (
             !$student->IndustrySupervisorVerified()
-            || !$student->pre_reg_verified
+            || !$student->pre_reg_done
             || !$student->verified
-            || !$student->form2->university_approval
+            // || !$student->form2->university_approval
+            || !$student->faculty_verified
         ) {
             $stage = 1;
             return response()->json([
@@ -221,7 +222,7 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'انجام پیش ثبت نام',
-                        'done' => $student->pre_reg_verified,
+                        'done' => $student->pre_reg_done,
                     ],
                     [
                         'name' => 'تاییدیه سرپرست صنعت',

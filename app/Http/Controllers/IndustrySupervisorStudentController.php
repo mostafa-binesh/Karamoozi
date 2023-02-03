@@ -141,6 +141,7 @@ class IndustrySupervisorStudentController extends Controller
         $student->supervisor_id = Auth::id();
         $student->unevaluate();
         $student->save();
+        // submit reports
         foreach ($req->reports as $report) {
             Report::create([
                 'form2_id' => $form2->id,

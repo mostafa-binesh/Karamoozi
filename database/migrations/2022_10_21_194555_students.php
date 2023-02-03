@@ -40,10 +40,14 @@ return new class extends Migration
             $table->bigInteger('company_id')->unsigned()->nullable();
             $table->foreign('company_id')->references('id')
                 ->on('companies')->onDelete('cascade');
-            $table->boolean('verified')->default(0); // this needs to be replaced with pre-reg-verified
+            $table->boolean('verified')->default(0); // first step of verification, verified by someone like dorosti
+            $table->boolean('pre_reg_done')->default(0);
+            $table->boolean('faculty_verified')->default(0); // fourth step of verification before being able to do anything, faculty approval
             // first stage | academic status page on figma | pre-internship | something between starting of pre-reg 
             // and internship
-            $table->boolean('pre_reg_verified')->default(0);
+
+            // $table->boolean('pre_reg_verified')->default(0);
+
             $table->boolean('expert_verification')->default(0);
             $table->boolean('supervisor_in_faculty_verification')->default(0);
             $table->boolean('internship_master_verification')->default(0);

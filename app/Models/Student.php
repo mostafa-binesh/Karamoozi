@@ -23,6 +23,7 @@ class Student extends Model
         'evaluations' => 'array',
         'verified' => 'boolean',
         'pre_reg_verified' => 'boolean',
+        'pre_reg_done' => 'boolean',
     ];
     /**
      * The attributes that are enum, these are using EnumTrait.
@@ -80,6 +81,7 @@ class Student extends Model
      *
      * @var array<int, string>
      */
+    // protected $guarded = [];
     protected $fillable = [
         'user_id',
         'first_name',

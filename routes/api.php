@@ -39,29 +39,34 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
     // ######### PRE REGISTRATION #########
-    Route::get('pre-reg', 'get_pre_registration');
-    Route::post('pre-reg', 'post_pre_registration');
-    Route::put('pre-reg', 'put_pre_registration');
-    // after student submitted pre reg, can see it's data with: 
-    Route::get('preRegInfo', 'studentPreRegInfo');
+    Route::middleware(['verifiedStudent'])->group(function () {
+        Route::get('pre-reg', 'get_pre_registration');
+        Route::post('pre-reg', 'post_pre_registration');
+        Route::put('pre-reg', 'put_pre_registration');
+        // after student submitted pre reg, can see it's data with: 
+        Route::get('preRegInfo', 'studentPreRegInfo');
+        // ######### PROFILE #########
+        Route::get('profile', 'getStudentProfile');
+        Route::put('profile/edit', 'editStudentProfile');
+    });
+    Route::middleware(['fullyVerifiedStudent'])->group(function () {
+        // ######### EVALUATE COMPANY #########
+        // get the options
+        Route::get('evaluateCompany', 'evaluateCompany');
 
-    // ######### EVALUATE COMPANY #########
-    // get the options
-    Route::get('evaluateCompany', 'evaluateCompany');
+        Route::post('evaluateCompany', 'submitEvaluateCompany');
+        Route::put('evaluateCompany', 'editEvaluateCompany');
+        // get the student company evaluations
+        Route::get('companyEvaluations', 'studentCompanyEvaluations');
+        Route::post("company", 'submitCompany');
 
-    Route::post('evaluateCompany', 'submitEvaluateCompany');
-    Route::put('evaluateCompany', 'editEvaluateCompany');
-    // get the student company evaluations
-    Route::get('companyEvaluations', 'studentCompanyEvaluations');
-    Route::post("company", 'submitCompany');
-
-    // ######### WEEKLY REPORT #########
-    Route::resource("weeklyReports", WeeklyReportController::class);
-
+        // ######### WEEKLY REPORT #########
+        Route::resource("weeklyReports", WeeklyReportController::class);
+    });
     Route::get('internshipStatus', 'internshipStatus');
-    // ######### PROFILE #########
-    Route::get('profile', 'getStudentProfile');
-    Route::put('profile/edit', 'editStudentProfile');
+    Route::get('testFullyVerifiedMiddleware', function () {
+        return null;
+    })->middleware(['fullyVerifiedStudent']);
 });
 
 // ###############                        #####
@@ -124,6 +129,9 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('allStudents', function (Request $req) {
         return Student::all();
+    });
+    Route::get('allUsers', function (Request $req) {
+        return User::all();
     });
     Route::get('allForms', function (Request $req) {
         return Form2s::all();

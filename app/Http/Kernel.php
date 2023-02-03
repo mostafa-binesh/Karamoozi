@@ -2,6 +2,8 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Students\FullyVerified;
+use App\Http\Middleware\Students\Verified;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -71,5 +73,8 @@ class Kernel extends HttpKernel
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'cors'          => \App\Http\Middleware\Cors::class, // added
         'verifiedIndustrySupervisor' => \App\Http\Middleware\VerifiedIndustrySupervisor::class, // check if industrySupervisor is verified or not
+        // student middlewares
+        'verifiedStudent' => Verified::class,
+        'fullyVerifiedStudent' => FullyVerified::class,
     ];
 }

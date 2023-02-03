@@ -159,7 +159,7 @@ class DevToolController extends Controller
             // $i = $i->student;
             // if (!isset($i) || $i == null) return $this->notFound();
             try {
-                $i->pre_reg_verified = true;
+                $i->pre_reg_done = true;
                 $i->save();
             } catch (Exception $e) {
                 return $this->error($e->getMessage());
@@ -174,7 +174,7 @@ class DevToolController extends Controller
             // $i = $i->student;
             // if (!isset($i) || $i == null) return $this->notFound();
             try {
-                $i->pre_reg_verified = false;
+                $i->pre_reg_done = false;
                 $i->save();
             } catch (Exception $e) {
                 return $this->error($e->getMessage());
