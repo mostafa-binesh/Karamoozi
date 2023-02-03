@@ -358,8 +358,13 @@ class StudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-
         $student = Auth::user()->student;
+        $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
+        if (!isset($studentEvalution)) {
+            return response()->json([
+                'message' => 'شما ارزیابی را انجام نداده اید',
+            ], 400);
+        }
         // update the evaluation without comment
         // ! data['id'] is evaluation table id ! 
         // ! i wish i would handle it in companyEvaluation id way
