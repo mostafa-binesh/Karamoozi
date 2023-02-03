@@ -98,15 +98,14 @@ class AuthController extends Controller
             case 'student':
                 $user->load('student');
                 break;
-
             case 'employee':
                 $user->load('employee');
                 break;
             case 'industry_supervisor':
                 $user->load('industrySupervisor');
+                break;
             default:
                 abort(400);
-                break;
         }
         return response()->json([
             'user' => $user,
