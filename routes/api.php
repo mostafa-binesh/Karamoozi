@@ -12,6 +12,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\WeeklyReportController;
+use App\Models\Company;
 use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Illuminate\Support\Facades\Artisan;
@@ -48,6 +49,9 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         // ######### PROFILE #########
         Route::get('profile', 'getStudentProfile');
         Route::put('profile/edit', 'editStudentProfile');
+        // ######### COMPANY #########
+        // submit or update custom student's company
+        Route::post("company", 'submitCompany');
     });
     Route::middleware(['fullyVerifiedStudent'])->group(function () {
         // ######### EVALUATE COMPANY #########
@@ -58,7 +62,6 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         Route::put('evaluateCompany', 'editEvaluateCompany');
         // get the student company evaluations
         Route::get('companyEvaluations', 'studentCompanyEvaluations');
-        Route::post("company", 'submitCompany');
 
         // ######### WEEKLY REPORT #########
         Route::resource("weeklyReports", WeeklyReportController::class);
@@ -139,4 +142,11 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('allUsersWithRole', function (Request $req) {
         return User::find(1)->loadRoleInfo();
     });
+    Route::get('null', function (Request $req) {
+        return null;
+    });
+    Route::get('allCompanies', function (Request $req) {
+        return Company::all();
+    });
+
 });

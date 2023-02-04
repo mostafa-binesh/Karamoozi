@@ -122,6 +122,9 @@ class Student extends Model
     {
         return $this->hasOne(WeeklyReport::class);
     }
+    public function customCompany() {
+        return $this->hasOne(Company::class);
+    }
     // ###############################################
     // ############# RELATION RELATED FUNCTIONS ###############
     // ###############################################

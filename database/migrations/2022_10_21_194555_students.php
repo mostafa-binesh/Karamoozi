@@ -37,7 +37,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('semester')->nullable();
             $table->unsignedInteger('internship_year')->nullable();
             $table->unsignedInteger('internship_type')->nullable();
-            $table->bigInteger('company_id')->unsigned()->nullable();
+            $table->bigInteger('company_id')->unsigned()->nullable(); // shows the submitted company for this student
             $table->foreign('company_id')->references('id')
                 ->on('companies')->onDelete('cascade');
             $table->boolean('verified')->default(0); // first step of verification, verified by someone like dorosti

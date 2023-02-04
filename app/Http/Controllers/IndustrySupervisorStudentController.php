@@ -284,8 +284,6 @@ class IndustrySupervisorStudentController extends Controller
         }
         $form2 = Form2s::where('student_id', $student->id)->first();
         if ($form2 == null) {
-            // dd($form2);
-            // return $form2->student_id;
             return response()->json([
                 'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
             ], 400);

@@ -102,12 +102,13 @@ class StudentController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
-        if (!(isset($req->company_id) || isset($student->company->id))) {
+        // return $student->company;
+        if (!(isset($req->company_id) || isset($student->customCompany->id))) {
             return response()->json([
                 'message' => 'شرکتی برای شما معرفی نشده است',
             ], 400);
         } else {
-            $company_id = $req->company_id ?? $student->company->id;
+            $company_id = $req->company_id ?? $student->customCompany->id;
         }
         // TODO: check: submitted company must be verified
         $user = Auth::user();
@@ -161,12 +162,13 @@ class StudentController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
-        if (!(isset($req->company_id) || isset($student->company->id))) {
+        return $student->customCompany;
+        if (!(isset($req->company_id) || isset($student->customCompany->id))) {
             return response()->json([
                 'message' => 'شرکتی برای شما معرفی نشده است',
             ], 400);
         } else {
-            $company_id = $req->company_id ?? $student->company->id;
+            $company_id = $req->company_id ?? $student->customCompany->id;
         }
         // TODO: check: submitted company must be verified
         $user = Auth::user();
@@ -240,7 +242,7 @@ class StudentController extends Controller
     // ##########################################
     // ########## COMPANY RELATED FUNCTIONS ###############
     // ##########################################
-    // submit a custom company in pre reg. page
+    // submit or update a custom company in pre reg. page
     public function submitCompany(Request $req)
     {
         $validator = Validator::make($req->all(), [
