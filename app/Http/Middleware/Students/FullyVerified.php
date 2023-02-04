@@ -44,7 +44,7 @@ class FullyVerified
                 'pre_reg_done' => $pre_reg_done,
                 'supervisor_id' => isset($supervisor_id),
                 'faculty_verified' => $faculty_verified,
-            ]);
+            ],400);
         }
         return $next($request);
     }

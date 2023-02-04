@@ -22,7 +22,7 @@ class DonePreReg
         if(!$student->pre_reg_done) {
             return response()->json([
                 'message' => 'شما باید پیش ثبت نام را انجام داده باشید',
-            ]);
+            ],400);
         }
         // otherwise, return next
         return $next($request);

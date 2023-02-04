@@ -22,7 +22,7 @@ class Verified
         if (!$student->verified) {
             return response()->json([
                 'message' => 'شما باید تایید شده باشید',
-            ]);
+            ],400);
         }
         // otherwise, return next
         return $next($request);
