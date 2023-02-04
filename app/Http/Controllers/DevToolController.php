@@ -181,5 +181,20 @@ class DevToolController extends Controller
             }
             return $this->successful();
         }
+        if (isset($req->unDoStudentPreReg)) {
+            // return 'delete';
+            $i = Student::where('student_number', $req->in)->first();
+            // $i ?? notFound();
+            if (!isset($i) || $i == null) return $this->notFound();
+            // $i = $i->student;
+            // if (!isset($i) || $i == null) return $this->notFound();
+            try {
+                $i->pre_reg_done = false;
+                $i->save();
+            } catch (Exception $e) {
+                return $this->error($e->getMessage());
+            }
+            return $this->successful();
+        }
     }
 }

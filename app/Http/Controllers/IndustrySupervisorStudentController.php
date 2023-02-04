@@ -151,10 +151,17 @@ class IndustrySupervisorStudentController extends Controller
         }
         // set the reports attr. of the weeklyReports table for this student
         $studentWeeklyReport = $student->weeklyReport;
-        WeeklyReport::create([
-            'student_id' => $student->id,
-            'reports' => $student->calculateAllWorkingDaysDate()
-        ]);
+        // ! 
+        // WeeklyReport::create([
+        //     'student_id' => $student->id,
+        //     'reports' => $student->calculateAllWorkingDaysDate()
+        // ]);
+        WeeklyReport::updateOrCreate(
+            ['student_id' => $student->id],
+            [
+                'reports' => $student->calculateAllWorkingDaysDate()
+            ]
+        );
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
         // return $form2;
     }
@@ -293,7 +300,7 @@ class IndustrySupervisorStudentController extends Controller
         // $student = Student::find($id);
         $student->supervisor_id = null;
         $student->save();
-
+        $student->weeklyReport->delete();
         return response()->json([
             'message' => 'دانشجو با موفقیت حذف شد',
         ]);

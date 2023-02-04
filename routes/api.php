@@ -15,6 +15,7 @@ use App\Http\Controllers\WeeklyReportController;
 use App\Models\Company;
 use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
+use App\Models\WeeklyReport;
 use Illuminate\Support\Facades\Artisan;
 
 // NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
@@ -147,6 +148,12 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('allCompanies', function (Request $req) {
         return Company::all();
+    });
+    Route::get('weeklyReports', function (Request $req) {
+        return WeeklyReport::all();
+    });
+    Route::delete('deleteWeeklyReports', function (Request $req) {
+        return WeeklyReport::where('student_id',$req->student_id)->delete();
     });
 
 });
