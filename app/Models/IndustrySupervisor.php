@@ -9,6 +9,9 @@ class IndustrySupervisor extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    // ###############################################
+    // ################## RELATIONSHIPS ###################
+    // ###############################################
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -27,4 +30,7 @@ class IndustrySupervisor extends Model
         // return $this->hasMany(Student::class)->where('supervisor_id', $this->id)->whereNull('evaluations');
         return $this->hasMany(Student::class,'supervisor_id')->where('supervisor_id', $this->id)->unevaluated();
     }
+    // ###############################################
+    // ################## FUNCTIONS ###################
+    // ###############################################
 }

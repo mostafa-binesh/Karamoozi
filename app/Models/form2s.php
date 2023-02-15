@@ -17,6 +17,9 @@ class Form2s extends Model
     protected $casts = [
         'schedule_table' => 'array',
     ];
+    // ###############################################
+    // ################## RELATIONSHIPS ###################
+    // ###############################################
     public function industrySupervisor() {
         return $this->belongsTo(IndustrySupervisor::class);
     }

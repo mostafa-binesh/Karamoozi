@@ -95,7 +95,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(IndustrySupervisor::class);
     }
-    // ######### Other functions #####
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+    // ###############################################
+    // ################## FUNCTIONS ###################
+    // ###############################################
     // custom role function
     public function cRole()
     {
@@ -124,14 +134,6 @@ class User extends Authenticatable implements JWTSubject
     public function fullName()
     {
         return $this->first_name . ' ' . $this->last_name;
-    }
-    public function receivedMessages()
-    {
-        return $this->hasMany(Message::class, 'receiver_id');
-    }
-    public function sentMessages()
-    {
-        return $this->hasMany(Message::class, 'sender_id');
     }
     public function ss($req)
     {
