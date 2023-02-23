@@ -102,7 +102,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_department' => 'required',
             'supervisor_position' => 'required',
             'internship_start_date' => 'required|date',
-            'internship_website' => 'required',
+            'internship_website' => 'present',
             'description' => 'nullable',
             'schedule_table' => 'sometimes|array|size:6',
             'reports' => 'required|array',

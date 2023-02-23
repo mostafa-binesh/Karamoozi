@@ -53,6 +53,7 @@ class WeeklyReportController extends Controller
         // return [1,2,3,4,5];
         // return $req;
         $validator = Validator::make($req->all(), [
+            'report' => 'required|array',
             'report.*.date' => 'required|date',
             'report.*.description' => 'required',
         ]);
@@ -61,15 +62,12 @@ class WeeklyReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        // student must done his pre reg. to this step
-        // make sure every object only has date and description
         $req2 = [];
         $student = Auth::user()->student;
         $errors = [];
         $reports = $student->weeklyReport->reports;
         foreach ($req->report as $re) {
             $found = false;
-
             for ($i = 0; $i < count($reports); $i++) {
                 for ($j = 0; $j < count($reports[$i]['days']); $j++) {
                     // return $re['date'];
@@ -83,9 +81,9 @@ class WeeklyReportController extends Controller
             if (!$found) {
                 array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
             }
+            // ! TODO: wtf is this line?!
             Report::insert($req2);
         }
-        // return $reports;
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
         $weeklyReport->reports = $reports;
         $weeklyReport->save();
