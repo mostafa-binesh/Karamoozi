@@ -219,5 +219,18 @@ class AdminSeeder extends Seeder
             'user_id' => $eighthEmployee->id,
             'faculty_id' => 4,
         ]);
+        $firstAdmin = User::create([
+            'first_name' => 'کیارش',
+            'last_name' => 'کسائیان',
+            'username' => '8000',
+            'national_code' => '8000',
+            'email' => 'kkasaei@admin.com',
+            'phone_number' => '092995418000',
+            'password' => '$2y$10$VTcsdGgndglxgSoMh1Qxc.Werk8WvrK0osrA.MdFkLoFlKMo6dYqK', // 8000
+        ])->assignRole('admin');
+        // Employee::create([
+        //     'user_id' => $firstAdmin->id,
+        //     'faculty_id' => 4,
+        // ]);
     }
 }

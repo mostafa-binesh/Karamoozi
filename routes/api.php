@@ -1,5 +1,8 @@
 <?php
 // use Melipayamak\MelipayamakApi;
+
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminStudentsController;
 use App\Models\User;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -91,6 +94,24 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
     Route::resource('messages', MessageController::class);
 });
 // ###############                        #####
+// ##################### ADMIN  #####################
+// ###############                       #####
+Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
+    Route::controller(AdminStudentsController::class)->prefix('students')->group(function() {
+        Route::get('home', 'studentsHomePage');
+        Route::get('initReg', 'initialRegistrationStudents');
+        Route::get('preReg', 'preRegStudents');
+        Route::put('{id}/initReg/verify', 'initRegVerifyStudent');
+        Route::put('{id}/initReg/unverify', 'initRegUnVerifyStudent');
+        Route::put('{id}/preReg/verify', 'preRegVerifyStudent');
+        Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
+        Route::get('{id}/preReg/desc', 'preRegDesc');
+    });
+});
+
+
+
+// ###############                        #####
 // ################ DEVELOPER ONLY ##############
 // ###############                       #####
 // ! DELETE ON PRODUCTION
@@ -153,7 +174,6 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
         return WeeklyReport::all();
     });
     Route::delete('deleteWeeklyReports', function (Request $req) {
-        return WeeklyReport::where('student_id',$req->student_id)->delete();
+        return WeeklyReport::where('student_id', $req->student_id)->delete();
     });
-
 });

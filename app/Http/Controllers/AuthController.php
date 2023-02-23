@@ -104,8 +104,11 @@ class AuthController extends Controller
             case 'industry_supervisor':
                 $user->load('industrySupervisor');
                 break;
+            case 'admin':
+                // do nothing i guess
+                break;
             default:
-                abort(400);
+                abort(400,"user role not found in switch case");
         }
         return response()->json([
             'user' => $user,
