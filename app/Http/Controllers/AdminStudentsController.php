@@ -89,7 +89,7 @@ class AdminStudentsController extends Controller
     }
     public function studentsHomePage()
     {
-        $users = User::all();
+        $users = Student::all();
         // initial registration
         $init_unVerified = 0;
         $init_verified = 0;
