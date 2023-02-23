@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('internship_department');
             $table->string('supervisor_position');
             $table->date("internship_start_date");
-            $table->string('internship_website');
+            $table->string('internship_website')->nullable();
             $table->json('schedule_table');
             $table->text('description')->nullable();
             $table->boolean("university_approval")->default(false);

@@ -24,6 +24,8 @@ class Student extends Model
         'verified' => 'boolean',
         'pre_reg_verified' => 'boolean',
         'pre_reg_done' => 'boolean',
+        // 'passed_units' => 'int',
+        'student_number' => 'int',
     ];
     /**
      * The attributes that are enum, these are using EnumTrait.

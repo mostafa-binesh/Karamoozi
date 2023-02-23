@@ -81,7 +81,7 @@ class WeeklyReportController extends Controller
             if (!$found) {
                 array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
             }
-            // ! TODO: wtf is this line?!
+            // ! TODO: wth is this line?!
             Report::insert($req2);
         }
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();

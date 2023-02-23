@@ -16,6 +16,7 @@ class StudentPreRegInfo extends JsonResource
      */
     public function toArray($request)
     {
+        // $this is user
         $student = $this->student;
         return [
             'first_name' => $this->first_name,
