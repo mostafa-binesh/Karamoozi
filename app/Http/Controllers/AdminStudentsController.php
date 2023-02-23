@@ -133,6 +133,7 @@ class AdminStudentsController extends Controller
     {
         $student = Student::findorfail($id);
         $student->verified = true;
+        $student->init_reg_rejection_reason = null;
         $student->save();
         return response()->json([
             'message' => 'دانشجو با موفقیت تایید شد'
@@ -152,7 +153,7 @@ class AdminStudentsController extends Controller
         }
         $student = Student::findorfail($id);
         $student->verified = false;
-        $student->rejection_reason = $req->reason;
+        $student->init_reg_rejection_reason = $req->reason;
         $student->save();
         return response()->json([
             'message' => 'دانشجو با موفقیت رد شد'
@@ -162,6 +163,7 @@ class AdminStudentsController extends Controller
     {
         $student = Student::findorfail($id);
         $student->pre_reg_verified = true;
+        $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
             'message' => 'پیش ثبت نام با موفقیت تایید شد'
@@ -181,7 +183,7 @@ class AdminStudentsController extends Controller
         }
         $student = Student::findorfail($id);
         $student->pre_reg_verified = false;
-        $student->rejection_reason = $req->reason;
+        $student->pre_reg_rejection_reason = $req->reason;
         $student->save();
         return response()->json([
             'message' => 'پیش ثبت نام با موفقیت رد شد'

@@ -320,4 +320,10 @@ class Student extends Model
             }
         }
     }
+    public function entrance_year() {
+        return "1" . substr($this->student_number, 0, 3);
+    }
+    public static function university_entrance_year_static($student_number) {
+        return "1" . substr($student_number, 0, 3);
+    }
 }

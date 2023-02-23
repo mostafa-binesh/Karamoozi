@@ -48,6 +48,14 @@ class AuthController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
+        $entrance_year = Student::university_entrance_year_static($req->student_number);
+        if($entrance_year < "1398" || $entrance_year > "1499"){
+            return response()->json([
+                'message' => [
+                    'student_number' => 'شماره دانشجویی مربوط به دانشگاه رجایی نیست',
+                ]
+            ], 400);
+        }
         // ADD: error handling
         $user = User::create([
             'first_name' => $req->first_name,

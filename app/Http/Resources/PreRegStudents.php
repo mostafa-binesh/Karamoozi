@@ -22,7 +22,7 @@ class PreRegStudents extends JsonResource
             'student_number' => $this->student_number,
             'company' => $this->companyName(),
             'faculty' => $this->facultyName(),
-            'term' => "جایی ازش نگرفتیم",
+            'entrance_year' => $this->entrance_year(),
             'passed_units' => $this->passed_units,
         ];
     }

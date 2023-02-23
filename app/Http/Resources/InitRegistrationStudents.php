@@ -20,7 +20,7 @@ class InitRegistrationStudents extends JsonResource
             'last_name' => $this->user->last_name,
             'student_number' => $this->student_number,
             'faculty' => "تو پیش ثبت نام پر میشه",
-            'term' => 'اصلا چنین دیتایی نگرفتیم',
+            'entrance_year' => $this->entrance_year(),
             'national_code' => $this->user->national_code,
             'national_code' => $this->user->phone_number,
         ];
