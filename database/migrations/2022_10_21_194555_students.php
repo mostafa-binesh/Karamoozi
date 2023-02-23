@@ -47,8 +47,8 @@ return new class extends Migration
             // and internship
 
             $table->boolean('pre_reg_verified')->default(0);
-            $table->string('pre_reg_rejection_reason')->nullable();
             $table->string('init_reg_rejection_reason')->nullable();
+            $table->string('pre_reg_rejection_reason')->nullable();
 
             $table->boolean('expert_verification')->default(0);
             $table->boolean('supervisor_in_faculty_verification')->default(0);

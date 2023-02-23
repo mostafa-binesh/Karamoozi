@@ -39,7 +39,7 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 // ###############                      #####
-// ################### STUDENT ###################
+// ! ################### STUDENT ###################
 // ###############                     #####
 
 Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
@@ -77,7 +77,7 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
 });
 
 // ###############                        #####
-// ################ INDUSTRY SUPERVISOR ##############
+// ! ################ INDUSTRY SUPERVISOR ##############
 // ###############                       #####
 Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
     Route::put('profile', 'industrySupervisorProfile');
@@ -94,7 +94,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
     Route::resource('messages', MessageController::class);
 });
 // ###############                        #####
-// ##################### ADMIN  #####################
+// ! ##################### ADMIN  #####################
 // ###############                       #####
 Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
     Route::controller(AdminStudentsController::class)->prefix('students')->group(function() {
@@ -103,6 +103,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('preReg', 'preRegStudents');
         Route::put('{id}/initReg/verify', 'initRegVerifyStudent');
         Route::put('{id}/initReg/unverify', 'initRegUnVerifyStudent');
+        Route::get('{id}/initReg/desc', 'initRegDesc');
         Route::put('{id}/preReg/verify', 'preRegVerifyStudent');
         Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
         Route::get('{id}/preReg/desc', 'preRegDesc');

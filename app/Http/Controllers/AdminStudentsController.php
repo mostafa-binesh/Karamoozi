@@ -136,10 +136,10 @@ class AdminStudentsController extends Controller
         $student->init_reg_rejection_reason = null;
         $student->save();
         return response()->json([
-            'message' => 'دانشجو با موفقیت تایید شد'
+            'message' => 'دانشجو تایید شد'
         ], 200);
     }
-    public function initRegUnVerifyStudent($id,Request $req)
+    public function initRegUnVerifyStudent($id, Request $req)
     {
         $validator = Validator::make($req->all(), [
             'reason' => 'required|max:255',
@@ -156,8 +156,15 @@ class AdminStudentsController extends Controller
         $student->init_reg_rejection_reason = $req->reason;
         $student->save();
         return response()->json([
-            'message' => 'دانشجو با موفقیت رد شد'
+            'message' => 'دانشجو رد شد'
         ], 200);
+    }
+    public function initRegDesc($id)
+    {
+        $student = Student::findorfail($id);
+        return response()->json([
+            'message' => $student->init_reg_rejection_reason,
+        ]);
     }
     public function preRegVerifyStudent($id)
     {
@@ -166,10 +173,10 @@ class AdminStudentsController extends Controller
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
-            'message' => 'پیش ثبت نام با موفقیت تایید شد'
+            'message' => 'پیش ثبت نام تایید شد'
         ], 200);
     }
-    public function preRegUnVerifyStudent($id,Request $req)
+    public function preRegUnVerifyStudent($id, Request $req)
     {
         $validator = Validator::make($req->all(), [
             'reason' => 'required|max:255',
@@ -186,7 +193,7 @@ class AdminStudentsController extends Controller
         $student->pre_reg_rejection_reason = $req->reason;
         $student->save();
         return response()->json([
-            'message' => 'پیش ثبت نام با موفقیت رد شد'
+            'message' => 'پیش ثبت نام رد شد'
         ], 200);
     }
     public function preRegDesc($id)
