@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\admin;
 
+use App\Models\Company;
 use App\Models\Student;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,7 +39,11 @@ class StudentPreRegDescription extends JsonResource
             ],
             'company' => [
                 'id' => $this->company_id,
-                'company_name' => $this->companyName(),
+                'name' => $this->companyName(),
+                'type' => Company::COMPANY_TYPE[$this->company->company_type],
+                'number' => $this->company->company_phone,
+                'postal_code' => $this->company->company_postal_code,
+                'address' => $this->company->company_address,
             ],
             'internship' => [
                 'id' => $this->internship_type,
