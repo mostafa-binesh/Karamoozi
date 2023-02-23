@@ -218,6 +218,7 @@ return [
         'company_phone' => 'شماره تلفن شرکت',
         'grade' => 'مقطع تحصیلی',
         'internship_website' => 'وبسایت محل کارآموزی',
+        'reason' => 'دلیل',
     ),
 
     // 'attributes' => [],
