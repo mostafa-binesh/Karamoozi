@@ -9,7 +9,8 @@ trait CPaginationTrait
 {
     public function scopeCpagination($query, $req, $apiResource = null)
     {
-        $count = ceil($query->count() / ($req->perPage ?? 5)); // this has to be declared before continue of the query
+        $queryCount = $query->count();
+        $count = ceil($queryCount / ($req->perPage ?? 5)); // this has to be declared before continue of the query
         $count==0 ? $count = 1 : null;
         if($req->page && $req->page > $count) {
             return response()->json([
@@ -24,6 +25,7 @@ trait CPaginationTrait
                 'current_page' => $req->page ?? 1,
                 'total_pages' => $count,
                 'per_page' => $req->perPage ?? 5,
+                'total_records' => $queryCount
             ],
             'data' => $data,
         ];
