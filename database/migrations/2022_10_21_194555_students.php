@@ -46,6 +46,7 @@ return new class extends Migration
             // first stage | academic status page on figma | pre-internship | something between starting of pre-reg 
             // and internship
 
+            // ! admin controllers
             $table->boolean('pre_reg_verified')->default(0);
             $table->string('init_reg_rejection_reason')->nullable();
             $table->string('pre_reg_rejection_reason')->nullable();

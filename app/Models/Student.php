@@ -110,7 +110,7 @@ class Student extends Model
     }
     public function industrySupervisor()
     {
-        return $this->belongsTo(IndustrySupervisor::class, 'id', 'supervisor_id');
+        return $this->belongsTo(IndustrySupervisor::class, 'supervisor_id', 'id');
     }
     public function professor()
     {
@@ -124,7 +124,8 @@ class Student extends Model
     {
         return $this->hasOne(WeeklyReport::class);
     }
-    public function customCompany() {
+    public function customCompany()
+    {
         return $this->hasOne(Company::class);
     }
     // ###############################################
@@ -146,6 +147,9 @@ class Student extends Model
     {
         return $this->form2->schedule_table;
     }
+    public function indSupervisorReports() {
+        return Report::where('form2_id',$this->form2->id)->get();
+    }
     // ###############################################
     // ##################  FUNCTIONS ###################
     // ###############################################
@@ -155,7 +159,10 @@ class Student extends Model
     }
     public function industrySupervisorEvaluated()
     {
-        return isEmpty($this->evaluations);
+        // ! previous impl. :
+        // return isEmpty($this->evaluations);
+        // ! require new implementation
+        return false;
     }
     public function scopeUnevaluated($query)
     {
@@ -320,10 +327,12 @@ class Student extends Model
             }
         }
     }
-    public function entrance_year() {
+    public function entrance_year()
+    {
         return "1" . substr($this->student_number, 0, 3);
     }
-    public static function university_entrance_year_static($student_number) {
+    public static function university_entrance_year_static($student_number)
+    {
         return "1" . substr($student_number, 0, 3);
     }
 }

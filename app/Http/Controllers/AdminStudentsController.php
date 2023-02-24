@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\admin\StudentForm2;
+use App\Http\Resources\admin\StudentFormsStatus;
 use App\Models\User;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -142,18 +144,16 @@ class AdminStudentsController extends Controller
     public function initRegUnVerifyStudent($id, Request $req)
     {
         $validator = Validator::make($req->all(), [
-            'reason' => 'required|max:255',
+            'rejection_reason' => 'required|max:255',
         ]);
-        // return Auth::id();
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         $student = Student::findorfail($id);
         $student->verified = false;
-        $student->init_reg_rejection_reason = $req->reason;
+        $student->init_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
             'message' => 'دانشجو رد شد'
@@ -179,18 +179,16 @@ class AdminStudentsController extends Controller
     public function preRegUnVerifyStudent($id, Request $req)
     {
         $validator = Validator::make($req->all(), [
-            'reason' => 'required|max:255',
+            'rejection_reason' => 'required|max:255',
         ]);
-        // return Auth::id();
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         $student = Student::findorfail($id);
         $student->pre_reg_verified = false;
-        $student->pre_reg_rejection_reason = $req->reason;
+        $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
             'message' => 'پیش ثبت نام رد شد'

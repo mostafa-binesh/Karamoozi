@@ -298,7 +298,7 @@ class StudentController extends Controller
             ], 400);
         }
         $student = Auth::user()->student;
-        // check if student have sent company evaluations
+        // check if student have sent company evaluations already
         $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
         if (isset($studentEvalution)) {
             return response()->json([

@@ -32,18 +32,8 @@ return new class extends Migration
             $table->string('internship_website')->nullable();
             $table->json('schedule_table');
             $table->text('description')->nullable();
+            // approvals
             $table->boolean("university_approval")->default(false);
-            // $table->string("saturday");
-            // $table->string("sunday");
-            // $table->string("monday");
-            // $table->string("tuesday");
-            // $table->string("wednesday");
-            // $table->string("thursday");
-
-
-            // $table->unsignedBigInteger('form_report_id');
-            // $table->foreign("form_report_id")->references("id")
-            //     ->on("FormatReports")->onDelete("cascade");
             $table->boolean("company_approval")->default(false);
             $table->boolean("supervisor_approval")->default(false);
             $table->timestamps();

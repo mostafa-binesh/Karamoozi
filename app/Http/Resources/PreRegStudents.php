@@ -20,6 +20,7 @@ class PreRegStudents extends JsonResource
             'name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
             'student_number' => $this->student_number,
+            'national_code' => $this->user->national_code,
             'company' => $this->companyName(),
             'faculty' => $this->facultyName(),
             'entrance_year' => $this->entrance_year(),

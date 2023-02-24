@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             // TODO: remove form_reports and weeklyReports tables
+            
+            // !notes:
             // report have two types
             // first type is when ind. supervisor submits it when is submitting form2s (submitting new student form) | report_type = 1
             // -- when it's first type report, we have form2_id and don't have student_id 
