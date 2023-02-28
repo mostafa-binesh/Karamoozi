@@ -45,6 +45,7 @@ class AdminSeeder extends Seeder
         Student::create([
             'user_id' => $firstStudent->id,
             'student_number' => $firstStudent->username,
+            'entrance_year' => Student::university_entrance_year_static($firstStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
         ]);
@@ -60,6 +61,7 @@ class AdminSeeder extends Seeder
         Student::create([
             'user_id' => $secondStudent->id,
             'student_number' => $secondStudent->username,
+            'entrance_year' => Student::university_entrance_year_static($secondStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
         ]);
@@ -75,6 +77,7 @@ class AdminSeeder extends Seeder
         Student::create([
             'user_id' => $thirdStudent->id,
             'student_number' => $thirdStudent->username,
+            'entrance_year' => Student::university_entrance_year_static($thirdStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
         ]);
@@ -92,6 +95,7 @@ class AdminSeeder extends Seeder
         $fs = Student::create([
             'user_id' => $fourthStudent->id,
             'student_number' => $fourthStudent->username,
+            'entrance_year' => Student::university_entrance_year_static($fourthStudent->username),
             'supervisor_id' => $industrySupervisorUser->id,
             'internship_type' => 1,
         ]);
