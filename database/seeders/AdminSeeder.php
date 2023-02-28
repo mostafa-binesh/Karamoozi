@@ -85,7 +85,7 @@ class AdminSeeder extends Seeder
         $fourthStudent = User::create([
             'first_name' => 'محسن',
             'last_name' => 'نوری',
-            'username' => '3981231111',
+            'username' => '3991231111',
             'national_code' => '1234',
             'email' => 'mohsen@admin.com',
             'phone_number' => '09852145',

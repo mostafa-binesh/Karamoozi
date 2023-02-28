@@ -130,23 +130,28 @@ class AdminStudentsController extends Controller
     }
     public function initialRegistrationStudents(Request $req)
     {
-        $students = Student::filter($req->all(), InitRegStudentsFilter::class)->where('verified', false)->with('user')->cpagination($req, InitRegistrationStudents::class);
-        return response()->json([
+        // $students = Student::filter($req->all(), InitRegStudentsFilter::class)->where('verified', false)->with('user')->cpagination($req, InitRegistrationStudents::class);
+        $students = Student::filter($req->all(), InitRegStudentsFilter::class)->with('user')->cpagination($req, InitRegistrationStudents::class);
+        return [
+            'meta' => $students['meta'],
             'data' => [
-                'faculties' => University_faculty::all(),
-                'students' => $students,
-            ],
-        ]);
+                // 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'students' => $students['data'],
+            ]
+        ];
     }
     public function preRegStudents(Request $req)
     {
-        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
-        return response()->json([
+        // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        return [
+            'meta' => $students['meta'],
             'data' => [
-                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
-                'students' => $students,
-            ],
-        ]);
+                // 'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                // 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'students' => $students['data'],
+            ]
+        ];
     }
     public function initRegVerifyStudent($id)
     {

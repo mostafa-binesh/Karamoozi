@@ -27,6 +27,8 @@ class InitRegStudentsFilter extends ModelFilter
     // init reg verified or verified 
     public function verified($verified)
     {
+        $verified == '1' ? $x = true : $x = false;
+        $this->where('verified', $x);
         $this->where('verified', $verified);
     }
 }
