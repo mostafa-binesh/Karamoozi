@@ -148,6 +148,7 @@ class Student extends Model
         return $this->form2->schedule_table;
     }
     public function indSupervisorReports() {
+        // ! i guess there would be a good relation pattern for this one
         return Report::where('form2_id',$this->form2->id)->get();
     }
     // ###############################################
