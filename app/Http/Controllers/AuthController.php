@@ -41,7 +41,6 @@ class AuthController extends Controller
             'national_code' => 'required|unique:users|digits:10',
             'phone_number' => 'required|unique:users|digits:11|regex:/^(09)+[0-9]{9}$/',
             'email' => 'required|unique:users|email',
-            // 'password' => 'required|min:4',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -49,7 +48,7 @@ class AuthController extends Controller
             ], 400);
         }
         $entrance_year = Student::university_entrance_year_static($req->student_number);
-        if($entrance_year < "1398" || $entrance_year > "1499"){
+        if ($entrance_year < "1398" || $entrance_year > "1499") {
             return response()->json([
                 'message' => [
                     'student_number' => 'شماره دانشجویی مربوط به دانشگاه رجایی نیست',
@@ -116,7 +115,7 @@ class AuthController extends Controller
                 // do nothing i guess
                 break;
             default:
-                abort(400,"user role not found in switch case");
+                abort(400, "user role not found in switch case");
         }
         return response()->json([
             'user' => $user,
