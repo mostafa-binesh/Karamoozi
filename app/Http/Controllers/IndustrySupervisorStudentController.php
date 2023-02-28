@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use App\Http\Resources\IndustrySupervisorStudentsList;
 use App\Http\Resources\IndustrySupervisor\CheckStudent;
 use App\Http\Resources\IndustrySupervisor\IndustrySupervisorsStudent;
+use App\Models\StudentEvaluation;
 use App\Models\WeeklyReport;
 
 class IndustrySupervisorStudentController extends Controller
@@ -109,11 +110,9 @@ class IndustrySupervisorStudentController extends Controller
             'reports.*.date' => 'required|date',
             'reports.*.desc' => 'required',
         ]);
-        // return Auth::id();
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         // return $req;
@@ -229,7 +228,6 @@ class IndustrySupervisorStudentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         // return $req;
@@ -280,11 +278,8 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function destroy($id)
     {
-        // $form2 = form2s::where('student_id', Student::where('student_number', $id)->first()->id)->first();
         $student = Student::where("student_number", $id)->first();
         if ($student == null) {
-            // dd($form2);
-            // return $form2->student_id;
             return response()->json([
                 'message' => 'این دانشجو وجود ندارد',
             ], 400);
@@ -297,7 +292,6 @@ class IndustrySupervisorStudentController extends Controller
         }
         // TODO: need to remove all saved info when was submitting by industry supervisor
         $form2->delete();
-        // $student = Student::find($id);
         $student->supervisor_id = null;
         $student->save();
         $student->weeklyReport->delete();
@@ -314,7 +308,6 @@ class IndustrySupervisorStudentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         $user = User::where('national_code', $req->national_code)->first();
@@ -330,11 +323,6 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 404);
         }
-        // return response()->json([
-        //     // 'data' => User::where('national_code',$req->national_code)->student->where('student_code')->first(),
-        //     // 'data' => User::where('national_code',$req->national_code)->first()->student->where('student_number',$req->student_number)->first(),
-        //     'data' => $user
-        // ]);
         return new CheckStudent($user);
     }
     public function industrySupervisorEvaluateStudentGET(Request $req)
@@ -345,10 +333,8 @@ class IndustrySupervisorStudentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
-        // return 1;
         $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
         if ($student == null) {
             return response()->json([
@@ -365,6 +351,7 @@ class IndustrySupervisorStudentController extends Controller
     }
     public function industrySupervisorEvaluateStudent(Request $req)
     {
+        // ! note: industry supervisor submits evaluations about a student
         // ! FIX: two queries for same purpose!
         // ! FIX: internship_finish_date doesn't have a column on student table
         $validator = Validator::make($req->all(), [
@@ -390,8 +377,13 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
             ], 400);
         }
-        // $student->evaluations = implode(',', $req->data);
-        $student->evaluations = $req->data;
+        // ! previous implementation: save all evaluation in a text column and retrieve it as a json file
+        // $student->evaluations = $req->data;
+        // ! fix: delete evaluation column in students table
+        // ! new implementation: save it on another table
+        foreach ($req->data as $evaluation) {
+            StudentEvaluation::create($evaluation);
+        }
         $student->internship_finished_at = $req->internship_finished_at;
         $student->internship_status = 3;
         $student->save();
@@ -408,7 +400,6 @@ class IndustrySupervisorStudentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors()
-                // 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
             ], 400);
         }
         $user = User::where('national_code', $req->national_code)->first();
