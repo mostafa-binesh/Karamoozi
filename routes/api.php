@@ -99,14 +99,22 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
 Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
     Route::controller(AdminStudentsController::class)->prefix('students')->group(function() {
         Route::get('home', 'studentsHomePage');
+        // list of students waiting for initial registration approval
         Route::get('initReg', 'initialRegistrationStudents');
+        // list of students waiting for pre registration approval
         Route::get('preReg', 'preRegStudents');
+        // init reg
         Route::put('{id}/initReg/verify', 'initRegVerifyStudent');
         Route::put('{id}/initReg/unverify', 'initRegUnVerifyStudent');
         Route::get('{id}/initReg/desc', 'initRegDesc');
+        // pre reg
         Route::put('{id}/preReg/verify', 'preRegVerifyStudent');
         Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
         Route::get('{id}/preReg/desc', 'preRegDesc');
+        // forms
+        Route::get('forms','forms');
+        Route::get('forms/{id}','studentForms');
+        Route::get('forms/{id}/form2','form2');
     });
 });
 

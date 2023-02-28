@@ -11,6 +11,12 @@ use App\Http\Resources\PreRegStudents;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\InitRegistrationStudents;
 use App\Http\Resources\admin\StudentPreRegDescription;
+use App\Http\Resources\UniversityFacultyResource;
+use App\ModelFilters\Admin\InitRegStudentsFilter;
+use App\ModelFilters\Admin\PreRegStudentsFilter;
+use App\ModelFilters\Admin\StudentsFilter;
+use App\ModelFilters\StudentFilter;
+use App\Models\University_faculty;
 
 class AdminStudentsController extends Controller
 {
@@ -92,6 +98,7 @@ class AdminStudentsController extends Controller
     public function studentsHomePage()
     {
         $users = Student::all();
+        // ! i handled the counters in backend not the database, i guess this way is faster
         // initial registration
         $init_unVerified = 0;
         $init_verified = 0;
@@ -123,13 +130,23 @@ class AdminStudentsController extends Controller
     }
     public function initialRegistrationStudents(Request $req)
     {
-        $students = Student::where('verified', false)->with('user')->cpagination($req, InitRegistrationStudents::class);
-        return $students;
+        $students = Student::filter($req->all(), InitRegStudentsFilter::class)->where('verified', false)->with('user')->cpagination($req, InitRegistrationStudents::class);
+        return response()->json([
+            'data' => [
+                'faculties' => University_faculty::all(),
+                'students' => $students,
+            ],
+        ]);
     }
     public function preRegStudents(Request $req)
     {
-        $students = Student::where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
-        return $students;
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        return response()->json([
+            'data' => [
+                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                'students' => $students,
+            ],
+        ]);
     }
     public function initRegVerifyStudent($id)
     {
@@ -198,5 +215,24 @@ class AdminStudentsController extends Controller
     {
         $student = Student::findorfail($id);
         return StudentPreRegDescription::make($student);
+    }
+    public function forms(Request $req)
+    {
+        $students = Student::whereHas("form2")->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        return $students;
+    }
+    public function studentForms($id)
+    {
+        // ! not completed yet
+        // ! need to add other forms, now just form2nd has been added
+        $student = Student::where("id", $id)->with(['form2'])->first();
+        return StudentFormsStatus::make($student);
+        return $student;
+    }
+    public function form2($id)
+    {
+        $student = Student::where("id", $id)->with(["form2"])->first();
+        return StudentForm2::make($student);
+        return $student;
     }
 }
