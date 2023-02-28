@@ -14,15 +14,16 @@ class InitRegistrationStudents extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        // $this is student
         return [
+            'id' => $this->id,
             'name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
             'student_number' => $this->student_number,
             'faculty' => "تو پیش ثبت نام پر میشه",
             'entrance_year' => $this->entrance_year(),
             'national_code' => $this->user->national_code,
-            'national_code' => $this->user->phone_number,
+            'phone_number' => $this->user->phone_number,
         ];
     }
 }
