@@ -132,26 +132,27 @@ class AdminStudentsController extends Controller
     {
         // $students = Student::filter($req->all(), InitRegStudentsFilter::class)->where('verified', false)->with('user')->cpagination($req, InitRegistrationStudents::class);
         $students = Student::filter($req->all(), InitRegStudentsFilter::class)->with('user')->cpagination($req, InitRegistrationStudents::class);
-        return [
+        return response()->json([
             'meta' => $students['meta'],
             'data' => [
-                // 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
-        ];
+        ]);
     }
     public function preRegStudents(Request $req)
     {
         // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
-        return [
+        return response()->json([
+
             'meta' => $students['meta'],
             'data' => [
                 // 'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
-                // 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
-        ];
+        ]);
     }
     public function initRegVerifyStudent($id)
     {
