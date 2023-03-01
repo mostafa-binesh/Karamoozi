@@ -231,7 +231,7 @@ class AdminStudentsController extends Controller
     {
         // ! not completed yet
         // ! need to add other forms, now just form2nd has been added
-        $student = Student::where("id", $id)->with(['form2'])->first();
+        $student = Student::where("id", $id)->with(['form2','user'])->first();
         return StudentFormsStatus::make($student);
         return $student;
     }
