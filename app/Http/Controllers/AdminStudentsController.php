@@ -114,7 +114,7 @@ class AdminStudentsController extends Controller
             }
             if ($student->pre_reg_verified == 1) {
                 $preReg_verified++;
-            } else if($student->pre_reg_verified == 2) {
+            } else if ($student->pre_reg_verified == 2) {
                 $preReg_unVerified++;
             }
         }
@@ -146,14 +146,26 @@ class AdminStudentsController extends Controller
         // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
-
             'meta' => $students['meta'],
             'data' => [
-                // 'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
                 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
         ]);
+    }
+    public function forms(Request $req)
+    {
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty','company'])->cpagination($req, PreRegStudents::class);
+        return response()->json([
+            'meta' => $students['meta'],
+            'data' => [
+                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'students' => $students['data'],
+            ]
+        ]);
+        return $students;
     }
     public function initRegVerifyStudent($id)
     {
@@ -223,11 +235,6 @@ class AdminStudentsController extends Controller
         $student = Student::findorfail($id);
         return StudentPreRegDescription::make($student);
     }
-    public function forms(Request $req)
-    {
-        $students = Student::whereHas("form2")->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
-        return $students;
-    }
     public function studentForms($id)
     {
         // ! not completed yet
@@ -242,8 +249,10 @@ class AdminStudentsController extends Controller
         return StudentForm2::make($student);
         return $student;
     }
-    public function form3($id){
-        $student = Student::where("id", $id)->with(["option"])->with(["students_evaluations"])->first();
+    public function form3($id)
+    {
+        $student = Student::where("id", $id)->with("studentEvaluations")->first();
+        // return $student->studentEvaluations; 
         return StudentForm3::make($student);
         return $student;
     }

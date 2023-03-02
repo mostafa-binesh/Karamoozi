@@ -33,7 +33,7 @@ class StudentForm2 extends JsonResource
             'company' => [
                 // ! i guess there are some problems with CompanyName function
                 'name' => $this->companyName(),
-                'type' => $this->company->company_type,
+                'type' => $this->company->companyType(),
                 'phone_number' => $this->company->company_phone,
                 'postal_code' => $this->company->company_postal_code,
                 'address' => $this->company->company_address,

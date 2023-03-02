@@ -14,8 +14,10 @@ class StudentForm3 extends JsonResource
      */
     public function toArray($request)
     {
+        // $this is student
         return [
             'student' => [
+                'id' => $this->id,
                 'first_name' => $this->user->first_name,
                 'last_name' => $this->user->last_name,
                 'faculty_name' => $this->facultyName(),
@@ -32,15 +34,20 @@ class StudentForm3 extends JsonResource
                 'full_name' => $this->industrySupervisor->user->fullName(),
                 'position' => $this->form2->supervisor_position,
             ],
-            'option'=>[
-                'type'=>$this->option->type,
-                'name'=>$this->option->name,
-            ],
-            'studentEvaluations'=>[
-                'option_id'=>$this->studentEvaluations->option_id,
-                'value'=>$this->studentEvaluations->value,
-            ]
+            // 'option'=>[
+            //     'type'=>$this->studentEvaluation->option->type,
+            //     'name'=>$this->studentEvaluation->option->name,
+            // ],
+            // 'sd' => $this->studentEvaluation,
+            // 'studentEvaluation' => $this->student_evaluations,
+            // 'studentEvaluations' => $this->when(isset($this->student_evaluations) && count($this->student_evaluations), function () {
+            //     return StudentEvaluationResource::collection($this->student_evaluations);
+            // }),
+            // 'ss' => StudentEvaluationResource::collection($this->student_evaluations),
+            'studentEvaluations' => $this->studentEvaluations,
+            // 'studentEvaluations' => isset($this->studentEvaluations) ? StudentEvaluationResource::collection($this->studentEvaluations) : null,
+            // 'studentEvaluations' => $this->studentEvaluations,
+            // 'studentEvaluations'=> StudentEvaluationResource::collection($this->studentEvaluations),
         ];
-
     }
 }

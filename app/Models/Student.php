@@ -77,7 +77,7 @@ class Student extends Model
     ];
     public const VERIFIED = [
         0 => 'بررسی نشده',
-    1 => 'تایید شده',
+        1 => 'تایید شده',
         2 => 'رد شده',
     ];
 
@@ -122,6 +122,11 @@ class Student extends Model
     {
         return $this->hasOne(Company::class);
     }
+    public function studentEvaluations()
+    {
+        return $this->hasMany(StudentEvaluation::class);
+    }
+
     // ###############################################
     // ############# RELATION RELATED FUNCTIONS ###############
     // ###############################################

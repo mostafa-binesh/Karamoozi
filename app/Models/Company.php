@@ -34,6 +34,9 @@ class Company extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function companyType() {
+        return SELF::COMPANY_TYPE[$this->company_type];
+    }
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################
