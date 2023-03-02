@@ -17,6 +17,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Models\Company;
 use App\Models\Form2s;
+// use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use App\Models\WeeklyReport;
 use Illuminate\Support\Facades\Artisan;
@@ -48,7 +49,7 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         Route::get('pre-reg', 'get_pre_registration');
         Route::post('pre-reg', 'post_pre_registration');
         Route::put('pre-reg', 'put_pre_registration');
-        // after student submitted pre reg, can see it's data with: 
+        // after student submitted pre reg, can see it's data with:
         Route::get('preRegInfo', 'studentPreRegInfo');
         // ######### PROFILE #########
         Route::get('profile', 'getStudentProfile');
@@ -115,6 +116,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms','forms');
         Route::get('forms/{id}','studentForms');
         Route::get('forms/{id}/form2','form2');
+        Route::get('forms/{id}/form3','form3');
     });
 });
 
@@ -138,9 +140,9 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         Artisan::call("migrate:fresh --seed");
     });
 });
-// // // 
+// // //
 // TEST CONTROLLER
-// // // 
+// // //
 Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('pagination', 'usersPagination');
     Route::get('user-function', function (Request $req) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\admin\StudentForm2;
+use App\Http\Resources\admin\StudentForm3;
 use App\Http\Resources\admin\StudentFormsStatus;
 use App\Models\User;
 use App\Models\Student;
@@ -239,6 +240,11 @@ class AdminStudentsController extends Controller
     {
         $student = Student::where("id", $id)->with(["form2"])->first();
         return StudentForm2::make($student);
+        return $student;
+    }
+    public function form3($id){
+        $student = Student::where("id", $id)->with(["option"])->with(["students_evaluations"])->first();
+        return StudentForm3::make($student);
         return $student;
     }
 }
