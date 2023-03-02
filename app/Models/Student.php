@@ -83,16 +83,7 @@ class Student extends Model
      *
      * @var array<int, string>
      */
-    // protected $guarded = [];
-    protected $fillable = [
-        'user_id',
-        'first_name',
-        'last_name',
-        'email',
-        'phone_number',
-        'student_number',
-        'national_code',
-    ];
+    protected $guarded = [];
     // ###############################################
     // ################## RELATIONSHIPS ###################
     // ###############################################
@@ -133,7 +124,8 @@ class Student extends Model
     // ###############################################
     public function facultyName()
     {
-        return $this->universityFaculty->faculty_name;
+        // ! added optional because some of values been hardcoded in the database and may have some problems
+        return optional($this->universityFaculty)->faculty_name;
     }
     public function professorName()
     {
@@ -141,7 +133,7 @@ class Student extends Model
     }
     public function companyName()
     {
-        return $this->company->company_name;
+        return optional($this->company)->company_name;
     }
     public function schedule()
     {

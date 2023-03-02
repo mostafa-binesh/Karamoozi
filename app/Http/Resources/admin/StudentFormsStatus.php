@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\admin;
 
+use App\Http\Resources\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StudentFormsStatus extends JsonResource
@@ -38,6 +39,7 @@ class StudentFormsStatus extends JsonResource
             $form2_status = 0;
         }
         return [
+            'student' => StudentFormsResource::make($this),
             // 'forms' => [
             'form2' => [ // internship start, the form that ind. supervisor sends
                 'status' => $form2_status,
@@ -54,7 +56,7 @@ class StudentFormsStatus extends JsonResource
             'finish_internship' => [
                 'status' => 0,
             ],
-            // ]
+            // ],
         ];
     }
 }

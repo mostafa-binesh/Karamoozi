@@ -24,6 +24,7 @@ class InitRegistrationStudents extends JsonResource
             'entrance_year' => $this->entrance_year(),
             'national_code' => $this->user->national_code,
             'phone_number' => $this->user->phone_number,
+            'verified' => $this->verified,
         ];
     }
 }
