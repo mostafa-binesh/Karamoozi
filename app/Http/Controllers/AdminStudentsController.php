@@ -97,7 +97,7 @@ class AdminStudentsController extends Controller
     }
     public function studentsHomePage()
     {
-        $users = Student::all();
+        $students = Student::all();
         // ! i handled the counters in backend not the database, i guess this way is faster
         // initial registration
         $init_unVerified = 0;
@@ -105,15 +105,15 @@ class AdminStudentsController extends Controller
         // pre reg students
         $preReg_unVerified = 0;
         $preReg_verified = 0;
-        foreach ($users as $user) {
-            if ($user->verified) {
+        foreach ($students as $student) {
+            if ($student->verified == 1) {
                 $init_verified++;
-            } else {
+            } else if ($student->verified == 2) {
                 $init_unVerified++;
             }
-            if ($user->pre_reg_verified) {
+            if ($student->pre_reg_verified == 1) {
                 $preReg_verified++;
-            } else {
+            } else if($student->pre_reg_verified == 2) {
                 $preReg_unVerified++;
             }
         }
@@ -157,7 +157,7 @@ class AdminStudentsController extends Controller
     public function initRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->verified = true;
+        $student->verified = 1; // 1: approved
         $student->init_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -175,7 +175,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->verified = false;
+        $student->verified = 2; // 2: denied
         $student->init_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -192,7 +192,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = true;
+        $student->pre_reg_verified = 1;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -210,7 +210,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = false;
+        $student->pre_reg_verified = 2;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -231,7 +231,7 @@ class AdminStudentsController extends Controller
     {
         // ! not completed yet
         // ! need to add other forms, now just form2nd has been added
-        $student = Student::where("id", $id)->with(['form2','user'])->first();
+        $student = Student::where("id", $id)->with(['form2', 'user'])->first();
         return StudentFormsStatus::make($student);
         return $student;
     }

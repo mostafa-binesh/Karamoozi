@@ -185,4 +185,11 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::delete('deleteWeeklyReports', function (Request $req) {
         return WeeklyReport::where('student_id', $req->student_id)->delete();
     });
+    Route::get('dupicateQuery', function (Request $req) {
+        // ! it seems two where clouses with same names doesn't work as expected
+        $students = Student::where('verified',0)->where('verified',1)->get();
+        // ! return query would be something like this where verified = 0 and where verified = 1
+        // return $x;
+        return $students;
+    });
 });
