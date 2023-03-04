@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Student;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class InitRegistrationStudents extends JsonResource
@@ -24,7 +25,7 @@ class InitRegistrationStudents extends JsonResource
             'entrance_year' => $this->entrance_year(),
             'national_code' => $this->user->national_code,
             'phone_number' => $this->user->phone_number,
-            'verified' => $this->verified,
+            'verified' => Student::VERIFIED[$this->verified],
         ];
     }
 }

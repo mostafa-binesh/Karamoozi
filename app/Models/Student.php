@@ -21,8 +21,6 @@ class Student extends Model
     use CPaginationTrait;
     protected $casts = [
         'evaluations' => 'array',
-        'verified' => 'boolean',
-        'pre_reg_verified' => 'boolean',
         'pre_reg_done' => 'boolean',
         // 'passed_units' => 'int',
         'student_number' => 'int',
@@ -77,6 +75,11 @@ class Student extends Model
         5 => 'پنج شنبه',
         6 => 'جمعه',
     ];
+    public const VERIFIED = [
+        0 => 'بررسی نشده',
+        1 => 'تایید شده',
+        2 => 'رد شده',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -119,6 +122,11 @@ class Student extends Model
     {
         return $this->hasOne(Company::class);
     }
+    public function studentEvaluations()
+    {
+        return $this->hasMany(StudentEvaluation::class);
+    }
+
     // ###############################################
     // ############# RELATION RELATED FUNCTIONS ###############
     // ###############################################
@@ -139,9 +147,10 @@ class Student extends Model
     {
         return $this->form2->schedule_table;
     }
-    public function indSupervisorReports() {
+    public function indSupervisorReports()
+    {
         // ! i guess there would be a good relation pattern for this one
-        return Report::where('form2_id',$this->form2->id)->get();
+        return Report::where('form2_id', $this->form2->id)->get();
     }
     // ###############################################
     // ##################  FUNCTIONS ###################

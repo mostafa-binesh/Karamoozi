@@ -21,13 +21,14 @@ class StudentFormsStatus extends JsonResource
         // 1: not checked
         // 2: refused
         // 3: approved
+        // #### FORM2
         $form2_status = 0;
         if (isset($this->form2)) {
             // available
-            if (!isset($this->form2->university_approval)) {
+            if (!isset($this->form2->verified)) {
                 // not checked
                 $form2_status = 1;
-            } elseif ($this->form2->university_approval) {
+            } elseif ($this->form2->verified) {
                 // approved
                 $form2_status = 3;
             } else {
@@ -38,6 +39,24 @@ class StudentFormsStatus extends JsonResource
             // form not available
             $form2_status = 0;
         }
+        // #### FORM3
+        $form3_status = 0;
+        if (isset($this->studentEvaluations)) {
+            // available
+            if (!isset($this->studentEvaluations->verified)) {
+                // not checked
+                $form3_status = 1;
+            } elseif ($this->studentEvaluations->verified) {
+                // approved
+                $form3_status = 3;
+            } else {
+                // refused
+                $form3_status = 2;
+            }
+        } else {
+            // form not available
+            $form3_status = 0;
+        }
         return [
             'student' => StudentFormsResource::make($this),
             // 'forms' => [
@@ -45,7 +64,7 @@ class StudentFormsStatus extends JsonResource
                 'status' => $form2_status,
             ],
             'form3' => [ // student evaluations
-                'status' => 0,
+                'status' => $form3_status,
             ],
             'form4' => [
                 'status' => 0,

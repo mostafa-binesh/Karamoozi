@@ -382,7 +382,11 @@ class IndustrySupervisorStudentController extends Controller
         // ! fix: delete evaluation column in students table
         // ! new implementation: save it on another table
         foreach ($req->data as $evaluation) {
-            StudentEvaluation::create($evaluation);
+            StudentEvaluation::create([
+                'student_id' => $student->id,
+                'option_id' => $evaluation['id'],
+                'value' => $evaluation['value'],
+            ]);
         }
         $student->internship_finished_at = $req->internship_finished_at;
         $student->internship_status = 3;

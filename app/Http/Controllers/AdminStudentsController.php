@@ -98,7 +98,7 @@ class AdminStudentsController extends Controller
     }
     public function studentsHomePage()
     {
-        $users = Student::all();
+        $students = Student::all();
         // ! i handled the counters in backend not the database, i guess this way is faster
         // initial registration
         $init_unVerified = 0;
@@ -106,15 +106,15 @@ class AdminStudentsController extends Controller
         // pre reg students
         $preReg_unVerified = 0;
         $preReg_verified = 0;
-        foreach ($users as $user) {
-            if ($user->verified) {
+        foreach ($students as $student) {
+            if ($student->verified == 1) {
                 $init_verified++;
-            } else {
+            } else if ($student->verified == 2) {
                 $init_unVerified++;
             }
-            if ($user->pre_reg_verified) {
+            if ($student->pre_reg_verified == 1) {
                 $preReg_verified++;
-            } else {
+            } else if ($student->pre_reg_verified == 2) {
                 $preReg_unVerified++;
             }
         }
@@ -146,19 +146,31 @@ class AdminStudentsController extends Controller
         // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->where('pre_reg_done', true)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
-
             'meta' => $students['meta'],
             'data' => [
-                // 'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
                 'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
         ]);
     }
+    public function forms(Request $req)
+    {
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
+        return response()->json([
+            'meta' => $students['meta'],
+            'data' => [
+                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
+                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
+                'students' => $students['data'],
+            ]
+        ]);
+        return $students;
+    }
     public function initRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->verified = true;
+        $student->verified = 1; // 1: approved
         $student->init_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -176,7 +188,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->verified = false;
+        $student->verified = 2; // 2: denied
         $student->init_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -193,7 +205,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = true;
+        $student->pre_reg_verified = 1;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -211,7 +223,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = false;
+        $student->pre_reg_verified = 2;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -223,27 +235,63 @@ class AdminStudentsController extends Controller
         $student = Student::findorfail($id);
         return StudentPreRegDescription::make($student);
     }
-    public function forms(Request $req)
-    {
-        $students = Student::whereHas("form2")->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
-        return $students;
-    }
     public function studentForms($id)
     {
         // ! not completed yet
         // ! need to add other forms, now just form2nd has been added
-        $student = Student::where("id", $id)->with(['form2','user'])->first();
+        $student = Student::where("id", $id)->with(['form2', 'user','studentEvaluations'])->first();
         return StudentFormsStatus::make($student);
         return $student;
     }
+    // ###################################### 
+    // ############## FORM2 #####################
+    // ###################################### 
     public function form2($id)
     {
         $student = Student::where("id", $id)->with(["form2"])->first();
         return StudentForm2::make($student);
         return $student;
     }
-    public function form3($id){
-        $student = Student::where("id", $id)->with(["option"])->with(["students_evaluations"])->first();
+    public function form2Verify($id)
+    {
+        $student = Student::findorfail($id);
+        $student->form2->verified = 1;
+        $student->form2->save();
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form2unVerify($id)
+    {
+        $student = Student::findorfail($id);
+        // $student->form2->verified = Student::VERIFIED[2];
+        $student->form2->verified = 2;
+        $student->form2->save();
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form3($id)
+    {
+        $student = Student::where("id", $id)->with("studentEvaluations")->first();
+        // return $student->studentEvaluations; 
         return StudentForm3::make($student);
     }
+    public function form3Verify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->evaluation_verified = 1;
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form3UnVerify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->evaluation_verified = 2;
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+
 }

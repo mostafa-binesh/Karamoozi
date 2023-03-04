@@ -195,7 +195,7 @@ class StudentController extends Controller
     public function studentPreRegInfo()
     {
         $user = Auth::user();
-        if (!$user->student->pre_reg_verified) {
+        if ($user->student->pre_reg_verified != 1) {
             return response()->json([
                 'message' => 'شرکتی برای شما معرفی نشده است',
             ], 400);
@@ -209,7 +209,8 @@ class StudentController extends Controller
         if (
             !$student->IndustrySupervisorVerified()
             || !$student->pre_reg_done
-            || !$student->verified
+            // || !$student->verified
+            || $student->verified != Student::VERIFIED[1]
             // || !$student->form2->university_approval
             || !$student->faculty_verified
         ) {
@@ -220,6 +221,7 @@ class StudentController extends Controller
                     [
                         'name' => 'تاییدیه سرپرست دانشکده',
                         'done' => $student->verified,
+                        // ! TODO: tell frontend that need to change it
                     ],
                     [
                         'name' => 'انجام پیش ثبت نام',
