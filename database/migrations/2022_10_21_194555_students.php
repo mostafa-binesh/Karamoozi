@@ -64,6 +64,7 @@ return new class extends Migration
 
             // $table->json('evaluations')->nullable();
             $table->text('evaluations')->nullable();
+            $table->unsignedTinyInteger('evaluations_verified')->default(0);
 
             
             // start of internship (apprent.) figma

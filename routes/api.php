@@ -2,6 +2,7 @@
 // use Melipayamak\MelipayamakApi;
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminMasterController;
 use App\Http\Controllers\AdminStudentsController;
 use App\Models\User;
 use App\Models\Student;
@@ -98,7 +99,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
 // ! ##################### ADMIN  #####################
 // ###############                       #####
 Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
-    Route::controller(AdminStudentsController::class)->prefix('students')->group(function() {
+    Route::controller(AdminStudentsController::class)->prefix('students')->group(function () {
         Route::get('home', 'studentsHomePage');
         // list of students waiting for initial registration approval
         Route::get('initReg', 'initialRegistrationStudents');
@@ -113,11 +114,16 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
         Route::get('{id}/preReg/desc', 'preRegDesc');
         // forms
-        Route::get('forms','forms');
-        Route::get('forms/{id}','studentForms');
-        Route::get('forms/{id}/form2','form2');
-        Route::get('forms/{id}/form3','form3');
+        Route::get('forms', 'forms');
+        Route::get('forms/{id}', 'studentForms');
+        Route::get('forms/{id}/form2', 'form2');
+        Route::put('forms/{id}/form2/verify', 'form2Verify');
+        Route::put('forms/{id}/form2/unverify', 'form2unVerify');
+        Route::get('forms/{id}/form3', 'form3');
+        Route::get('forms/{id}/form3/verify', 'form3Verify');
+        Route::get('forms/{id}/form3/unverify', 'form3UnVerify');
     });
+    
 });
 
 
@@ -189,7 +195,7 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('dupicateQuery', function (Request $req) {
         // ! it seems two where clouses with same names doesn't work as expected
-        $students = Student::where('verified',0)->where('verified',1)->get();
+        $students = Student::where('verified', 0)->where('verified', 1)->get();
         // ! return query would be something like this where verified = 0 and where verified = 1
         // return $x;
         return $students;

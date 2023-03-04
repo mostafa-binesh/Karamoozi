@@ -156,7 +156,7 @@ class AdminStudentsController extends Controller
     }
     public function forms(Request $req)
     {
-        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty','company'])->cpagination($req, PreRegStudents::class);
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -239,15 +239,37 @@ class AdminStudentsController extends Controller
     {
         // ! not completed yet
         // ! need to add other forms, now just form2nd has been added
-        $student = Student::where("id", $id)->with(['form2', 'user'])->first();
+        $student = Student::where("id", $id)->with(['form2', 'user','studentEvaluations'])->first();
         return StudentFormsStatus::make($student);
         return $student;
     }
+    // ###################################### 
+    // ############## FORM2 #####################
+    // ###################################### 
     public function form2($id)
     {
         $student = Student::where("id", $id)->with(["form2"])->first();
         return StudentForm2::make($student);
         return $student;
+    }
+    public function form2Verify($id)
+    {
+        $student = Student::findorfail($id);
+        $student->form2->verified = 1;
+        $student->form2->save();
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form2unVerify($id)
+    {
+        $student = Student::findorfail($id);
+        // $student->form2->verified = Student::VERIFIED[2];
+        $student->form2->verified = 2;
+        $student->form2->save();
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
     }
     public function form3($id)
     {
@@ -256,4 +278,21 @@ class AdminStudentsController extends Controller
         return StudentForm3::make($student);
         return $student;
     }
+    public function form3Verify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->evaluation_verified = 1;
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form3UnVerify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->evaluation_verified = 2;
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+
 }

@@ -33,9 +33,7 @@ return new class extends Migration
             $table->json('schedule_table');
             $table->text('description')->nullable();
             // approvals
-            $table->boolean("university_approval")->default(false);
-            $table->boolean("company_approval")->default(false);
-            $table->boolean("supervisor_approval")->default(false);
+            $table->unsignedTinyInteger("verified")->default(0);
             $table->timestamps();
         });
     }
