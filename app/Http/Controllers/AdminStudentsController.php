@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\admin\CompanyEvaluationResource;
 use App\Http\Resources\admin\StudentForm2;
 use App\Http\Resources\admin\StudentForm3;
+use App\Http\Resources\admin\StudentForm4Resource;
 use App\Http\Resources\admin\StudentFormsStatus;
 use App\Models\User;
 use App\Models\Student;
@@ -297,15 +298,9 @@ class AdminStudentsController extends Controller
     }
     public function form4($id)
     {
-        $companyEvaluations = CompanyEvaluation::where('student_id', $id)->with('option')->get();
-        $student = Student::where("id", $id)->first();
-        return [
-            'data' => [
-                'evaluations' => CompanyEvaluationResource::collection($companyEvaluations),
-                'comment' => 'یه متن تست هارد کود',
-                'status' => $student->form4_verified,
-            ]
-        ];
+        // $companyEvaluations = CompanyEvaluation::where('student_id', $id)->with('option')->get();
+        $student = Student::findorfail($id)->with('user')->first();
+        return StudentForm4Resource::make($student);
     }
     public function form4Verify($id)
     {
