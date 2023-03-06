@@ -284,6 +284,7 @@ class AdminStudentsController extends Controller
     {
         $student = Student::where("id", $id)->first();
         $student->evaluation_verified = 2;
+        $student->save();
         return response()->json([
             'message' => 'فرم تایید شد',
         ]);
@@ -292,8 +293,9 @@ class AdminStudentsController extends Controller
     {
         $student = Student::where("id", $id)->first();
         $student->evaluation_verified = 3;
+        $student->save();
         return response()->json([
-            'message' => 'فرم تایید شد',
+            'message' => 'فرم رد شد',
         ]);
     }
     public function form4($id)
