@@ -76,9 +76,10 @@ class Student extends Model
         6 => 'جمعه',
     ];
     public const VERIFIED = [
-        0 => 'بررسی نشده',
-        1 => 'تایید شده',
-        2 => 'رد شده',
+        0 => 'موجود نیست',
+        1 => 'بررسی نشده',
+        2 => 'تایید شده',
+        3 => 'رد شده',
     ];
 
     /**
@@ -122,6 +123,7 @@ class Student extends Model
     {
         return $this->hasOne(Company::class);
     }
+    // form3
     public function studentEvaluations()
     {
         return $this->hasMany(StudentEvaluation::class);
