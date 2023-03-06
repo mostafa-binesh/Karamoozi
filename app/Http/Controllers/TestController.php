@@ -35,4 +35,146 @@ class TestController extends Controller
         // if now friday
         // echo ;
     }
+    public function num2word(Request $req)
+    {
+        // return SELF::number_to_words($req->num);
+        $words = array(
+            0 => 'صفر',
+            1 => 'یک',
+            2 => 'دو',
+            3 => 'سه',
+            4 => 'چهار',
+            5 => 'پنج',
+            6 => 'شش',
+            7 => 'هفت',
+            8 => 'هشت',
+            9 => 'نه',
+            10 => 'ده',
+            11 => 'یازده',
+            12 => 'دوازده',
+            13 => 'سیزده',
+            14 => 'چهارده',
+            15 => 'پانزده',
+            16 => 'شانزده',
+            17 => 'هفده',
+            18 => 'هجده',
+            19 => 'نوزده',
+            20 => 'بیست',
+            30 => 'سی',
+            40 => 'چهل',
+            50 => 'پنجاه',
+            60 => 'شصت',
+            70 => 'هفتاد',
+            80 => 'هشتاد',
+            90 => 'نود'
+        );
+        // return 1;
+        $num_to_words = new NumberToWords($words);
+        $number = 1234.56;
+        $words = $num_to_words->convert(8521);
+        return $words;
+    }
+    public function number_to_words($number)
+    {
+        $words = array(
+            0 => 'صفر',
+            1 => 'یک',
+            2 => 'دو',
+            3 => 'سه',
+            4 => 'چهار',
+            5 => 'پنج',
+            6 => 'شش',
+            7 => 'هفت',
+            8 => 'هشت',
+            9 => 'نه',
+            10 => 'ده',
+            11 => 'یازده',
+            12 => 'دوازده',
+            13 => 'سیزده',
+            14 => 'چهارده',
+            15 => 'پانزده',
+            16 => 'شانزده',
+            17 => 'هفده',
+            18 => 'هجده',
+            19 => 'نوزده',
+            20 => 'بیست',
+            30 => 'سی',
+            40 => 'چهل',
+            50 => 'پنجاه',
+            60 => 'شصت',
+            70 => 'هفتاد',
+            80 => 'هشتاد',
+            90 => 'نود'
+        );
+        if (!is_numeric($number)) {
+            return false;
+        }
+
+        $num_words = array();
+
+        // Split the number into integer and decimal parts
+        $parts = explode('.', $number);
+
+        // Handle the integer part
+        $integer_part = $parts[0];
+        if ($integer_part < 0) {
+            $num_words[] = 'منفی';
+            $integer_part = abs($integer_part);
+        }
+
+        $places = array(
+            1000000000000,
+            1000000000,
+            1000000,
+            1000,
+            1
+        );
+
+        foreach ($places as $place) {
+            if ($integer_part >= $place) {
+                $current_place = floor($integer_part / $place);
+                $integer_part %= $place;
+
+                if ($current_place < 21) {
+                    $num_words[] = $words[$current_place];
+                } elseif ($current_place < 100) {
+                    $num_words[] = $words[10 * floor($current_place / 10)];
+                    if ($current_place % 10 > 0) {
+                        $num_words[] = $words[$current_place % 10];
+                    }
+                } else {
+                    $num_words[] = self::number_to_words($current_place, $words) . ' ' . $words[100];
+                }
+
+                if ($place > 1) {
+                    $num_words[] = $words[$place];
+                }
+            }
+        }
+        // Add separator between the words
+        // $separator = ' و ';
+        // $num_words = array_filter($num_words);
+        // $last_word = array_pop($num_words);
+        // if (count($num_words) > 0) {
+        //     $num_words[] = $separator;
+        // }
+        // $num_words[] = $last_word;
+        // Handle the decimal part
+        if (count($parts) > 1 && is_numeric($parts[1])) {
+            $decimal_part = $parts[1];
+            $num_words[] = 'ممیز';
+            for ($i = 0; $i < strlen($decimal_part); $i++) {
+                if ($decimal_part[$i] < 21) {
+                    $num_words[] = $words[$decimal_part[$i]];
+                } elseif ($decimal_part[$i] < 100) {
+                    $num_words[] = $words[10 * floor($decimal_part[$i] / 10)];
+                    if ($decimal_part[$i] % 10 > 0) {
+                        $num_words[] = $words[$decimal_part[$i] % 10];
+                    }
+                }
+            }
+        }
+
+        return implode(' ', $num_words);
+    }
 }
