@@ -16,10 +16,13 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sender_id');
-            $table->unsignedBigInteger('receiver_id');
-            $table->string('title');
-            $table->text('body');   
-            $table->boolean('read')->default(false);
+            $table->foreign('sender_id')->references('id')
+                ->on('users')->onDelete('cascade');
+            $table->text('body');
+            $table->unsignedBigInteger('chat_id');
+            $table->foreign('chat_id')->references('id')
+                ->on('chats')->onDelete('cascade');
+            // $table->boolean('read')->default(false);
             // need to add media here, or use spatie media library
             $table->timestamps();
         });
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messaging');
+        Schema::dropIfExists('messages');
     }
 };

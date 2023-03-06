@@ -278,7 +278,6 @@ class AdminStudentsController extends Controller
         $student = Student::where("id", $id)->with("studentEvaluations")->first();
         // return $student->studentEvaluations; 
         return StudentForm3::make($student);
-        return $student;
     }
     public function form3Verify($id)
     {

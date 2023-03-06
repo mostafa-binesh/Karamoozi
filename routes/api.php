@@ -155,6 +155,12 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
 // TEST CONTROLLER
 // // //
 Route::prefix('test')->controller(TestController::class)->group(function () {
+    Route::get('send/{id}','sender');
+    Route::get('receive/{id}','receive');
+    Route::post('create_chat','create_chat');
+    Route::post('create_message','create_message');
+
+
     Route::get('pagination', 'usersPagination');
     Route::get('user-function', function (Request $req) {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
