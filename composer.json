@@ -13,6 +13,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "melipayamak/laravel": "1.0.0",
+        "mojtabaahn/php-persian-number-to-words": "^1.1",
         "php-open-source-saver/jwt-auth": "^2.0",
         "spatie/laravel-json-api-paginate": "^1.12",
         "spatie/laravel-permission": "^5.5",

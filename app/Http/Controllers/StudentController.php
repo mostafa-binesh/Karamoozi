@@ -210,7 +210,8 @@ class StudentController extends Controller
             !$student->IndustrySupervisorVerified()
             || !$student->pre_reg_done
             // || !$student->verified
-            || $student->verified != Student::VERIFIED[1]
+            // || $student->verified != Student::VERIFIED[1]
+            || $student->verified != 2
             // || !$student->form2->university_approval
             || !$student->faculty_verified
         ) {

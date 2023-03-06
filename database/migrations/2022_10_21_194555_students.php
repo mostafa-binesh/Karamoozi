@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedBigInteger('supervisor_id')->nullable(); // this is for industry supervisor
             // ! manzoor az grade, degree (maghta' tahisilie :) )
             // $table->float('grade')->nullable(); 
-            $table->unsignedInteger('grade')->nullable(); 
+            $table->unsignedInteger('grade')->nullable();
             // ! FIX: there is no value for grade in pre-reg
             $table->unsignedTinyInteger('passed_units')->nullable();
             $table->bigInteger('faculty_id')->unsigned()->nullable();
@@ -46,10 +46,9 @@ return new class extends Migration
             $table->boolean('faculty_verified')->default(0); // fourth step of verification before being able to do anything, faculty approval
             // first stage | academic status page on figma | pre-internship | something between starting of pre-reg 
             // and internship
-
             // ! admin controllers
             $table->unsignedTinyInteger('pre_reg_verified')->default(0);
-            $table->string('init_reg_rejection_reason')->nullable();
+            $table->string('init_reg_rejection_reason')->nullable(); // this field controller is verified
             $table->string('pre_reg_rejection_reason')->nullable();
 
             $table->boolean('expert_verification')->default(0);
@@ -64,9 +63,11 @@ return new class extends Migration
 
             // $table->json('evaluations')->nullable();
             $table->text('evaluations')->nullable();
-            $table->unsignedTinyInteger('evaluations_verified')->default(0);
-
+            $table->unsignedTinyInteger('evaluations_verified')->default(0); // = form3 verified
             
+            $table->unsignedTinyInteger('form4_verified')->default(0); // = companyEvaluations
+
+
             // start of internship (apprent.) figma
 
             // $table->boolean('supervisor_submitted')->default(0); // it can be handled in another way 

@@ -1,5 +1,4 @@
 <?php
-// use Melipayamak\MelipayamakApi;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminMasterController;
@@ -16,17 +15,18 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\WeeklyReportController;
+use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Models\Company;
 use App\Models\Form2s;
-// use App\Models\Form2s;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
+use App\Models\StudentEvaluation;
 use App\Models\WeeklyReport;
 use Illuminate\Support\Facades\Artisan;
 
-// NOTE: ALL ROUTES BEGINS WITH LOCALHOST/API/...
+// NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 
 // ###############                        #####
-// ################ AUTHENTICATION ##############
+// ! ################ AUTHENTICATION ##############
 // ###############                       #####
 
 Route::controller(AuthController::class)->group(function () {
@@ -119,11 +119,16 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/form2', 'form2');
         Route::put('forms/{id}/form2/verify', 'form2Verify');
         Route::put('forms/{id}/form2/unverify', 'form2unVerify');
+        // form3
         Route::get('forms/{id}/form3', 'form3');
         Route::get('forms/{id}/form3/verify', 'form3Verify');
         Route::get('forms/{id}/form3/unverify', 'form3UnVerify');
+        // form4
+        Route::get('forms/{id}/form4', 'form4');
+        Route::put('forms/{id}/form4/verify', 'form4Verify');
+        Route::put('forms/{id}/form4/unverify', 'form4UnVerify');
     });
-    
+    Route::resource('master', AdminMasterController::class);
 });
 
 
@@ -172,6 +177,15 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('allStudents', function (Request $req) {
         return Student::all();
     });
+    Route::get('student/{id}/studentEvaluation', function ($id) {
+        $student = Student::findorfail($id)->with('studentEvaluations')->first();
+        return StudentEvaluationResource::collection($student->studentEvaluations);
+    });
+    Route::get('studentEvaluation/{id}', function ($id) {
+        // $student = Student::findorfail($id)->with('studentEvaluations')->first();
+        $studentEvalution = StudentEvaluation::findorfail($id)->getRelations();
+        return StudentEvaluationResource::collection($studentEvalution);
+    });
     Route::get('allUsers', function (Request $req) {
         return User::all();
     });
@@ -200,4 +214,5 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
         // return $x;
         return $students;
     });
+    Route::get('num2word', 'num2word');
 });

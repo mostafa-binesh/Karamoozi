@@ -30,10 +30,10 @@ class StudentFormsStatus extends JsonResource
                 $form2_status = 1;
             } elseif ($this->form2->verified) {
                 // approved
-                $form2_status = 3;
+                $form2_status = 2;
             } else {
                 // refused
-                $form2_status = 2;
+                $form2_status = 3;
             }
         } else {
             // form not available
@@ -48,10 +48,10 @@ class StudentFormsStatus extends JsonResource
                 $form3_status = 1;
             } elseif ($this->studentEvaluations->verified) {
                 // approved
-                $form3_status = 3;
+                $form3_status = 2;
             } else {
                 // refused
-                $form3_status = 2;
+                $form3_status = 3;
             }
         } else {
             // form not available
@@ -67,7 +67,7 @@ class StudentFormsStatus extends JsonResource
                 'status' => $form3_status,
             ],
             'form4' => [
-                'status' => 0,
+                'status' => $this->form4_verified,
             ],
             'weekly_reports' => [
                 'status' => 0,

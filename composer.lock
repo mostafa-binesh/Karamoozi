@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "53af76d01231bcf1d174e13cf130470f",
+    "content-hash": "fca4f4ee1b326b715822229dcc06b23d",
     "packages": [
         {
             "name": "brick/math",
@@ -2124,6 +2124,56 @@
                 "source": "https://github.com/Melipayamak/melipayamak-php/tree/1.0.0"
             },
             "time": "2019-12-23T13:19:36+00:00"
+        },
+        {
+            "name": "mojtabaahn/php-persian-number-to-words",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mojtabaahn/php-persian-number-to-words.git",
+                "reference": "c48a72eb18085336bff2e42a69568a70aed02a9f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mojtabaahn/php-persian-number-to-words/zipball/c48a72eb18085336bff2e42a69568a70aed02a9f",
+                "reference": "c48a72eb18085336bff2e42a69568a70aed02a9f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4"
+            },
+            "require-dev": {
+                "pestphp/pest": "^0.2.3",
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MojtabaaHN\\PersianNumberToWords\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "mojtabaa hn",
+                    "email": "mojtabaa.hn@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Converts number to words in persian",
+            "homepage": "https://github.com/mojtabaahn/php-number-to-words",
+            "keywords": [
+                "numbers-to-words",
+                "persian"
+            ],
+            "support": {
+                "issues": "https://github.com/mojtabaahn/php-persian-number-to-words/issues",
+                "source": "https://github.com/mojtabaahn/php-persian-number-to-words/tree/master"
+            },
+            "time": "2020-08-04T11:03:32+00:00"
         },
         {
             "name": "monolog/monolog",

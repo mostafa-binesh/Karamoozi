@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Option;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CompanyEvaluation extends Model
 {
@@ -13,6 +14,6 @@ class CompanyEvaluation extends Model
     // ################## RELATIONSHIPS ###################
     // ###############################################
     public function option() {
-        return $this->belongsTo(Options::class,'option_id','id');
+        return $this->belongsTo(Option::class,'option_id','id');
     }
 }

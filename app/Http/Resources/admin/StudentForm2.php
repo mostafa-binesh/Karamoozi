@@ -18,10 +18,13 @@ class StudentForm2 extends JsonResource
     {
         // $this is student
         return [
+            'status' => $this->form2->verified,
             'student' => [
+                'id' => $this->id,
                 'first_name' => $this->user->first_name,
                 'last_name' => $this->user->last_name,
                 'faculty_name' => $this->facultyName(),
+                'student_number' => $this->student_number,
             ],
             'form2' => [
                 'created_at' => $this->form2->created_at->format('Y-m-d'),
@@ -29,6 +32,7 @@ class StudentForm2 extends JsonResource
                 'internship_start_date' => $this->form2->internship_start_date,
                 // 'schedule_table' => $this->form2->schedule_table,
                 'schedule_table' => ScheduleTableResource::make($this->form2->schedule_table),
+                'status' => $this->form2->verified,
             ],
             'company' => [
                 // ! i guess there are some problems with CompanyName function

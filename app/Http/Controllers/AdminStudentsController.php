@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\admin\CompanyEvaluationResource;
 use App\Http\Resources\admin\StudentForm2;
 use App\Http\Resources\admin\StudentForm3;
 use App\Http\Resources\admin\StudentFormsStatus;
@@ -17,6 +18,7 @@ use App\ModelFilters\Admin\InitRegStudentsFilter;
 use App\ModelFilters\Admin\PreRegStudentsFilter;
 use App\ModelFilters\Admin\StudentsFilter;
 use App\ModelFilters\StudentFilter;
+use App\Models\CompanyEvaluation;
 use App\Models\University_faculty;
 
 class AdminStudentsController extends Controller
@@ -239,7 +241,7 @@ class AdminStudentsController extends Controller
     {
         // ! not completed yet
         // ! need to add other forms, now just form2nd has been added
-        $student = Student::where("id", $id)->with(['form2', 'user','studentEvaluations'])->first();
+        $student = Student::where("id", $id)->with(['form2', 'user', 'studentEvaluations'])->first();
         return StudentFormsStatus::make($student);
         return $student;
     }
@@ -255,20 +257,20 @@ class AdminStudentsController extends Controller
     public function form2Verify($id)
     {
         $student = Student::findorfail($id);
-        $student->form2->verified = 1;
+        $student->form2->verified = 2;
         $student->form2->save();
         return response()->json([
-            'message' => 'فرم تایید شد',
+            'message' => 'فرم تایید شد| وضعیت 2',
         ]);
     }
     public function form2unVerify($id)
     {
         $student = Student::findorfail($id);
         // $student->form2->verified = Student::VERIFIED[2];
-        $student->form2->verified = 2;
+        $student->form2->verified = 3;
         $student->form2->save();
         return response()->json([
-            'message' => 'فرم تایید شد',
+            'message' => 'فرم رد شد | وضعیت 3',
         ]);
     }
     public function form3($id)
@@ -281,7 +283,7 @@ class AdminStudentsController extends Controller
     public function form3Verify($id)
     {
         $student = Student::where("id", $id)->first();
-        $student->evaluation_verified = 1;
+        $student->evaluation_verified = 2;
         return response()->json([
             'message' => 'فرم تایید شد',
         ]);
@@ -289,10 +291,39 @@ class AdminStudentsController extends Controller
     public function form3UnVerify($id)
     {
         $student = Student::where("id", $id)->first();
-        $student->evaluation_verified = 2;
+        $student->evaluation_verified = 3;
         return response()->json([
             'message' => 'فرم تایید شد',
         ]);
     }
-
+    public function form4($id)
+    {
+        $companyEvaluations = CompanyEvaluation::where('student_id', $id)->with('option')->get();
+        $student = Student::where("id", $id)->first();
+        return [
+            'data' => [
+                'evaluations' => CompanyEvaluationResource::collection($companyEvaluations),
+                'comment' => 'یه متن تست هارد کود',
+                'status' => $student->form4_verified,
+            ]
+        ];
+    }
+    public function form4Verify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->form4_verified = 2;
+        $student->save();
+        return response()->json([
+            'message' => 'فرم تایید شد',
+        ]);
+    }
+    public function form4UnVerify($id)
+    {
+        $student = Student::where("id", $id)->first();
+        $student->form4_verified = 3;
+        $student->save();
+        return response()->json([
+            'message' => 'فرم رد شد',
+        ]);
+    }
 }

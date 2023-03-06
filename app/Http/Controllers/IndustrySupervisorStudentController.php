@@ -217,7 +217,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_department' => 'required',
             'supervisor_position' => 'required',
             'internship_start_date' => 'required|date',
-            'internship_website' => 'required',
+            'internship_website' => 'present',
             'description' => 'nullable',
             // 'schedule_table' => 'required|array|size:6',
             'reports' => 'required|array',
@@ -327,6 +327,7 @@ class IndustrySupervisorStudentController extends Controller
     }
     public function industrySupervisorEvaluateStudentGET(Request $req)
     {
+        // ! not optimized queries
         $validator = Validator::make($req->all(), [
             'student_number' => 'required|exists:students,student_number',
         ]);
@@ -390,6 +391,7 @@ class IndustrySupervisorStudentController extends Controller
         }
         $student->internship_finished_at = $req->internship_finished_at;
         $student->internship_status = 3;
+        $student->evaluation_verified = 1;
         $student->save();
         return [
             'message' => 'عملیات با موفقیت انجام شد',
