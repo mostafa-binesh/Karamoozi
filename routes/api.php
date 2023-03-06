@@ -121,8 +121,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('forms/{id}/form2/unverify', 'form2unVerify');
         // form3
         Route::get('forms/{id}/form3', 'form3');
-        Route::get('forms/{id}/form3/verify', 'form3Verify');
-        Route::get('forms/{id}/form3/unverify', 'form3UnVerify');
+        Route::put('forms/{id}/form3/verify', 'form3Verify');
+        Route::put('forms/{id}/form3/unverify', 'form3UnVerify');
         // form4
         Route::get('forms/{id}/form4', 'form4');
         Route::put('forms/{id}/form4/verify', 'form4Verify');
