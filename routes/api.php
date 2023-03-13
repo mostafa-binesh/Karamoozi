@@ -18,11 +18,13 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\AdminMasterController;
+use App\Http\Controllers\AmdinCompanyController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AdminStudentsController;
 use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
+use Spatie\Permission\Contracts\Role;
 
 // NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 
@@ -135,6 +137,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
     Route::resource('master', AdminMasterController::class);
+    Route::resource('company',AmdinCompanyController::class);
 });
 
 

@@ -7,7 +7,6 @@ use App\Models\Employee;
 use App\Models\User;
 use App\Models\University_faculty;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 class AdminMasterController extends Controller
 {
@@ -44,18 +43,17 @@ class AdminMasterController extends Controller
         $validator = Validator::make($req->all(), [
             'first_name'=>'required',
             'last_name'=>'required',
-            'email'=>'email|required',
-            'national_code'=>'required|max:10|min:10',
-            'PersonnelCode'=>'required|max:10|min:10',
-            'phone_number'=>'required|max:11|min:11',
-            'faculty_name'=>'required'
+            'email'=>'email|required|unique:User,email',
+            'national_code'=>'required|max:10|min:10|unique:User,national_code',
+            'PersonnelCode'=>'required|max:10|min:10|unique:User,username',
+            'phone_number'=>'required|max:11|min:11|unique:User,phone_number',
+            'faculty_id'=>'required'
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors(),
             ], 400);
         }
-        $faculty=University_faculty::where("faculty_name",$req->faculty_name)->first();
         $master=User::create([
             'first_name'=>$req->first_name,
             'last_name'=>$req->last_name,
@@ -66,7 +64,7 @@ class AdminMasterController extends Controller
         ]);
         Employee::create([
             'user_id'=>$master->id,
-            'faculty_id'=>$faculty->id,
+            'faculty_id'=>$req->faculty_id,
         ]);
         return response()->json([
             'message' => 'استاد با موفقیت اضافه شد',
@@ -98,8 +96,13 @@ class AdminMasterController extends Controller
      */
     public function edit($id)
     {
-        $master=Employee::where("user_id",$id)->with(["user",'faculty'])->first();
-        return $master;
+        $master = User::findorfail($id);
+        if ($master->cRole() != 'master') {
+            return response()->json([
+                'message' => 'استاد یافت نشد'
+            ], 400);
+        }
+        return MasterResource::make($master);
     }
 
     /**
@@ -114,11 +117,11 @@ class AdminMasterController extends Controller
         $validator = Validator::make($req->all(), [
             'first_name'=>'required',
             'last_name'=>'required',
-            'email'=>'email|required',
-            'national_code'=>'required|max:10|min:10',
-            'PersonnelCode'=>'required|max:10|min:10',
-            'phone_number'=>'required|max:11|min:11',
-            'faculty_name'=>'required'
+            'email'=>'email|required|unique:User,email',
+            'national_code'=>'required|max:10|min:10|unique:User,national_code',
+            'PersonnelCode'=>'required|max:10|min:10|unique:User,username',
+            'phone_number'=>'required|max:11|min:11|unique:User,phone_number',
+            'faculty_id'=>'required'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -133,9 +136,8 @@ class AdminMasterController extends Controller
         $master->username=$req->PersonnelCode;
         $master->national_code=$req->national_code;
         $master->save();
-        $emp=Employee::where("user_id",$id);
-        $faculty=University_faculty::where("faculty_name",$req->faculty_name)->first();
-        $emp->faculty_id=$faculty->id;
+        $emp=Employee::where("user_id",$id)->first();
+        $emp->faculty_id=$req->faculty_id;
         $emp->save();
         return response()->json([
             'message' => 'اطلاعات با موفقیت ویرایش شد',
