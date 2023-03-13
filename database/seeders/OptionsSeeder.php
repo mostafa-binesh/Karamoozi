@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Options;
+use App\Models\Option;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +16,7 @@ class OptionsSeeder extends Seeder
     public function run()
     {
         // Options::factory()->times(5)->create();
-        Options::insert(
+        Option::insert(
             [
                 [
                     'type' => 'industry_supervisor_evaluation',

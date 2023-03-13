@@ -141,4 +141,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->offset((($req->page ?? 1) - 1) * ($req->per_page ?? 5))->limit(($req->per_page ?? 5))->get();
     }
+
 }

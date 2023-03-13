@@ -241,6 +241,6 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get("queryTest", function (Request $req) {
         Student::where('id', '>', 1)->orWhere('id', '<', 100)->with('user')->get();
-        return $z;
+        // return $z;
     });
 });

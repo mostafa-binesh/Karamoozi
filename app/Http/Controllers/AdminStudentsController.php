@@ -250,9 +250,9 @@ class AdminStudentsController extends Controller
         return StudentFormsStatus::make($student);
         return $student;
     }
-    // ###################################### 
+    // ######################################
     // ############## FORM2 #####################
-    // ###################################### 
+    // ######################################
     public function form2($id)
     {
         $student = Student::where("id", $id)->with(["form2"])->first();
@@ -281,7 +281,7 @@ class AdminStudentsController extends Controller
     public function form3($id)
     {
         $student = Student::where("id", $id)->with("studentEvaluations")->first();
-        // return $student->studentEvaluations; 
+        // return $student->studentEvaluations;
         return StudentForm3::make($student);
     }
     public function form3Verify($id)
@@ -379,7 +379,7 @@ class AdminStudentsController extends Controller
                 //     ], [
                 //         'status' => 3,
                 //         'count' => 0
-                //     ],   
+                //     ],
             ]);
         }
         return $weeks = [
