@@ -70,10 +70,10 @@ class StudentFormsStatus extends JsonResource
                 'status' => $this->form4_verified,
             ],
             'weekly_reports' => [
-                'status' => 0,
+                'status' => 1,
             ],
             'finish_internship' => [
-                'status' => 0,
+                'status' => 1,
             ],
             // ],
         ];

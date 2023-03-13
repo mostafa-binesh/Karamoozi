@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Str;
+use App\Traits\CPaginationTrait;
 use Spatie\Permission\Models\Role;
 use App\Notifications\PasswordReset;
 use Spatie\Permission\Traits\HasRoles;
@@ -15,6 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, HasRoles;
+    use CPaginationTrait;
     /**
      * The attributes that are mass assignable.
      *

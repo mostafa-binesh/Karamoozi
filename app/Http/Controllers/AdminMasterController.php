@@ -16,8 +16,8 @@ class AdminMasterController extends Controller
     public function index(Request $req)
     {
         // ! probably elequent query is not optimized, because we get the employee relation and withing the employee, we get the faculty relation
-        $masters = User::role('master')->cpagination($req)->get();
-        return MasterResource::collection($masters);
+        return User::role('master')->cpagination($req,MasterResource::class);
+        
     }
 
     /**
@@ -49,12 +49,12 @@ class AdminMasterController extends Controller
      */
     public function show($id)
     {
-        $master = User::findorfail($id)->first();
+        $master = User::findorfail($id);
         if ($master->cRole() != 'master') {
             return response()->json([
                 'message' => 'استاد یافت نشد'
             ], 400);
-        }
+        }   
         return MasterResource::make($master);
     }
 

@@ -1,27 +1,28 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminMasterController;
-use App\Http\Controllers\AdminStudentsController;
 use App\Models\User;
-use App\Models\Student;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DeveloperController;
-use App\Http\Controllers\IndustrySupervisor;
-use App\Http\Controllers\IndustrySupervisorStudentController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\TestController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\WeeklyReportController;
-use App\Http\Resources\admin\StudentEvaluationResource;
-use App\Models\Company;
 use App\Models\Form2s;
-use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
-use App\Models\StudentEvaluation;
+use App\Models\Company;
+use App\Models\Student;
 use App\Models\WeeklyReport;
+use Illuminate\Http\Request;
+use App\Models\StudentEvaluation;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\IndustrySupervisor;
+use App\Http\Controllers\DeveloperController;
+use App\Http\Controllers\AdminMasterController;
+use App\Http\Controllers\WeeklyReportController;
+use App\Http\Controllers\AdminStudentsController;
+use App\Http\Resources\admin\StudentEvaluationResource;
+use App\Http\Controllers\IndustrySupervisorStudentController;
+use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 
 // NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 
@@ -127,6 +128,11 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/form4', 'form4');
         Route::put('forms/{id}/form4/verify', 'form4Verify');
         Route::put('forms/{id}/form4/unverify', 'form4UnVerify');
+        // weekly report
+        Route::get('forms/{id}/weekly_reports', 'weeklyReports');
+        Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
+        // finish internship
+        Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
     Route::resource('master', AdminMasterController::class);
 });
@@ -155,10 +161,10 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
 // TEST CONTROLLER
 // // //
 Route::prefix('test')->controller(TestController::class)->group(function () {
-    Route::get('send/{id}','sender');
-    Route::get('receive/{id}','receive');
-    Route::post('create_chat','create_chat');
-    Route::post('create_message','create_message');
+    Route::get('send/{id}', 'sender');
+    Route::get('receive/{id}', 'receive');
+    Route::post('create_chat', 'create_chat');
+    Route::post('create_message', 'create_message');
 
 
     Route::get('pagination', 'usersPagination');
@@ -221,4 +227,20 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
         return $students;
     });
     Route::get('num2word', 'num2word');
+    Route::post("validationTest", function (Request $req) {
+        $validator = Validator::make($req->all(), [
+            // 15 fields
+            'age' => 'required|numeric|between:18,85',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors(),
+            ], 400);
+        }
+        return "problem solved";
+    });
+    Route::get("queryTest", function (Request $req) {
+        Student::where('id', '>', 1)->orWhere('id', '<', 100)->with('user')->get();
+        return $z;
+    });
 });

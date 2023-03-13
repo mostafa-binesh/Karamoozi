@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\WeeklyReportResource;
 use App\Models\Report;
 use App\Models\WeeklyReport;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -62,18 +63,17 @@ class WeeklyReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $req2 = [];
+        $dbReports = [];
         $student = Auth::user()->student;
         $errors = [];
         $reports = $student->weeklyReport->reports;
         foreach ($req->report as $re) {
             $found = false;
+            array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
             for ($i = 0; $i < count($reports); $i++) {
                 for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    // return $re['date'];
                     if ($re['date'] == $reports[$i]['days'][$j]['date']) {
                         $reports[$i]['days'][$j]['is_done'] = true;
-                        // return var_dump($reports[$i]['days'][$j]['is_done']);
                         $found = true;
                     }
                 }
@@ -81,11 +81,11 @@ class WeeklyReportController extends Controller
             if (!$found) {
                 array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
             }
-            // ! TODO: wth is this line?!
-            Report::insert($req2);
+            // insert the report into the database
+            Report::insert($dbReports);
         }
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports;
+        $weeklyReport->reports = $reports; // save the modified report
         $weeklyReport->save();
         return response()->json([
             'message' => 'گزارشات با موفقیت ثبت شد',

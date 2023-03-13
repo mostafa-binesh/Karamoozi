@@ -213,16 +213,22 @@ class StudentController extends Controller
             // || $student->verified != Student::VERIFIED[1]
             || $student->verified != 2
             // || !$student->form2->university_approval
-            || !$student->faculty_verified
+            // || !$student->faculty_verified
         ) {
             $stage = 1;
+            if(isset($student->form2->verified)) {
+                $ss = $student->form2->verified == '3' ? true : false;
+            } else {
+                $ss = false;
+            }
             return response()->json([
                 'stage' => $stage,
                 'data' => [
                     [
                         'name' => 'تاییدیه سرپرست دانشکده',
-                        'done' => $student->verified,
+                        'done' => $student->verified == '0' ? false : true,
                         // ! TODO: tell frontend that need to change it
+                        // ! for now, i will change the verified to true and false
                     ],
                     [
                         'name' => 'انجام پیش ثبت نام',
@@ -233,8 +239,10 @@ class StudentController extends Controller
                         'done' => $student->IndustrySupervisorVerified(),
                     ],
                     [
-                        'name' => 'تاییدیه مراحل توسط دانشکده',
-                        'done' => $student->form2->university_approval ?? false,
+                        // 'name' => 'تاییدیه مراحل توسط دانشکده',
+                        'name' => 'تاییدیه فرم 2 توسط دانشکده',
+                        // 'done' => $student->form2->verified ?? false,
+                        'done' => $ss,
                     ],
                 ]
             ]);

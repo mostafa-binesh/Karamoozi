@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\admin\CompanyEvaluationResource;
-use App\Http\Resources\admin\StudentForm2;
-use App\Http\Resources\admin\StudentForm3;
-use App\Http\Resources\admin\StudentForm4Resource;
-use App\Http\Resources\admin\StudentFormsStatus;
 use App\Models\User;
+use App\Models\Report;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use App\Http\Resources\PreRegStudents;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\InitRegistrationStudents;
-use App\Http\Resources\admin\StudentPreRegDescription;
-use App\Http\Resources\UniversityFacultyResource;
-use App\ModelFilters\Admin\InitRegStudentsFilter;
-use App\ModelFilters\Admin\PreRegStudentsFilter;
-use App\ModelFilters\Admin\StudentsFilter;
-use App\ModelFilters\StudentFilter;
+use Hekmatinasser\Verta\Verta;
 use App\Models\CompanyEvaluation;
 use App\Models\University_faculty;
+use App\ModelFilters\StudentFilter;
+use App\Http\Resources\PreRegStudents;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\admin\StudentForm2;
+use App\Http\Resources\admin\StudentForm3;
+use App\ModelFilters\Admin\StudentsFilter;
+use App\Http\Resources\WeeklyReportResource;
+use App\Http\Resources\admin\StudentFormsStatus;
+use App\Http\Resources\InitRegistrationStudents;
+use App\ModelFilters\Admin\PreRegStudentsFilter;
+use App\Http\Resources\UniversityFacultyResource;
+use App\ModelFilters\Admin\InitRegStudentsFilter;
+use App\Http\Resources\admin\StudentForm4Resource;
+use App\Http\Resources\admin\StudentPreRegDescription;
+use App\Http\Resources\admin\CompanyEvaluationResource;
+use App\Http\Resources\admin\FinishInternshipLetterResource;
 
 class AdminStudentsController extends Controller
 {
@@ -102,7 +106,7 @@ class AdminStudentsController extends Controller
     public function studentsHomePage()
     {
         $students = Student::all();
-        // ! i handled the counters in backend not the database, i guess this way is faster
+        // ! i handled the counters in backend not the database, i guess     way is faster
         // initial registration
         $init_unVerified = 0;
         $init_verified = 0;
@@ -322,4 +326,112 @@ class AdminStudentsController extends Controller
             'message' => 'فرم رد شد',
         ]);
     }
+    public function weeklyReports($id)
+    {
+        $student = Student::where("id", $id)->first();
+        // return $student->weeklyReport['reports'];
+        // counters
+        $weeks = [];
+        // ! put this foreach in Weeklyreportresource
+        foreach ($student->weeklyReport['reports'] as $week) {
+            $status0 = 0;
+            $status1 = 0;
+            $status2 = 0;
+            $status3 = 0;
+            foreach ($week['days'] as $day) {
+                switch ($day['is_done']) {
+                    case 0:
+                        $status0++;
+                        break;
+                    case 1:
+                        $status1++;
+                        break;
+                    case 2:
+                        $status2++;
+                        break;
+                    case 3:
+                        $status3++;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
+            array_push($weeks, [
+                'id' => $week['week_number'],
+                'first_day_of_week' => Verta::parse($week['first_day_of_week'])->datetime()->format('Y-m-d'),
+                // 'status' => $week['is_done'] == true ? 2 : 0,
+                'status' => rand(0, 3),
+                'not_available' => $status0,
+                'not_checked' => $status1,
+                'rejected' => $status2,
+                'accepted' => $status3,
+                // 'days_status' => [
+                //     [
+                //         'status' => 0,
+                //         'count' => 0
+                //     ], [
+                //         'status' => 1,
+                //         'count' => 0
+                //     ], [
+                //         'status' => 2,
+                //         'count' => 0
+                //     ], [
+                //         'status' => 3,
+                //         'count' => 0
+                //     ],   
+            ]);
+        }
+        return $weeks = [
+            'data' => [
+                'weeks' => $weeks,
+                'student' => [
+                    'id' => $student->id,
+                    'first_name' => $student->user->first_name,
+                    'last_name' => $student->user->last_name,
+                    'faculty_name' => $student->facultyName(),
+                    'student_number' => $student->student_number,
+                    'internship_start_date' => $student->form2->internship_start_date,
+                    'internship_finish_date' => $student->form2->internship_finished_at,
+                ],
+                'company' => [
+                    // ! i guess there are some problems with CompanyName function
+                    'name' => $student->companyName(),
+                    'type' => $student->company->companyType(),
+                    'phone_number' => $student->company->company_phone,
+                    'postal_code' => $student->company->company_postal_code,
+                    'address' => $student->company->company_address,
+                ],
+                'industry_supervisor' => [
+                    'full_name' => $student->industrySupervisor->user->fullName(),
+                    'position' => $student->form2->supervisor_position,
+                ],
+            ]
+        ];
+    }
+    public function showWeeklyReport($id, $weekID)
+    { // arguments: studentID, weekID
+        $student = Student::findorfail($id)->first();
+        // return $student->weeklyReport['reports'][$weekID]['days'];
+        $dates = [];
+        foreach ($student->weeklyReport['reports'][$weekID]['days'] as $day) {
+            array_push($dates, Verta::parse($day['date'])->datetime()->format('Y-m-d'));
+        }
+        return [
+            'data' =>
+            [
+                'reports' => Report::whereIn('date', $dates)->get(['date', 'description']),
+                // 'dates' => $dates,
+                // 'dd' => $student->weeklyReport['reports'][$weekID]['days'],
+            ]
+        ];
+    }
+    // return $days;
+    public function finishInternship($id)
+    {
+        $student = Student::where("id", $id)->with(["form2", 'user'])->first();
+        // return $student;
+        return FinishInternshipLetterResource::make($student);
+    }
+    // return $days;
 }

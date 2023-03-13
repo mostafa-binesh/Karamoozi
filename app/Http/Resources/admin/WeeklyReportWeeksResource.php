@@ -4,7 +4,7 @@ namespace App\Http\Resources\admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MasterResource extends JsonResource
+class WeeklyReportWeeksResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,14 +14,16 @@ class MasterResource extends JsonResource
      */
     public function toArray($request)
     {
-        // $this is user
         return [
-            'id' => $this->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'national_code' => $this->national_code,
-            'phone' => $this->phone_number,
-            'faculty' => $this->employee->faculty->faculty_name,
+            'id' => 1,
         ];
+        // return [
+        //     'id' => $this->id,
+        //     'title' => $this->title,
+        // ];
+        // return [
+        //     'id' => $this->week_number,
+        //     'first_day_of_week' => $this->first_day_of_week,
+        // ];
     }
 }

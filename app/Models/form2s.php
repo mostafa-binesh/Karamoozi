@@ -16,6 +16,7 @@ class Form2s extends Model
      */
     protected $casts = [
         'schedule_table' => 'array',
+        // 'university_approval' => 'boolean',
     ];
     // ###############################################
     // ################## RELATIONSHIPS ###################
