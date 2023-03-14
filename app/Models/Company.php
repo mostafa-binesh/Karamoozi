@@ -38,7 +38,7 @@ class Company extends Model
     // ###############################################
     public function user()
     {
-        return $this->belongsTo(User::class,'boss_id');
+        return $this->belongsTo(User::class,'company_boss_id');
     }
     public function companyType() {
         return SELF::COMPANY_TYPE[$this->company_type];

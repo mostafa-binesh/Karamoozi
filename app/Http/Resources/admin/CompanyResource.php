@@ -19,8 +19,7 @@ class CompanyResource extends JsonResource
             'company_name'=>$this->company_name,
             'caption'=>$this->caption,
             'company_grade'=>$this->company_grade,
-            'company_boss_id'=>$this->company_boss_id,
-            // 'company_boss_id'=>$this->user->first_name, چرا نمیشه؟؟:((
+            'company_boss_id'=>$this->user->first_name,
             'company_number'=>$this->company_number,
             'company_registry'=>$this->company_registry_code,
         ];
