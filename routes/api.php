@@ -18,7 +18,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\AdminMasterController;
-use App\Http\Controllers\AmdinCompanyController;
+use App\Http\Controllers\AdminCompanyController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AdminStudentsController;
 use App\Http\Resources\admin\StudentEvaluationResource;
@@ -137,7 +137,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
     Route::resource('master', AdminMasterController::class);
-    Route::resource('company',AmdinCompanyController::class);
+    // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
+    Route::resource('company',AdminCompanyController::class);
 });
 
 
