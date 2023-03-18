@@ -18,11 +18,10 @@ class AdminMasterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $req)
+    public function index(Request $req, MasterFilter $filter)
     {
         // ! probably elequent query is not optimized, because we get the employee relation and withing the employee, we get the faculty relation
         $master = User::role("master")->filter($req->all(), MasterFilter::class)->cpagination($req, MasterResource::class);
-        // return $master;
         return response()->json([
             'meta' => $master['meta'],
             'data' => [
@@ -39,7 +38,7 @@ class AdminMasterController extends Controller
      */
     public function create(Request $req)
     {
-        return University_faculty::cpagination($req ,UniversityFacultyResource::class);
+        return University_faculty::cpagination($req, UniversityFacultyResource::class);
     }
 
     /**
@@ -59,7 +58,7 @@ class AdminMasterController extends Controller
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'
         ]);
-        Validator::make($req->all(),[
+        Validator::make($req->all(), [
             'unique:table,column,except,id'
         ]);
         if ($validator->fails()) {
@@ -131,9 +130,9 @@ class AdminMasterController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'email|required|unique:User,email',
-            'national_code' => 'required|digits:10|unique:users,national_code,'.$id,
-            'PersonnelCode' => 'required|digits:10|unique:users,username,'.$id,
-            'phone_number' => 'required|digits:11|unique:users,phone_number,'.$id,
+            'national_code' => 'required|digits:10|unique:users,national_code,' . $id,
+            'PersonnelCode' => 'required|digits:10|unique:users,username,' . $id,
+            'phone_number' => 'required|digits:11|unique:users,phone_number,' . $id,
             'faculty_id' => 'required'
         ]);
         if ($validator->fails()) {
