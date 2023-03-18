@@ -24,6 +24,9 @@ class Employee extends Model
     // ################## FUNCTIONS ###################
     // ###############################################
     public function fullName() {
-        return $this->user->first_name . " " . $this->user->last_name; 
+        return $this->user->first_name . " " . $this->user->last_name;
+    }
+    public function studentMaster(){
+        return $this->hasMany(Student::class);
     }
 }

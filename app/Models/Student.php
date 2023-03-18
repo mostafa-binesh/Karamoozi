@@ -38,7 +38,7 @@ class Student extends Model
     ];
     /**
      * Users' roles
-     * 
+     *
      * @var array
      */
     public const ROLES = [
@@ -269,14 +269,14 @@ class Student extends Model
     public function calculateAllWorkingDaysDate()
     {
         // calculate all working days based on schedule
-        // assume that first working day is: 
+        // assume that first working day is:
         // TODO: need to get this data from database, haven't created the attr. for it in the db
         $firstWorkingDayDate = verta('2023/01/07');
         // ! clone and ->copy() for verta do the same thing
         $firstWorkingDayDateBackUp = clone $firstWorkingDayDate;
         // get the schedule
         $schedule = $this->schedule();
-        // calculate how many days student have to work based on schedule, eg: 30 
+        // calculate how many days student have to work based on schedule, eg: 30
         $howManyDaysMustWork = self::howManyDaysMustWork($schedule);
         // calculate all working days date, an array of dates
         $allWorkingDaysDate = [];

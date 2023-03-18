@@ -26,6 +26,7 @@ class MasterFilter extends ModelFilter
         // // ->orwhere('student_number','LIKE',"%{$search}%");
         // ->orwhere('last_name','LIKE',"%{$search}%");
     }
+
     public function faculty($faculty)
     {
         $this->whereHas('employee', function (Builder $query) use ($faculty) {

@@ -18,7 +18,7 @@ class AdminMasterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $req, MasterFilter $filter)
+    public function index(Request $req)
     {
         // ! probably elequent query is not optimized, because we get the employee relation and withing the employee, we get the faculty relation
         $master = User::role("master")->filter($req->all(), MasterFilter::class)->cpagination($req, MasterResource::class);
