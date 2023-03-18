@@ -136,10 +136,10 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
-    Route::get('faculty',[AdminMasterController::class,'faculty_data']);
+    Route::get('faculties', [AdminMasterController::class, 'faculties']);
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
-    Route::resource('company',AdminCompanyController::class);
+    Route::resource('company', AdminCompanyController::class);
 });
 
 

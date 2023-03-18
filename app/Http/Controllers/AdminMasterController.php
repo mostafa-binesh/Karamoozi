@@ -175,8 +175,10 @@ class AdminMasterController extends Controller
             'message' => 'استاد حذف شد'
         ]);
     }
-    public function faculty_data()
+    public function faculties()
     {
-        return University_faculty::get()->all();
+        return [
+            'data' => University_faculty::all()
+        ];
     }
 }
