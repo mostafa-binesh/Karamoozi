@@ -36,9 +36,9 @@ class AdminMasterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $req)
+    public function create()
     {
-        return University_faculty::cpagination($req, UniversityFacultyResource::class);
+        return University_faculty::get()->all();
     }
 
     /**
@@ -175,9 +175,8 @@ class AdminMasterController extends Controller
             'message' => 'استاد حذف شد'
         ]);
     }
-    public function initialRegistrationMaster(Request $req)
+    public function faculty_data()
     {
-        // return "ddd";
-
+        return University_faculty::get()->all();
     }
 }
