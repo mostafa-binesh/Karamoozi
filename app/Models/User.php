@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use App\Traits\CPaginationTrait;
 use Spatie\Permission\Models\Role;
 use App\Notifications\PasswordReset;
+use EloquentFilter\Filterable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, Filterable;
     use CPaginationTrait;
     /**
      * The attributes that are mass assignable.
@@ -87,7 +88,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function companyboss()
     {
-        return $this->hasOne(Company::class,'boss_id');
+        return $this->hasOne(Company::class, 'company_boss_id');
     }
     public function cars()
     {
@@ -109,6 +110,11 @@ class User extends Authenticatable implements JWTSubject
     // ################## FUNCTIONS ###################
     // ###############################################
     // custom role function
+    public function get_students_count_by_professor_id($professor_id)
+    {
+        $count = Student::where('professor_id', $professor_id)->count();
+        return $count;
+    }
     public function cRole()
     {
         return $this->getRoleNames()->first();
@@ -141,5 +147,4 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->offset((($req->page ?? 1) - 1) * ($req->per_page ?? 5))->limit(($req->per_page ?? 5))->get();
     }
-
 }

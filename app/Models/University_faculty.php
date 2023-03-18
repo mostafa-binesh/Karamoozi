@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CPaginationTrait;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class University_faculty extends Model
 {
     use HasFactory,HasRoles;
+    use CPaginationTrait;
     protected $guarded = [];
     // ######
     // ############### relations ##############

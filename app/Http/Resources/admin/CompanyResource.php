@@ -14,16 +14,14 @@ class CompanyResource extends JsonResource
      */
     public function toArray($request)
     {
-        // $this is company
-        return [
-            'id' => $this->id,
-            'company_name' => $this->company_name,
-            'caption' => $this->caption,
-            'company_grade' => $this->company_grade,
-            // 'company_boss_id' => $this->company_boss_id,
-            'company_boss_id' => $this->user->fullName(),
-            'company_number' => $this->company_number,
-            'company_registry' => $this->company_registry_code,
+        return[
+            'id'=>$this->id,
+            'company_name'=>$this->company_name,
+            'caption'=>$this->caption,
+            'company_grade'=>$this->company_grade,
+            'company_boss_id'=>$this->user->fullname(),
+            'company_number'=>$this->company_number,
+            'company_registry'=>$this->company_registry_code,
         ];
     }
 }
