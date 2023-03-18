@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\admin\MasterResource;
+use App\Http\Resources\FacultyResource;
 use App\Http\Resources\UniversityFacultyResource;
 use App\ModelFilters\MasterFilter;
 use App\Models\Employee;
@@ -38,7 +39,9 @@ class AdminMasterController extends Controller
      */
     public function create()
     {
-        return University_faculty::get()->all();
+        return [
+            "data" => FacultyResource::collection(University_faculty::all())
+        ];
     }
 
     /**
@@ -178,7 +181,7 @@ class AdminMasterController extends Controller
     public function faculties()
     {
         return [
-            'data' => University_faculty::all()
+            "data" => FacultyResource::collection(University_faculty::all())
         ];
     }
 }
