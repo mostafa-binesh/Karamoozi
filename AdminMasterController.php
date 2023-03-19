@@ -7,7 +7,6 @@ use App\Http\Resources\FacultyResource;
 use App\Http\Resources\UniversityFacultyResource;
 use App\ModelFilters\MasterFilter;
 use App\Models\Employee;
-use App\Models\ModelHasRole;
 use App\Models\User;
 use App\Models\University_faculty;
 use Illuminate\Http\Request;
@@ -56,11 +55,14 @@ class AdminMasterController extends Controller
         $validator = Validator::make($req->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'email|required|unique:users,email',
+            'email' => 'email|required|unique:User,email',
             'national_code' => 'required|digits:10|unique:users,national_code',
-            'personal_code' => 'required|digits:10|unique:users,username',
+            'PersonnelCode' => 'required|digits:10|unique:users,username',
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'
+        ]);
+        Validator::make($req->all(), [
+            'unique:table,column,except,id'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -70,15 +72,10 @@ class AdminMasterController extends Controller
         $master = User::create([
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
-            'username' => $req->personal_code,
+            'username' => $req->PersonnelCode,
             'national_code' => $req->national_code,
             'phone_number' => $req->phone_number,
             'email' => $req->email,
-        ]);
-        ModelHasRole::create([
-            "role_id"=>3,
-            "model_type"=>"App\Models\User",
-            "model_id"=>$master->id,
         ]);
         Employee::create([
             'user_id' => $master->id,
@@ -97,7 +94,7 @@ class AdminMasterController extends Controller
      */
     public function show($id)
     {
-        $master = User::where("id",$id)->first();
+        $master = User::findorfail($id);
         if ($master->cRole() != 'master') {
             return response()->json([
                 'message' => 'استاد یافت نشد'
@@ -114,24 +111,13 @@ class AdminMasterController extends Controller
      */
     public function edit($id)
     {
-        $master = User::where("id",$id)->first();
+        $master = User::findorfail($id);
         if ($master->cRole() != 'master') {
             return response()->json([
                 'message' => 'استاد یافت نشد'
             ], 400);
         }
-        return [
-            "data" => [
-                "id"=>$master->id,
-                "first_name"=>$master->first_name,
-                "last_name"=>$master->last_name,
-                "national_code"=>$master->national_code,
-                "personal_code"=>$master->username,
-                "email"=>$master->email,
-                "phone_number"=>$master->phone_number,
-                "faculty"=>$master->employee->faculty
-            ]
-        ];
+        return MasterResource::make($master);
     }
 
     /**
@@ -146,9 +132,9 @@ class AdminMasterController extends Controller
         $validator = Validator::make($req->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'email|required|unique:users,email,'.$id,
+            'email' => 'email|required|unique:User,email',
             'national_code' => 'required|digits:10|unique:users,national_code,' . $id,
-            'personal_code' => 'required|digits:10|unique:users,username,' . $id,
+            'PersonnelCode' => 'required|digits:10|unique:users,username,' . $id,
             'phone_number' => 'required|digits:11|unique:users,phone_number,' . $id,
             'faculty_id' => 'required'
         ]);
@@ -157,21 +143,15 @@ class AdminMasterController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
-        $master = User::where("id",$id)->first();
-        if ($master->cRole() != 'master') {
-            return response()->json([
-                'message' => 'استاد یافت نشد'
-            ], 400);
-        }
+        $master = User::where("id", $id)->first();
         $master->phone_number = $req->phone_number;
         $master->first_name = $req->first_name;
         $master->last_name = $req->last_name;
         $master->email = $req->email;
-        $master->username = $req->personal_code;
+        $master->username = $req->PersonnelCode;
         $master->national_code = $req->national_code;
         $master->save();
-        $emp = Employee::where("user_id", $master->id)->first();
-        // return $emp;
+        $emp = Employee::where("user_id", $id)->first();
         $emp->faculty_id = $req->faculty_id;
         $emp->save();
         return response()->json([
@@ -187,21 +167,19 @@ class AdminMasterController extends Controller
      */
     public function destroy($id)
     {
-        $master = User::where("id",$id)->first();
+        $master = User::findorfail($id)->first();
         if ($master->cRole() != 'master') {
             return response()->json([
                 'message' => 'استاد یافت نشد'
             ], 400);
         }
-        User::destroy($master->id);
+        $master->destroy();
         return response()->json([
             'message' => 'استاد حذف شد'
         ]);
     }
     public function faculties()
     {
-        return [
-            "data" => FacultyResource::collection(University_faculty::all())
-        ];
+        return FacultyResource::collection(University_faculty::all());
     }
 }

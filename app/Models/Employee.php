@@ -9,7 +9,6 @@ class Employee extends Model
 {
     use HasFactory;
     protected $guarded = [];
-
     // ###############################################
     // ################## RELATIONSHIPS ###################
     // ###############################################
@@ -28,5 +27,8 @@ class Employee extends Model
     }
     public function studentMaster(){
         return $this->hasMany(Student::class);
+    }
+    public function get_faculty_id(){
+        return $this->faculty_id;
     }
 }
