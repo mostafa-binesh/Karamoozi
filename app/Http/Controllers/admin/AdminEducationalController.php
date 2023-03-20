@@ -14,6 +14,16 @@ class AdminEducationalController extends Controller
     // ###############                        #####
     // ! ##################### FACULTIES  #####################
     // ###############                       #####
+    public function singleFaculty($id)
+    {
+        $faculty = University_faculty::find($id);
+        if (!$faculty) {
+            return response()->json([
+                'message' => 'دانشکده پیدا نشد',
+            ], 400);
+        }
+        return $faculty;
+    }
     public function addFaculty(Request $req)
     {
         $validator = Validator::make($req->all(), [
@@ -77,6 +87,16 @@ class AdminEducationalController extends Controller
     public function allTerms(Request $req)
     {
         return Term::cpagination($req, TermResource::class);
+    }
+    public function singleTerm($id)
+    {
+        $term = Term::find($id);
+        if (!$term) {
+            return response()->json([
+                'message' => 'ترم پیدا نشد',
+            ], 400);
+        }
+        return $term;
     }
     public function addTerm(Request $req)
     {
