@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AdminEducationalController;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Company;
@@ -136,7 +137,12 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
-    Route::get('faculties', [AdminMasterController::class, 'faculties']);
+    Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
+        Route::post('faculties', 'addFaculty');
+        Route::get('terms', 'allTerms');
+        Route::post('terms', 'addTerm');
+    });
+    Route::get('faculties', [AdminMasterController::class, 'faculties']); // TODO move this function to adminController
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('company', AdminCompanyController::class);
