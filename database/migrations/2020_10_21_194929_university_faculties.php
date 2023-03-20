@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        
-        
+
+
         Schema::create('university_faculties', function (Blueprint $table) {
             $table->id();
             $table->string('faculty_name');
+            $table->timestamps();
         });
     }
 

@@ -138,9 +138,15 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/finish_internship', 'finishInternship');
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
+        // ! faculties
         Route::post('faculties', 'addFaculty');
+        Route::put('faculties/{id}', 'editFaculty');
+        Route::delete('faculties/{id}', 'deleteFaculty');
+        // ! terms
         Route::get('terms', 'allTerms');
         Route::post('terms', 'addTerm');
+        Route::put('terms/{id}', 'editTerm');
+        Route::delete('terms/{id}', 'deleteTerm');
     });
     Route::get('faculties', [AdminMasterController::class, 'faculties']); // TODO move this function to adminController
     Route::resource('master', AdminMasterController::class);
