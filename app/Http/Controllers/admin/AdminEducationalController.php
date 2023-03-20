@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\admin\TermResource;
+use App\Http\Resources\FacultyResource;
 use App\Models\Term;
 use App\Models\University_faculty;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +23,7 @@ class AdminEducationalController extends Controller
                 'message' => 'دانشکده پیدا نشد',
             ], 400);
         }
-        return $faculty;
+        return FacultyResource::make($faculty);
     }
     public function addFaculty(Request $req)
     {
@@ -96,7 +97,7 @@ class AdminEducationalController extends Controller
                 'message' => 'ترم پیدا نشد',
             ], 400);
         }
-        return $term;
+        return TermResource::make($term);
     }
     public function addTerm(Request $req)
     {
