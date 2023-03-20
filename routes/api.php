@@ -144,8 +144,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('faculties/{id}', 'editFaculty');
         Route::delete('faculties/{id}', 'deleteFaculty');
         // ! terms
-        Route::get('terms/{id}', 'singleTerm');
         Route::get('terms', 'allTerms');
+        Route::get('terms/{id}', 'singleTerm');
         Route::post('terms', 'addTerm');
         Route::put('terms/{id}', 'editTerm');
         Route::delete('terms/{id}', 'deleteTerm');
@@ -166,6 +166,7 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
     Route::get("freshMigrate", function () {
         // Artisan::call("migrate:reset");
         Artisan::call("migrate:fresh --seed");
+        return "Migration completed successfully";
     });
     Route::get("migrate", function () {
         // Artisan::call("migrate:reset");
