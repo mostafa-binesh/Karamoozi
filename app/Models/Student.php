@@ -128,6 +128,10 @@ class Student extends Model
     {
         return $this->hasMany(StudentEvaluation::class);
     }
+    public function term()
+    {
+        return $this->belongsTo(Term::class);
+    }
 
     // ###############################################
     // ############# RELATION RELATED FUNCTIONS ###############

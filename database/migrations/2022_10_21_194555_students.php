@@ -35,8 +35,15 @@ return new class extends Migration
             $table->bigInteger('professor_id')->unsigned()->nullable();
             $table->foreign('professor_id')->references('id')
                 ->on('employees')->onDelete('cascade');
-            $table->unsignedTinyInteger('semester')->nullable();
+
+
+            $table->unsignedTinyInteger('semester')->nullable(); // ! needs to be replaced by term_id
             $table->unsignedInteger('internship_year')->nullable();
+
+            $table->unsignedBigInteger('term_id');
+            $table->foreign('term_id')->references('id')->on('terms')
+                ->onDelete('cascade');
+
             $table->unsignedInteger('internship_type')->nullable();
             $table->bigInteger('company_id')->unsigned()->nullable(); // shows the submitted company for this student
             $table->foreign('company_id')->references('id')
@@ -64,7 +71,7 @@ return new class extends Migration
             // $table->json('evaluations')->nullable();
             $table->text('evaluations')->nullable();
             $table->unsignedTinyInteger('evaluations_verified')->default(0); // = form3 verified
-            
+
             $table->unsignedTinyInteger('form4_verified')->default(0); // = companyEvaluations
 
 

@@ -147,6 +147,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         // ! terms
         Route::get('terms', 'allTerms');
         Route::get('terms/{id}', 'singleTerm');
+        Route::get('terms/{id}/students', 'termStudents');
+        Route::get('terms/{id}/masters', 'termMasters');
         Route::post('terms', 'addTerm');
         Route::put('terms/{id}', 'editTerm');
         Route::delete('terms/{id}', 'deleteTerm');

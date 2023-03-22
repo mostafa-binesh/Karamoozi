@@ -19,7 +19,7 @@ class AdminCompanyController extends Controller
      */
     public function index(Request $req)
     {
-        return Company::cpagination($req,CompanyResource::class);
+        return Company::cpagination($req, CompanyResource::class);
     }
 
     /**
@@ -29,7 +29,6 @@ class AdminCompanyController extends Controller
      */
     public function create()
     {
-
     }
 
     /**
@@ -40,14 +39,14 @@ class AdminCompanyController extends Controller
      */
     public function store(Request $req)
     {
-        $validator=Validator::make($req->all(),[
-            'company_name'=>'required',
-            'company_number'=>'required|digits:11|unique:companies,company_number',
-            'company_registry_code'=>'required|unique:companies,company_registry_code',
-            'company_phone'=>'required|digits:11|unique:companies,company_phone',
-            'compny_address'=>'required',
-            'company_category'=>'required',
-            'company_postal_code'=>'required|unique:companies',
+        $validator = Validator::make($req->all(), [
+            'company_name' => 'required',
+            'company_number' => 'required|digits:11|unique:companies,company_number',
+            'company_registry_code' => 'required|unique:companies,company_registry_code',
+            'company_phone' => 'required|digits:11|unique:companies,company_phone',
+            'compny_address' => 'required',
+            'company_category' => 'required',
+            'company_postal_code' => 'required|unique:companies',
             'company_type' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
@@ -57,7 +56,7 @@ class AdminCompanyController extends Controller
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'
         ]);
-        $boss=User::create([
+        $boss = User::create([
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->username,
@@ -73,22 +72,22 @@ class AdminCompanyController extends Controller
 
         // return "ccc";
         Company::create([
-            'company_name'=>$req->company_name,
-            'caption'=>$req->caption,
-            'company_grade'=>0,
-            'company_number'=>$req->company_number,
-            'company_registry_code'=>$req->company_registry_code,
-            'company_phone'=>$req->company_phone,
-            'company_address'=>$req->compny_address,
-            'company_category'=>$req->company_category,
-            'company_postal_code'=>$req->company_postal_code,
-            'company_type'=> $req->company_type ,
-            'company_boss_id'=> $boss->id,
-            'verified'=>1
+            'company_name' => $req->company_name,
+            'caption' => $req->caption,
+            'company_grade' => 0,
+            'company_number' => $req->company_number,
+            'company_registry_code' => $req->company_registry_code,
+            'company_phone' => $req->company_phone,
+            'company_address' => $req->compny_address,
+            'company_category' => $req->company_category,
+            'company_postal_code' => $req->company_postal_code,
+            'company_type' => $req->company_type,
+            'company_boss_id' => $boss->id,
+            'verified' => 1
         ]);
         return response()->json([
             'message' => 'شرکت با موفقیت اضافه شد',
-        ],200);
+        ], 200);
     }
 
     /**
@@ -99,8 +98,8 @@ class AdminCompanyController extends Controller
      */
     public function show($id)
     {
-        $company=Company::where("id",$id)->first();
-        if(!isset($company)){
+        $company = Company::where("id", $id)->first();
+        if (!isset($company)) {
             return response()->json([
                 'message' => 'شرکت یافت نشد'
             ], 400);
@@ -116,8 +115,8 @@ class AdminCompanyController extends Controller
      */
     public function edit($id)
     {
-        $company=Company::where("id",$id)->first();
-        if(!isset($company)){
+        $company = Company::where("id", $id)->first();
+        if (!isset($company)) {
             return response()->json([
                 'message' => 'شرکت یافت نشد'
             ], 400);
@@ -134,37 +133,37 @@ class AdminCompanyController extends Controller
      */
     public function update(Request $req, $id)
     {
-        $validator=Validator::make($req->all(),[
-            'company_name'=>'required',
-            'company_number'=>'required|digits:11|unique:companies,company_number,'.$id,
-            'company_registry_code'=>'required|unique:companies,company_registry_code,'.$id,
-            'company_phone'=>'required|digits:11|unique:companies,company_phone,'.$id,
-            'compny_address'=>'required',
-            'company_category'=>'required',
-            'company_postal_code'=>'required|unique:companies,company_postal_code,'.$id,
-            'verified'=>'required'
+        $validator = Validator::make($req->all(), [
+            'company_name' => 'required',
+            'company_number' => 'required|digits:11|unique:companies,company_number,' . $id,
+            'company_registry_code' => 'required|unique:companies,company_registry_code,' . $id,
+            'company_phone' => 'required|digits:11|unique:companies,company_phone,' . $id,
+            'compny_address' => 'required',
+            'company_category' => 'required',
+            'company_postal_code' => 'required|unique:companies,company_postal_code,' . $id,
+            'verified' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json([
                 'message' => $validator->errors(),
             ], 400);
         }
-        $company=Company::where("id",$id)->first();
-        if(!isset($company)){
+        $company = Company::where("id", $id)->first();
+        if (!isset($company)) {
             return response()->json([
                 'message' => 'شرکت یافت نشد'
             ], 400);
         }
-        $company->company_name=$req->company_name;
-        $company->company_number=$req->company_number;
-        $company->company_registry_code=$req->company_registry_code;
-        $company->company_phone=$req->company_phone;
-        $company->company_address=$req->company_address;
-        $company->company_grade=$req->company_grade;
-        $company->verified=$req->verified;
-        $company->caption=$req->caption;
-        $company->company_category=$req->company_category;
-        $company->company_postal_code=$req->company_postal_code;
+        $company->company_name = $req->company_name;
+        $company->company_number = $req->company_number;
+        $company->company_registry_code = $req->company_registry_code;
+        $company->company_phone = $req->company_phone;
+        $company->company_address = $req->company_address;
+        $company->company_grade = $req->company_grade;
+        $company->verified = $req->verified;
+        $company->caption = $req->caption;
+        $company->company_category = $req->company_category;
+        $company->company_postal_code = $req->company_postal_code;
         $company->save();
         return response()->json([
             'message' => 'اطلاعات با موفقیت ویرایش شد',
@@ -179,16 +178,15 @@ class AdminCompanyController extends Controller
      */
     public function destroy($id)
     {
-        $company=Company::where("id",$id)->first();
-        if(!isset($company)){
+        $company = Company::where("id", $id)->first();
+        if (!isset($company)) {
             return response()->json([
                 'message' => 'شرکت یافت نشد'
             ], 400);
         }
         Company::destroy($id);
         return response()->json([
-            'message'=>'شرکت با موفقیت حذف شد'
-        ],200);
+            'message' => 'شرکت با موفقیت حذف شد'
+        ], 200);
     }
-
 }

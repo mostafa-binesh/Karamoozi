@@ -4,8 +4,11 @@ namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\admin\MasterOriginalResource;
+use App\Http\Resources\admin\MasterResource;
 use App\Http\Resources\admin\TermResource;
 use App\Http\Resources\FacultyResource;
+use App\Http\Resources\StudentResource;
 use App\Models\Term;
 use App\Models\University_faculty;
 use Illuminate\Support\Facades\Validator;
@@ -87,11 +90,11 @@ class AdminEducationalController extends Controller
     // ###############                #####
     public function allTerms(Request $req)
     {
-        return Term::cpagination($req, TermResource::class);
+        return Term::with(['students', 'masters'])->cpagination($req, TermResource::class);
     }
     public function singleTerm($id)
     {
-        $term = Term::find($id);
+        $term = Term::with(['students', 'masters'])->find($id);
         if (!$term) {
             return response()->json([
                 'message' => 'ترم پیدا نشد',
@@ -157,5 +160,26 @@ class AdminEducationalController extends Controller
         return response()->json([
             'message' => 'سر ترم حذف شد',
         ]);
+    }
+    // 
+    public function termStudents($id, Request $req)
+    {
+        $term = Term::find($id);
+        if (!$term) {
+            return response()->json([
+                'message' => 'ترم یافت نشد',
+            ], 400);
+        }
+        return $term->students()->cpagination($req, StudentResource::class);
+    }
+    public function termMasters($id, Request $req)
+    {
+        $term = Term::find($id);
+        if (!$term) {
+            return response()->json([
+                'message' => 'ترم یافت نشد',
+            ], 400);
+        }
+        return $term->masters()->cpagination($req, MasterOriginalResource::class);
     }
 }

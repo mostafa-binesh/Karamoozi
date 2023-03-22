@@ -48,6 +48,7 @@ class AdminSeeder extends Seeder
             'entrance_year' => Student::university_entrance_year_static($firstStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
+            'term_id' => 1,
         ]);
         $secondStudent = User::create([
             'first_name' => 'حسن',
@@ -64,6 +65,7 @@ class AdminSeeder extends Seeder
             'entrance_year' => Student::university_entrance_year_static($secondStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
+            'term_id' => 1,
         ]);
         $thirdStudent = User::create([
             'first_name' => 'احسان',
@@ -80,6 +82,7 @@ class AdminSeeder extends Seeder
             'entrance_year' => Student::university_entrance_year_static($thirdStudent->username),
             'supervisor_id' => $industrySupervisor->id,
             'internship_type' => 1,
+            'term_id' => 1,
         ]);
         // Mohsen Nouri
         $fourthStudent = User::create([
@@ -98,6 +101,7 @@ class AdminSeeder extends Seeder
             'entrance_year' => Student::university_entrance_year_static($fourthStudent->username),
             'supervisor_id' => $industrySupervisorUser->id,
             'internship_type' => 1,
+            'term_id' => 1,
         ]);
         // $form2 = Form2s::create([
         //     'industry_supervisor_id' => $industrySupervisor->id,
