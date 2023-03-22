@@ -139,6 +139,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
+        Route::get('faculties', [AdminMasterController::class, 'faculties']);
         Route::get('faculties/{id}', 'singleFaculty');
         Route::post('faculties', 'addFaculty');
         Route::put('faculties/{id}', 'editFaculty');
