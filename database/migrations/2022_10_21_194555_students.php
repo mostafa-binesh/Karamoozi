@@ -40,7 +40,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('semester')->nullable(); // ! needs to be replaced by term_id
             $table->unsignedInteger('internship_year')->nullable();
 
-            $table->unsignedBigInteger('term_id');
+            $table->unsignedBigInteger('term_id')->nullable();
             $table->foreign('term_id')->references('id')->on('terms')
                 ->onDelete('cascade');
 
