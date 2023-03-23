@@ -3,8 +3,8 @@
 namespace App\Http\Resources\chats;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-
-class send extends JsonResource
+// ! name doesn't represent concept perfectly! name needs to be changed later probably
+class ReceiveResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,7 @@ class send extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'receiver'=>$this->user_receiver->fullName(),
+            'sender'=>$this->sender->fullName(),
             'title'=>$this->title,
         ];
     }

@@ -4,7 +4,7 @@ namespace App\Http\Resources\chats;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class message extends JsonResource
+class ChatResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,6 @@ class message extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id'=>$this->id,
-            'body'=>$this->body,
-            'sender_name'=>$this->user_sender->fullname(),
-            'receiver_name'=>$this->user_receiver->fullname(),
-        ];
+        return parent::toArray($request);
     }
 }
