@@ -16,6 +16,7 @@ class TermResource extends JsonResource
     {
         // $this is term
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
