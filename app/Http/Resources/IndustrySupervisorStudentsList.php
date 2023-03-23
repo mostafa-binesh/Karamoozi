@@ -14,6 +14,7 @@ class IndustrySupervisorStudentsList extends JsonResource
      */
     public function toArray($request)
     {
+        // ! TODO wtf?!
         return parent::toArray($request);
         return [
             'req' => $this->req,

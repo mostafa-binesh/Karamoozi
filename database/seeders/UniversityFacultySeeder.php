@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\University_faculty;
+
 class UniversityFacultySeeder extends Seeder
 {
     /**
@@ -27,9 +28,6 @@ class UniversityFacultySeeder extends Seeder
             [
                 'faculty_name' => 'دانشکده مواد متالوژی'
             ],
-            // [
-            //     'faculty_name' => 'دانشکده عمران'
-            // ],
         ]);
     }
 }

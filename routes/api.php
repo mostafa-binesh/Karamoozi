@@ -27,8 +27,8 @@ use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Spatie\Permission\Contracts\Role;
 
-// NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
-
+// ! install 'better comments' plugin on vs code to see the code more clear
+// ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 // ###############                        #####
 // ! ################ AUTHENTICATION ##############
 // ###############                       #####
@@ -139,12 +139,14 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
+        // TODO move all the faculties function to a separated controller
         Route::get('faculties', [AdminMasterController::class, 'faculties']);
         Route::get('faculties/{id}', 'singleFaculty');
         Route::post('faculties', 'addFaculty');
         Route::put('faculties/{id}', 'editFaculty');
         Route::delete('faculties/{id}', 'deleteFaculty');
         // ! terms
+        // TODO move all the terms function to a separated controller
         Route::get('terms', 'allTerms');
         Route::get('terms/{id}', 'singleTerm');
         Route::get('terms/{id}/students', 'termStudents');
@@ -167,17 +169,16 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
 // ! DELETE ON PRODUCTION
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
     Route::get("freshMigrate", function () {
-        // Artisan::call("migrate:reset");
         Artisan::call("migrate:fresh --seed");
         return "Migration completed successfully";
     });
     Route::get("migrate", function () {
-        // Artisan::call("migrate:reset");
         Artisan::call("migrate");
+        return "Migration completed successfully";
     });
     Route::get("migrateSeed", function () {
-        // Artisan::call("migrate:reset");
         Artisan::call("migrate:fresh --seed");
+        return "Migration completed successfully";
     });
 });
 // // //
@@ -242,7 +243,7 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::delete('deleteWeeklyReports', function (Request $req) {
         return WeeklyReport::where('student_id', $req->student_id)->delete();
     });
-    Route::get('dupicateQuery', function (Request $req) {
+    Route::get('duplicateQuery', function (Request $req) {
         // ! it seems two where clouses with same names doesn't work as expected
         $students = Student::where('verified', 0)->where('verified', 1)->get();
         // ! return query would be something like this where verified = 0 and where verified = 1

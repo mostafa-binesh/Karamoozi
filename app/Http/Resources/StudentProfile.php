@@ -14,7 +14,7 @@ class StudentProfile extends JsonResource
      */
     public function toArray($request)
     {
-        // $this is a object from student model
+        // $this is student
         return [
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,

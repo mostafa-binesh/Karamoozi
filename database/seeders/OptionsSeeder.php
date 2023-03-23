@@ -15,7 +15,6 @@ class OptionsSeeder extends Seeder
      */
     public function run()
     {
-        // Options::factory()->times(5)->create();
         Option::insert(
             [
                 [

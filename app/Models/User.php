@@ -86,14 +86,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Employee::class);
     }
-    public function companyboss()
-    {
-        return $this->hasOne(Company::class, 'company_boss_id');
-    }
-    public function cars()
-    {
-        return $this->hasMany(Car::class);
-    }
     public function industrySupervisor()
     {
         return $this->hasOne(IndustrySupervisor::class);
@@ -110,6 +102,8 @@ class User extends Authenticatable implements JWTSubject
     // ################## FUNCTIONS ###################
     // ###############################################
     // custom role function
+    // ! wtf is this function ?!
+    // ! needs to change the function to relationship in this case (see the used case)
     public function get_students_count_by_professor_id($professor_id)
     {
         $count = Student::where('professor_id', $professor_id)->count();
@@ -142,9 +136,5 @@ class User extends Authenticatable implements JWTSubject
     public function fullName()
     {
         return $this->first_name . ' ' . $this->last_name;
-    }
-    public function ss($req)
-    {
-        return $this->offset((($req->page ?? 1) - 1) * ($req->per_page ?? 5))->limit(($req->per_page ?? 5))->get();
     }
 }

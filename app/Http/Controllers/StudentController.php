@@ -201,6 +201,7 @@ class StudentController extends Controller
                 'message' => 'شرکتی برای شما معرفی نشده است',
             ], 400);
         }
+        // ! TODO optimize eager loading
         return StudentPreRegInfo::make(Auth::user());
     }
     // first student page api
