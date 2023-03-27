@@ -92,7 +92,7 @@ class IndustrySupervisorStudentController extends Controller
     {
         // ! OPTIMIZATION queries in this request are not OPTIMIZED
         // in this request, we need both studentNumber and nationalCode for security reasons,
-        // -- because ind. supervisor 
+        // -- because ind. supervisor
         // TODO: add check that schedule table should be written correctly
         // -- for example, first hours cannot be 11:00 and second one 8:00
         $validator = Validator::make($req->all(), [
@@ -142,7 +142,7 @@ class IndustrySupervisorStudentController extends Controller
         $student->save();
         // submit reports
         foreach ($req->reports as $report) {
-            Report::create([
+            $result = Report::create([
                 'form2_id' => $form2->id,
                 'date' => $report['date'],
                 'description' => $report['desc'],
@@ -150,7 +150,7 @@ class IndustrySupervisorStudentController extends Controller
         }
         // set the reports attr. of the weeklyReports table for this student
         $studentWeeklyReport = $student->weeklyReport;
-        // ! 
+        // !
         // WeeklyReport::create([
         //     'student_id' => $student->id,
         //     'reports' => $student->calculateAllWorkingDaysDate()
