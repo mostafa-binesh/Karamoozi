@@ -18,7 +18,7 @@ class IndustrySupervisor extends Model
     }
     public function students()
     {
-        return $this->hasMany(Student::class,'supervisor_id');
+        return $this->hasMany(Student::class, 'supervisor_id');
     }
     // TODO:  could rename them to a shorter name
     public function industrySupervisorStudents()
@@ -28,7 +28,11 @@ class IndustrySupervisor extends Model
     public function industrySupervisorUnevaluatedStudents()
     {
         // return $this->hasMany(Student::class)->where('supervisor_id', $this->id)->whereNull('evaluations');
-        return $this->hasMany(Student::class,'supervisor_id')->where('supervisor_id', $this->id)->unevaluated();
+        return $this->hasMany(Student::class, 'supervisor_id')->where('supervisor_id', $this->id)->unevaluated();
+    }
+    public function company()
+    {
+        return $this->hasOne(Company::class, "company_boss_id");
     }
     // ###############################################
     // ################## FUNCTIONS ###################

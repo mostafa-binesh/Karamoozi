@@ -86,7 +86,8 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
 // ! ################ INDUSTRY SUPERVISOR ##############
 // ###############                       #####
 Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
-    Route::put('profile', 'industrySupervisorProfile');
+    Route::get('profile', 'industrySupervisorProfile');
+    Route::put('profile', 'editIndustrySupervisorProfile');
     Route::get('home', 'industrySupervisorHome');
     // ########### STUDENT RELATED ########
     Route::middleware("verifiedIndustrySupervisor")->group(function () {
