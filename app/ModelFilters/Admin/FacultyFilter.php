@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ModelFilters\Admin\FacultyFilter;
+namespace App\ModelFilters\Admin;
 
 use EloquentFilter\ModelFilter;
 
