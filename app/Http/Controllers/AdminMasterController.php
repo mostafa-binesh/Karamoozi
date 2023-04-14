@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\admin\MasterResource;
 use App\Http\Resources\FacultyResource;
 use App\Http\Resources\UniversityFacultyResource;
+use App\ModelFilters\Admin\FacultyFilter\FacultyFilter;
 use App\ModelFilters\MasterFilter;
 use App\Models\Employee;
 use App\Models\ModelHasRole;
@@ -200,6 +201,6 @@ class AdminMasterController extends Controller
     }
     public function faculties(Request $req)
     {
-        return University_faculty::cpagination($req, FacultyResource::class);
+        return University_faculty::filter($req->all(), FacultyFilter::class)->cpagination($req, FacultyResource::class);
     }
 }
