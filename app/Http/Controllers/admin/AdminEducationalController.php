@@ -9,6 +9,7 @@ use App\Http\Resources\admin\MasterResource;
 use App\Http\Resources\admin\TermResource;
 use App\Http\Resources\FacultyResource;
 use App\Http\Resources\StudentResource;
+use App\ModelFilters\Admin\TermFilter;
 use App\Models\Term;
 use App\Models\University_faculty;
 use Illuminate\Support\Facades\Validator;
@@ -90,7 +91,8 @@ class AdminEducationalController extends Controller
     // ###############                #####
     public function allTerms(Request $req)
     {
-        return Term::with(['students', 'masters'])->cpagination($req, TermResource::class);
+        return Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req, TermResource::class);
+        // ! TODO add name filter
     }
     public function singleTerm($id)
     {
@@ -144,6 +146,7 @@ class AdminEducationalController extends Controller
         $term->name = $req->name;
         $term->start_date = $req->start_date;
         $term->end_date = $req->end_date;
+        $term->save();
         return response()->json([
             'message' => 'سر ترم ویرایش شد',
         ]);
