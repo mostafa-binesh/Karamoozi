@@ -46,7 +46,7 @@ class IndustrySupervisor extends Controller
             'company_name' => 'required|max:255',
             'company_type' => 'required|max:255',
             'old_password' => 'required',
-            'new_password' => 'nullable|min:4'
+            // 'new_password' => 'nullable|min:4'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -59,10 +59,32 @@ class IndustrySupervisor extends Controller
         $user->email = $req->email;
         $user->industrySupervisor->company->company_name = $req->company_name;
         $user->industrySupervisor->company->company_type = $req->company_type;
-        $user->industrySupervisor->company->save();
         if (!Hash::check($req->old_password, $user->password)) {
             return response()->json([
-                'message' => "رمز قدیم با رمز حساب مطابقت ندارد",
+                'message' => "رمز قدیم وارد شده با رمز حساب مطابقت ندارد",
+            ], 400);
+        }
+        $user->industrySupervisor->company->save();
+        $user->save();
+        return response()->json([
+            'message' => 'اطلاعات ویرایش شد',
+        ]);
+    }
+    public function editIndustrySupervisorPassword(Request $req)
+    {
+        $user = auth()->user();
+        $validator = Validator::make($req->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|min:4'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
+        if (!Hash::check($req->old_password, $user->password)) {
+            return response()->json([
+                'message' => "رمز قدیم وارد شده با رمز حساب مطابقت ندارد",
             ], 400);
         }
         if ($req->new_password != "") {
@@ -70,7 +92,7 @@ class IndustrySupervisor extends Controller
         }
         $user->save();
         return response()->json([
-            'message' => 'اطلاعات ویرایش شد',
+            'message' => 'رمز عبور ویرایش شد',
         ]);
     }
 }
