@@ -87,9 +87,7 @@ class IndustrySupervisor extends Controller
                 'message' => "رمز قدیم وارد شده با رمز حساب مطابقت ندارد",
             ], 400);
         }
-        if ($req->new_password != "") {
-            $user->password = Hash::make($req->new_password);
-        }
+        $user->password = Hash::make($req->new_password);
         $user->save();
         return response()->json([
             'message' => 'رمز عبور ویرایش شد',
