@@ -220,6 +220,8 @@ return [
         'internship_website' => 'وبسایت محل کارآموزی',
         'rejection_reason' => 'دلیل رد',
         'repeat_password' => 'تکرار رمز عبور',
+        'old_password' => 'رمز قدیم',
+        'new_password' => 'رمز جدید',
     ),
 
     // 'attributes' => [],
