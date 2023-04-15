@@ -15,6 +15,6 @@ class FacultyFilter extends ModelFilter
     public $relations = [];
     public function name($name)
     {
-        $this->where('faculty_name', $name);
+        $this->where('faculty_name', 'LIKE', "%{$name}%");
     }
 }

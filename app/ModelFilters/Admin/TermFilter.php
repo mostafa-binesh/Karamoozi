@@ -15,6 +15,6 @@ class TermFilter extends ModelFilter
     public $relations = [];
     public function name($name)
     {
-        $this->where('name', $name);
+        $this->where('name', 'LIKE', "%{$name}%");
     }
 }
