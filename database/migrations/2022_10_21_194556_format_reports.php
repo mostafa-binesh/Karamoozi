@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text("caption");
             $table->date("start_date");
             $table->time("start_time");
-            $table->integer("form_id");
+            $table->integer("form2_id");
             $table->unsignedBigInteger('student_id');
             $table->foreign("student_id")->references("id")
            ->on("students")->onDelete("cascade");
