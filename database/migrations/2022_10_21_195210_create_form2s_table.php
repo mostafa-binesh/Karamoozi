@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('internship_website')->nullable();
             $table->json('schedule_table');
             $table->text('description')->nullable();
+            $table->string('rejection_reason')->nullable();
             // approvals
             $table->unsignedTinyInteger("verified")->default(0);
             $table->timestamps();
