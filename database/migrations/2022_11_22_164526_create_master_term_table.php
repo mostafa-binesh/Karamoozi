@@ -21,6 +21,8 @@ return new class extends Migration
             $table->unsignedBigInteger('term_id');
             $table->foreign('term_id')->references('id')->on('terms')
                 ->onDelete('cascade');
+            // $table->integer('capacity');
+            // $table->integer('available');
             $table->timestamps();
         });
     }

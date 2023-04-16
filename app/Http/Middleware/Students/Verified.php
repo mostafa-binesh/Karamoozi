@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\Students;
 
+use App\Models\Student;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +18,11 @@ class Verified
      */
     public function handle(Request $request, Closure $next)
     {
+        // for now
+        return $next($request);
         $student = Auth::user()->student;
         // if student is not verified, return error
-        if (!$student->verified) {
+        if ($student->verified != Student::VERIFIED[1]) {
             return response()->json([
                 'message' => 'شما باید تایید شده باشید',
             ],400);

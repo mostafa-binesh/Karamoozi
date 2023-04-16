@@ -17,6 +17,8 @@ class DonePreReg
      */
     public function handle(Request $request, Closure $next)
     {
+        // for now
+        return $next($request);
         // if not completed the pre registration, return error
         $student = Auth::user()->student;
         if(!$student->pre_reg_done) {

@@ -29,6 +29,7 @@ class StudentPreRegDescription extends JsonResource
             'degree' => [
                 'id' => $this->grade,
                 'degree' => Student::DEGREE[$this->grade],
+                // 'degree' => $this->grade,
             ],
             'passed_units' => $this->passed_units,
             'semester' => Student::SEMESTER[1],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\Students;
 
+use App\Models\Student;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,8 @@ class FullyVerified
      */
     public function handle(Request $request, Closure $next)
     {
+        // for now
+        return $next($request);
         // ! create another field for pre_reg_done
         $student = Auth::user()->student;
         // first step: verified
@@ -32,7 +35,7 @@ class FullyVerified
         // $faculty_verified = $student->faculty_verified;
         $faculty_verified = true;
         if (
-            !$verified
+            $verified != Student::VERIFIED[1] 
             || !$pre_reg_done
             || !isset($supervisor_id)
             || !$faculty_verified
