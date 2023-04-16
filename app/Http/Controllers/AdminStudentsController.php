@@ -212,7 +212,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 1;
+        $student->pre_reg_verified = 2;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
