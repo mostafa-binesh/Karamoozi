@@ -128,6 +128,7 @@ class StudentController extends Controller
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
         $student->term_id = 1; // ! TODO needs to be dynamic
         $student->save();
         return response()->json([
