@@ -230,7 +230,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 2; // ! FIX: why unverified is 2
+        $student->pre_reg_verified = 3;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -241,6 +241,13 @@ class AdminStudentsController extends Controller
     {
         $student = Student::findorfail($id);
         return StudentPreRegDescription::make($student);
+    }
+    public function rejectionDescription($id)
+    {
+        $student = Student::findorfail($id);
+        return response()->json([
+            'message' => $student->pre_reg_rejection_reason,
+        ]);
     }
     public function studentForms($id)
     {
@@ -268,7 +275,7 @@ class AdminStudentsController extends Controller
             'message' => 'فرم تایید شد| وضعیت 2',
         ]);
     }
-    public function form2unVerify($id, Request $req)
+    public function form2unVerify($StudentID, Request $req)
     {
         $validator = Validator::make($req->all(), [
             'rejection_reason' => 'required|max:255',
@@ -278,7 +285,7 @@ class AdminStudentsController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $student = Student::findorfail($id);
+        $student = Student::findorfail($StudentID);
         // $student->form2->verified = Student::VERIFIED[2];
         $student->form2->verified = 3;
         $student->form2->rejection_reason = $req->rejection_reason;

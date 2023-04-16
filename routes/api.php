@@ -119,12 +119,13 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('{id}/preReg/verify', 'preRegVerifyStudent');
         Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
         Route::get('{id}/preReg/desc', 'preRegDesc');
+        Route::get('{id}/preReg/rejectionDescription', 'rejectionDescription');
         // forms
         Route::get('forms', 'forms');
         Route::get('forms/{id}', 'studentForms');
         Route::get('forms/{id}/form2', 'form2');
         Route::put('forms/{id}/form2/verify', 'form2Verify');
-        Route::put('forms/{id}/form2/unverify', 'form2unVerify');
+        Route::put('forms/{StudentID}/form2/unverify', 'form2unVerify');
         // form3
         Route::get('forms/{id}/form3', 'form3');
         Route::put('forms/{id}/form3/verify', 'form3Verify');
