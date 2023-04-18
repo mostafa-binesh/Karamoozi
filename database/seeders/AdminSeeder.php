@@ -192,9 +192,9 @@ class AdminSeeder extends Seeder
             'first_name' => 'علیرضا',
             'last_name' => 'منصوری',
             'username' => '4005',
-            'national_code' => '53230054005',
+            'national_code' => '5323054005',
             'email' => 'mansouri@admin.com',
-            'phone_number' => '092995414005',
+            'phone_number' => '09295414005',
             'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
         ])->assignRole('master');
         Employee::create([
