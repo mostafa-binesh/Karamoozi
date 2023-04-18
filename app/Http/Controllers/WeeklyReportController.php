@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class WeeklyReportController extends Controller
 {
+    // ! weekly reports which been submitted by students
     /**
      * Display a listing of the resource.
      *

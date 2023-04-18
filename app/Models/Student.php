@@ -24,6 +24,8 @@ class Student extends Model
         'pre_reg_done' => 'boolean',
         // 'passed_units' => 'int',
         'student_number' => 'int',
+        'stage' => 'int',
+        // 'verified' => 'integer',
     ];
     /**
      * The attributes that are enum, these are using EnumTrait.
@@ -342,5 +344,9 @@ class Student extends Model
     public static function university_entrance_year_static($student_number)
     {
         return "1" . substr($student_number, 0, 3);
+    }
+    public function preRegDone()
+    {
+        return $this->pre_reg_verified == 2;
     }
 }

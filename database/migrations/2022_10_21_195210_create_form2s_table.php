@@ -34,7 +34,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('rejection_reason')->nullable();
             // approvals
-            $table->unsignedTinyInteger("verified")->default(0);
+            $table->unsignedTinyInteger("verified")->default(1);
             $table->timestamps();
         });
     }

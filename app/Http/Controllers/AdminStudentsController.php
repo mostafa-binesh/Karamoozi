@@ -110,20 +110,25 @@ class AdminStudentsController extends Controller
         // initial registration
         $init_unVerified = 0;
         $init_verified = 0;
-        // $init_unkown_status = 0;
+        $init_waiting = 0;
         // pre reg students
         $preReg_unVerified = 0;
         $preReg_verified = 0;
+        $preReg_waiting = 0;
         foreach ($students as $student) {
-            if ($student->verified == 1) {
+            if ($student->verified == 2) {
                 $init_verified++;
-            } else if ($student->verified == 2) {
+            } else if ($student->verified == 3) {
                 $init_unVerified++;
+            } else if ($student->verified == 1) {
+                $init_waiting++;
             }
-            if ($student->pre_reg_verified == 1) {
+            if ($student->pre_reg_verified == 2) {
                 $preReg_verified++;
-            } else if ($student->pre_reg_verified == 2) {
+            } else if ($student->pre_reg_verified == 3) {
                 $preReg_unVerified++;
+            } else if ($student->pre_reg_verified == 1) {
+                $preReg_waiting++;
             }
         }
         return response()->json([
@@ -163,7 +168,9 @@ class AdminStudentsController extends Controller
     }
     public function forms(Request $req)
     {
-        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
+        // ! inja preRegStudentsFilter nabayad pre_reg_verified filter dashte bashe
+        // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
+        $students = Student::whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -177,7 +184,7 @@ class AdminStudentsController extends Controller
     public function initRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->verified = 1; // 1: approved
+        $student->verified = 2; // 1: approved
         $student->init_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -195,7 +202,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->verified = 2; // 2: denied
+        $student->verified = 3; // 3: denied
         $student->init_reg_rejection_reason = $req->rejection_reason;
         $student->save();
         return response()->json([
@@ -268,8 +275,13 @@ class AdminStudentsController extends Controller
     }
     public function form2Verify($id)
     {
+        // ! دقت کنید
+        // ! در صورتی که فرم 2 یک دانشجو تایید شود، دانشجو می تواند به مرحله ی بعدی رفته و شروع به پر کردن گزارش های هفتگی خود کند
         $student = Student::findorfail($id);
-        $student->form2->verified = 2;
+        $student->stage = 2;
+        $student->save();
+        $student->form2->verified = 2; // verified
+        $student->form2->rejection_reason = null;
         $student->form2->save();
         return response()->json([
             'message' => 'فرم تایید شد| وضعیت 2',
@@ -303,7 +315,7 @@ class AdminStudentsController extends Controller
     public function form3Verify($id)
     {
         $student = Student::where("id", $id)->first();
-        $student->evaluation_verified = 2;
+        $student->evaluations_verified = 2;
         $student->save();
         return response()->json([
             'message' => 'فرم تایید شد',
@@ -312,7 +324,7 @@ class AdminStudentsController extends Controller
     public function form3UnVerify($id)
     {
         $student = Student::where("id", $id)->first();
-        $student->evaluation_verified = 3;
+        $student->evaluations_verified = 3;
         $student->save();
         return response()->json([
             'message' => 'فرم رد شد',

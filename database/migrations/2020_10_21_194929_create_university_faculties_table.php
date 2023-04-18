@@ -19,6 +19,7 @@ return new class extends Migration
             $table->id();
             $table->string('faculty_name');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

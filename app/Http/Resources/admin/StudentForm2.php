@@ -33,6 +33,7 @@ class StudentForm2 extends JsonResource
                 // 'schedule_table' => $this->form2->schedule_table,
                 'schedule_table' => ScheduleTableResource::make($this->form2->schedule_table),
                 'status' => $this->form2->verified,
+                'rejection_reason' => $this->form2->rejection_reason,
             ],
             'company' => [
                 // ! i guess there are some problems with CompanyName function

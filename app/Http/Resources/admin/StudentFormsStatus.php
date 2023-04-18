@@ -19,44 +19,46 @@ class StudentFormsStatus extends JsonResource
         // statuses:
         // 0: not available
         // 1: not checked
-        // 2: refused
-        // 3: approved
+        // 2: approved
+        // 3: refused
         // #### FORM2
-        $form2_status = 0;
-        if (isset($this->form2)) {
-            // available
-            if (!isset($this->form2->verified)) {
-                // not checked
-                $form2_status = 1;
-            } elseif ($this->form2->verified) {
-                // approved
-                $form2_status = 2;
-            } else {
-                // refused
-                $form2_status = 3;
-            }
-        } else {
-            // form not available
-            $form2_status = 0;
-        }
+        // $form2_status = optional($this->form2)->verified ?? 0;
+        $form2_status = $this->form2->verified;
+        // if (isset($this->form2)) {
+        //     // available
+        //     if (!isset($this->form2->verified)) {
+        //         // not checked
+        //         $form2_status = 1;
+        //     } elseif ($this->form2->verified == 3) {
+        //         // approved
+        //         $form2_status = 2;
+        //     } else {
+        //         // refused
+        //         $form2_status = 3;
+        //     }
+        // } else {
+        //     // form not available
+        //     $form2_status = 0;
+        // }
         // #### FORM3
-        $form3_status = 0;
-        if (isset($this->studentEvaluations)) {
-            // available
-            if (!isset($this->studentEvaluations->verified)) {
-                // not checked
-                $form3_status = 1;
-            } elseif ($this->studentEvaluations->verified) {
-                // approved
-                $form3_status = 2;
-            } else {
-                // refused
-                $form3_status = 3;
-            }
-        } else {
-            // form not available
-            $form3_status = 0;
-        }
+        // $form3_status = $this->studentEvaluations->verified ?? 0;
+        $form3_status = $this->evaluations_verified;
+        // if (isset($this->studentEvaluations)) {
+        //     // available
+        //     if (!isset($this->studentEvaluations->verified)) {
+        //         // not checked
+        //         $form3_status = 1;
+        //     } elseif ($this->studentEvaluations->verified) {
+        //         // approved
+        //         $form3_status = 2;
+        //     } else {
+        //         // refused
+        //         $form3_status = 3;
+        //     }
+        // } else {
+        //     // form not available
+        //     $form3_status = 0;
+        // }
         return [
             'student' => StudentFormsResource::make($this),
             // 'forms' => [
@@ -65,6 +67,7 @@ class StudentFormsStatus extends JsonResource
             ],
             'form3' => [ // student evaluations
                 'status' => $form3_status,
+                // 'status' => $this->studentEvaluations,
             ],
             'form4' => [
                 'status' => $this->form4_verified,

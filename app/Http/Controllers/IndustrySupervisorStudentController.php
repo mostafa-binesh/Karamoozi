@@ -135,6 +135,7 @@ class IndustrySupervisorStudentController extends Controller
             'internship_website' => $req->internship_website,
             'description' => $req->description,
             'schedule_table' => $req->schedule_table ?? null,
+            'verified' => 1, // waiting
         ]);
         $student = Student::where("student_number", $req->student_number)->first();
         $student->supervisor_id = Auth::id();
@@ -391,7 +392,7 @@ class IndustrySupervisorStudentController extends Controller
         }
         $student->internship_finished_at = $req->internship_finished_at;
         $student->internship_status = 3;
-        $student->evaluation_verified = 1;
+        $student->evaluations_verified = 1;
         $student->save();
         return [
             'message' => 'عملیات با موفقیت انجام شد',

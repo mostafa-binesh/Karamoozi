@@ -48,7 +48,7 @@ class StudentForm3 extends JsonResource
             'student_evaluations' => isset($this->studentEvaluations) ? StudentEvaluationResource::collection($this->studentEvaluations) : null,
             'total_grade' => $total_grade, // ! fix later
             // 'total_grade_word' => $converter->convert($total_grade),
-            'status' => $this->evaluation_verified,
+            'status' => $this->evaluations_verified,
             'final_evaluation' => [
                 [
                     'title' => 'میانگین ارزشیابی بازدید های استاد کارآموزی',

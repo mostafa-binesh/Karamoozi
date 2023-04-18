@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Company;
-use App\Models\Options;
+use App\Models\Option;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\University_faculty;
@@ -209,23 +209,14 @@ class StudentController extends Controller
     public function internshipStatus()
     {
         $student = Auth::user()->student;
-        if (
-            !$student->IndustrySupervisorVerified()
-            || !$student->pre_reg_done
-            // || !$student->verified
-            // || $student->verified != Student::VERIFIED[1]
-            || $student->verified != 2
-            // || !$student->form2->university_approval
-            // || !$student->faculty_verified
-        ) {
-            $stage = 1;
+        if ($student->stage == 1) {
             if (isset($student->form2->verified)) {
-                $ss = $student->form2->verified == '3' ? true : false;
+                $form2Verification = $student->form2->verified == '3' ? true : false;
             } else {
-                $ss = false;
+                $form2Verification = false;
             }
             return response()->json([
-                'stage' => $stage,
+                'stage' => 1,
                 'data' => [
                     [
                         'name' => 'تاییدیه سرپرست دانشکده',
@@ -245,12 +236,33 @@ class StudentController extends Controller
                         // 'name' => 'تاییدیه مراحل توسط دانشکده',
                         'name' => 'تاییدیه فرم 2 توسط دانشکده',
                         // 'done' => $student->form2->verified ?? false,
-                        'done' => $ss,
+                        'done' => $form2Verification,
                     ],
                 ]
             ]);
-        } elseif (false) {
+        } else if ($student->stage == 2) {
+            return response()->json([
+                'stage' => 2,
+            ]);
         }
+        // if (
+        //     !$student->IndustrySupervisorVerified()
+        //     || !$student->pre_reg_done
+        //     // || !$student->verified
+        //     // || $student->verified != Student::VERIFIED[1]
+        //     || $student->verified != 2
+        //     // || !$student->form2->university_approval
+        //     // || !$student->faculty_verified
+        // ) {
+        //     $stage = 1;
+        //     if (isset($student->form2->verified)) {
+        //         $ss = $student->form2->verified == '3' ? true : false;
+        //     } else {
+        //         $ss = false;
+        //     }
+
+        // } elseif (false) {
+        // }
     }
     // ##########################################
     // ########## COMPANY RELATED FUNCTIONS ###############
@@ -289,7 +301,7 @@ class StudentController extends Controller
     {
         return response()->json([
             'data' => [
-                'options' => evaluateCompanyOptions::collection(Options::where('type', 'student_company_evaluation')->get()),
+                'options' => evaluateCompanyOptions::collection(Option::where('type', 'student_company_evaluation')->get()),
             ],
         ]);
     }
@@ -314,7 +326,7 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         // check if student have sent company evaluations already
         $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
-        if (isset($studentEvalution)) {
+        if (isset($studentEvalution)) { // ! TODO check the companyEvalaution exisence with form4_verified
             return response()->json([
                 'message' => 'شما ارزیابی را قبلا انجام داده اید',
             ], 400);
@@ -333,6 +345,8 @@ class StudentController extends Controller
             'student_id' => $student->id,
             'description' => $req->comment,
         ]);
+        $student->form4_verified = 1; // waiting
+        $student->save();
         return response()->json([
             'message' => 'ارزیابی شرکت با موفقیت ثبت شد',
         ]);
@@ -420,15 +434,15 @@ class StudentController extends Controller
             ], 400);
         }
         // check if currentPassword param. is equal to user's database password
+        $user = Auth::user();
         if ($req->current_password) {
-            if (!Hash::check($req->current_password, Auth::user()->password)) {
+            if (!Hash::check($req->current_password, $user->password)) {
                 return response()->json([
                     'message' => 'رمز عبور فعلی وارد شده با رمز حساب مطابقت ندارد',
                 ], 400);
             }
         }
         // change user info
-        $user = Auth::user();
         $user->email = $req->email;
         $user->phone_number = $req->phone_number;
         if (isset($req->new_password)) {
