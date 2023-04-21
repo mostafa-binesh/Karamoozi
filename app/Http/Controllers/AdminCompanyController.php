@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use App\Http\Resources\admin\CompanyResource;
+use App\ModelFilters\CompanyFilter;
 use App\ModelFilters\MasterFilter;
+use App\Models\ModelHasRole;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 
@@ -19,7 +21,7 @@ class AdminCompanyController extends Controller
      */
     public function index(Request $req)
     {
-        return Company::cpagination($req, CompanyResource::class);
+        return Company::filter($req->all(),CompanyFilter::class)->cpagination($req, CompanyResource::class);
     }
 
     /**
@@ -63,6 +65,11 @@ class AdminCompanyController extends Controller
             'national_code' => $req->national_code,
             'phone_number' => $req->phone_number,
             'email' => $req->email,
+        ]);
+        ModelHasRole::create([
+            "role_id" => 5,
+            "model_type" => "App\Models\User",
+            "model_id" => $$boss->id,
         ]);
         if ($validator->fails()) {
             return response()->json([

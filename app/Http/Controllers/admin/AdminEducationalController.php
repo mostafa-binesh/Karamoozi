@@ -164,7 +164,7 @@ class AdminEducationalController extends Controller
             'message' => 'سر ترم حذف شد',
         ]);
     }
-    // 
+    //
     public function termStudents($id, Request $req)
     {
         $term = Term::find($id);
@@ -184,5 +184,12 @@ class AdminEducationalController extends Controller
             ], 400);
         }
         return $term->masters()->cpagination($req, MasterOriginalResource::class);
+    }
+
+    // ! ################ TERMS AND FACULTIES  #####################
+    // data passing -> ، نام سر ترم ، نام دانشکده ، تعداد دانشجو ، تعداد استاد و مشاهده جزییات .
+    public function TermAndFaculty()
+    {
+        
     }
 }
