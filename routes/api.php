@@ -162,7 +162,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::get('faculties', [AdminMasterController::class, 'faculties']); // TODO move this function to adminController
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
-    Route::resource('company', AdminCompanyController::class);
+    Route::resource('companies', AdminCompanyController::class);
 });
 
 

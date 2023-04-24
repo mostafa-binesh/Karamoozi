@@ -23,6 +23,10 @@ class Term extends Model
     {
         return $this->hasMany(Student::class);
     }
+    public function faculties()
+    {
+        return University_faculty::get()->all();
+    }
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################
