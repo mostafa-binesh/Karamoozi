@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReportResource;
 use App\Http\Resources\WeeklyReportResource;
 use App\Models\Report;
 use App\Models\WeeklyReport;
@@ -30,8 +31,32 @@ class WeeklyReportController extends Controller
     ];
     public function index()
     {
+        // ! todo: eager loading too inja aslan rayat nashode   
+        // $student = Auth::user()->student->with('weeklyReport');
         $student = Auth::user()->student;
-        return WeeklyReportResource::make($student->getLatestUncompletedReportWeek());
+        // find the first unfinished week and get all the the days of it 
+        $reports =  $student->weeklyReport->reports;
+        $unfinishedWeekDays = [];
+        foreach ($reports as $week) {
+            if ($week['is_done']) {
+                continue;
+            } else {
+                // iterating in days of the week
+                // if is_done is true, save the date to the array
+                foreach ($week['days'] as $day) {
+                    if ($day['is_done']) {
+                        // array_push($unfinishedWeekDays, $day['date']);
+                        array_push($unfinishedWeekDays, Verta::parse($day['date'])->datetime());
+                    }
+                }
+            }
+        }
+        // then go to the Reports database and return all of reports in the array
+        return response()->json([
+            'reports' => ReportResource::collection(Report::whereIn('date', $unfinishedWeekDays)->get()),
+            'unfinished_week' => WeeklyReportResource::make($student->getLatestUncompletedReportWeek()),
+        ]);
+        // return WeeklyReportResource::make($student->getLatestUncompletedReportWeek());
     }
 
     /**
@@ -70,14 +95,16 @@ class WeeklyReportController extends Controller
         $reports = $student->weeklyReport->reports;
         foreach ($req->report as $re) {
             $found = false;
-            array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
             for ($i = 0; $i < count($reports); $i++) {
                 for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    if ($re['date'] == $reports[$i]['days'][$j]['date']) {
+                    if ($re['date'] == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == false) {
                         $reports[$i]['days'][$j]['is_done'] = true;
                         $found = true;
+                        array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
+                        break;
                     }
                 }
+                if ($found) break;
             }
             if (!$found) {
                 array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
@@ -137,5 +164,36 @@ class WeeklyReportController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function verifyWeek()
+    {
+        $student = Auth::user()->student;
+        // find the first unfinished week and get all the the days of it 
+        $reports =  $student->weeklyReport->reports;
+        // foreach ($reports as $week) {
+        for ($i = 0; $i < count($reports); $i++) {
+            # code...
+            if ($reports[$i]['is_done']) {
+                continue;
+            } else {
+                // check if all reports' days of the week are fullfied
+                foreach ($reports[$i]['days'] as $days) {
+                    if ($days['is_done'] == false) {
+                        return response()->json([
+                            'message' => 'باید همه ی روز های این هفته گزارش داشته باشند',
+                        ], 400);
+                    }
+                }
+                $reports[$i]['is_done'] = true;
+                $student->weeklyReport->reports = $reports;
+                $student->weeklyReport->save();
+                return response()->json([
+                    'message' => 'هفته تایید شد',
+                ]);
+            }
+        }
+        return response()->json([
+            'message' => 'هفته ای برای تایید پیدا نشد'
+        ], 400);
     }
 }

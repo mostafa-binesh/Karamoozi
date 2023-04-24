@@ -74,6 +74,7 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         Route::get('companyEvaluations', 'studentCompanyEvaluations');
 
         // ######### WEEKLY REPORT #########
+        Route::put('weeklyReports/verifyWeek', [WeeklyReportController::class, 'verifyWeek']);
         Route::resource("weeklyReports", WeeklyReportController::class);
     });
     Route::get('internshipStatus', 'internshipStatus');
@@ -242,6 +243,9 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     });
     Route::get('weeklyReports', function (Request $req) {
         return WeeklyReport::all();
+    });
+    Route::get('weeklyReports/{id}', function (Request $req, $id) {
+        return WeeklyReport::where('student_id', $id)->get();
     });
     Route::delete('deleteWeeklyReports', function (Request $req) {
         return WeeklyReport::where('student_id', $req->student_id)->delete();
