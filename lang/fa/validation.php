@@ -222,6 +222,9 @@ return [
         'repeat_password' => 'تکرار رمز عبور',
         'old_password' => 'رمز قدیم',
         'new_password' => 'رمز جدید',
+        'company_number' => 'شماره شرکت',
+        'company_registry_code' => 'شماره ثبت شرکت',
+        'company_postal_code' => 'کد پستی شرکت',
     ),
 
     // 'attributes' => [],
