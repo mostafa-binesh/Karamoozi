@@ -243,6 +243,7 @@ class StudentController extends Controller
         } else if ($student->stage == 2) {
             return response()->json([
                 'stage' => 2,
+                'industry_supervisor_name' => $student->industrySupervisor->user->fullName(),
             ]);
         }
         // if (
