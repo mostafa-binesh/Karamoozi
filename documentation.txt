@@ -1,0 +1,197 @@
+MIGRATION:
+    1. baraye migration, migration ha be tartibe tarikhi ke tooye esmeshun hast run mishan  
+    pas age foreign key dari havaset bashe ke tablee dovvomi ghablesh sakhte shode bashe
+
+REFRENCES:
+    1. https://blog.logrocket.com/implementing-jwt-authentication-laravel-9/
+
+-- NOTES: 
+    -- files that only start with capital letter can be accessed from other files
+
+-- HOMEPAGE
+    - news 
+    - committess
+    - authoritties 
+    - 
+
+-- factory 
+    -- factory name and model should be same
+
+
+-- TO DO :
+    -- i donno why i installed php-open-source-saver/jwt-auth when another popular jwt-authentiation package was avaiable 
+        -- edit: wtf ! why i wanted to choose jwt-authentication while laravel sanctrum exists!!!!!
+    
+-- NEW CONCEPTS 
+    -- accessors: if you want to change field of a model WHEN RECEIVING IT, u need to use accessors 
+        -- for example, if you want to capilize first letter of user.name https://www.youtube.com/watch?v=B7bVaWL6BPU&list=PL8p2I9GklV46dciS4GDzBFHBi0JVIbnzT&index=36
+    -- mutator: if you want to change field of a model WHEN SAVING IT IN DATABASE, u need to use it 
+        -- for example, u need to add "City: " before adding address to the database 
+    -- stubs: if you want to change default controllers, models and etc. you can use stubbs 
+    -- route model binding: for example, if you want to get product with id==1 without typing the code 
+        -- you have to use route model binding
+    -- resource controllers: you can make some default functions into a controller and use with route::apiresouce 
+        -- and it will be easier for you  
+            -- https://laravel.com/docs/9.x/controllers#resource-controllers
+    -- resources: if you want to show data of a model in a particular way, you need to use resources 
+        -- to create one of the, php artisan make:resource UserResource 
+            -- https://laravel.com/docs/9.x/eloquent-resources
+    -- morphs in models and miration 
+        -- instead of creating two tables for products image and posts image, you can create one and handle them both
+    -- traits: if you want to declare a function and use it in another class, you should use traits
+        -- traits vs helpers: helpers are used in framework and u can use them as well but traits are  
+            -- user defined functions that only user use them mose of the time  
+
+
+
+REMEBER:
+    -- remove barryvdh/laravel-debugbar for production > removed the package
+    -- remove printing db quieries in appserviceprovidor > done for now
+
+status : 
+    ('done', 'reject','waiting','undone',)
+	-- 1: pre-reg
+	-- 2: karamaoozi
+		--steps: 1-7
+		(step 6)--staff: "sarparast"
+		--status: "waiting"
+	-- 3: etmam
+    -- means if student was in pre-reg stage, you're gonna set the status value to pre-reg 
+        -- if he was in karamoozi stage, you're gonna send him some more info, for example the step
+            -- and based on the student's step, you're gonna send him more info as explained above 
+                
+I dind't know:
+    -- you can create enum in mysql database ! 
+    -- you can get auth()->id()
+    --     return auth()->user()->load(['student']); // -> 2 queries 
+        --    return User::with('student')->find(Auth::id()); // -> 3 queries
+
+Route::get('test', function () {
+    return auth()->user()->load(['student']); // -> 2 queries 
+    return User::with('student')->find(Auth::id()); // -> 3 queries
+})->middleware('auth:api');
+
+DIFFERNET ROLES: 
+- admin 
+- master
+- student 
+- industry_supervisor
+
+
+Route::get('roles', function () {
+    // get roles of a user
+    // $user = User::find(1);
+    // return $user->getRoleNames();
+
+    // get all users with master role
+    // User::role('master')->get();
+});
+
+
+Route::get('/relationships', function () {
+    // find and return student only 
+    // $user = student::find(1);
+    // return $user->user;
+
+    // return only student of user 
+    // $user = User::where('first_name','Mostafa')->first();
+    // return $user->student;
+
+    // return user with student attrs. 
+    // $user = User::where('first_name','Mostafa')->with('student')->get();
+    // return $user;
+
+    // return student with assigned user
+    // $user = Student::with('user')->get();
+    // return $user;
+});
+
+Route::post('email', function (Request $req) {
+    $validator = Validator::make($req->all(), [
+        'email' => 'required|email|exists:users',
+    ]);
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => $validator->errors()
+        ], 400);
+    }
+    // Delete all old code that user send before.
+    Password_reset::where('email', $req->email)->delete();
+    // Generate random code
+    // $data['token'] = mt_rand(100000, 999999);
+    // Create a new code
+    // Password::createToken()
+    $token = mt_rand(100000, 999999);
+    $codeData = Password_reset::create([
+        'token' => $token,
+        'email' => $req->email
+    ]);
+    // Send email to user
+    Mail::to($req->email)->send(new send_code_reset_password($token));
+
+    return response(['message' => trans('passwords.sent')], 200);
+});
+
+-- ways to convert "1,1,1,1" to int array
+        // return array_map('intval', explode(',', Student::find(1)->evaluations));
+        // return json_decode('[' . Student::find(1)->evaluations . ']', true);
+
+composer require spatie/laravel-json-api-paginate
+
+
+NOTE ON NEW CPAGINATION TRAIT:
+    EXPLATIONS:
+        -- BECAUSE DEFAULT PAGINATION ADDED SO MUCH USELESS DATA AND MAKE THE RESPONSE JSON SO UGLY, I CREATED A CUSTOM 
+            -- PAGINATION FUNCTION THAT JUST ADDS 3 ATTRS., CURRENT_PAGE, TOTAL PAGES AND PER_PAGE ATTRS. 
+            -- TO USE THEM, FIRST ADD CPAGINATIONTRAIT REFRENCE AND USE IT IN THE MODEL 
+            -- THEN AS IT IS A SCOPE, YOU NEED TO ADD TO TO THE END OF THE QUERY 
+    ARGUMENTS:
+        -- REQ: PASS THE REQUEST OBJECT 
+        -- API RESOURCE: OPTIONNAL, IF YOU WANT TO FIT YOUR DATA IN A API RESOURCE, PASS IT 
+    USAGE:
+        -- STUDENT::CPAGINATE(REQ,API`RESOURCE)
+        -- STUDENT->USER()->CPAGINATE(REQ,APIRESOURCE) 
+            -- ATTENTION: IN THIS EXAMPLE, STUDENT->USER RETURNS A RELATIONSHIP BUT WE NEED QUERY! SO ADD () 
+            -- TO END OF IT 
+
+-- REQUEST OBJECT CANNOT BE CHANGED ENTIRELY, FOR EXAMPLE, IF YOU CHANGE A ATTR. OF A REQUEST OBJECT AND RETURN THE ENTIRE REQ  
+    -- OBJECT, YOU WILL SEE NOTHING HAS BEEN CHANGED BUT IF YOU RETURN THE A ATTR. OF THE OBJECT, THE FIELD WAS CHANGED
+
+https://stackoverflow.com/questions/42521022/get-model-where-relationship-id
+
+// MAKING ALIAS
+https://stackoverflow.com/questions/61926140/unapable-to-set-alias-in-powershell-using-a-string/71052000#71052000
+https://trendoceans.com/create-temporary-and-permanent-powershell-aliases/ > better one
+
+function phpartisan($arg1,$arg2,$arg3,$arg4,$arg5) {
+    php artisan $arg1 $arg2 $arg3 $arg4 $arg5
+}
+function artisanserve($arg1,$arg2,$arg3,$arg4,$arg5) {
+    php artisan serve $arg1 $arg2 $arg3 $arg4 $arg5
+}
+Set-Alias art phpartisan
+Set-Alias ars artisanserve
+
+=== 
+    PA > PHP ARTISAN  
+    PAS  > PHP ARTISAN SERVE 
+    PAM > PHP ARTISAN MAKE: 
+    PAMF > PHP ARTISAN MIGRATE:FRESH  
+    PAMS > PHP ARTISAN MIGRATE:FRESH --SEED
+===
+if (!(Test-Path -Path $PROFILE )) {New-Item -Type File -Path $PROFILE -Force }
+notepad $profile
+
+Sometimes validation:
+    -- not exist, or exist have to have value
+! note:
+if you're using collection::collection, make sure the argument has ->get() at the end of it, because it may return single row
+
+if you want some variable to exist in the data but can be null, you need to use present
+
+// verta: 
+// ! note that if we wanna set a verta, we need to clone it ! otherwise every change
+// -- ! to right one, will affect on the left one as well
+
+! nested relationship example in get pre reg with serveral with methods
+
