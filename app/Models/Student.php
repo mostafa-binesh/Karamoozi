@@ -326,14 +326,14 @@ class Student extends Model
     }
     public function getLatestUncompletedReportWeek()
     {
+        // ?! TODO what i'm taking the student again in here. i need to get the student with this model not the auth and ... (self i mean)
         $student = Auth::user()->student;
         $reports =  $student->weeklyReport->reports;
-        foreach ($reports as $report) {
-            if ($report['is_done']) {
+        foreach ($reports as $week) {
+            if ($week['is_done']) {
                 continue;
             } else {
-                return $report;
-                return WeeklyReportResource::make($report);
+                return $week;
             }
         }
     }
