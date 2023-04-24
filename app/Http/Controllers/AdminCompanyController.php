@@ -21,7 +21,7 @@ class AdminCompanyController extends Controller
      */
     public function index(Request $req)
     {
-        return Company::filter($req->all(),CompanyFilter::class)->cpagination($req, CompanyResource::class);
+        return Company::filter($req->all(), CompanyFilter::class)->cpagination($req, CompanyResource::class);
     }
 
     /**
@@ -71,7 +71,7 @@ class AdminCompanyController extends Controller
             'national_code' => $req->national_code,
             'phone_number' => $req->phone_number,
             'email' => $req->email,
-        ]);
+        ])->assignRole('industry_supervisor');
         Company::create([
             'company_name' => $req->company_name,
             'caption' => $req->caption,
