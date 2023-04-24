@@ -44,18 +44,24 @@ class AdminCompanyController extends Controller
             'company_number' => 'required|digits:11|unique:companies,company_number',
             'company_registry_code' => 'required|unique:companies,company_registry_code',
             'company_phone' => 'required|digits:11|unique:companies,company_phone',
-            'compny_address' => 'required',
+            'company_address' => 'required',
             'company_category' => 'required',
             'company_postal_code' => 'required|unique:companies',
             'company_type' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'email|required|unique:User,email',
+            'email' => 'email|required|unique:users',
             'national_code' => 'required|digits:10|unique:users,national_code',
-            'username' => 'required|digits:10|unique:users,username',
+            // 'username' => 'required|digits:10|unique:users,username',
+            'username' => 'required|unique:users,username',
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()
+            ], 400);
+        }
         $boss = User::create([
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
@@ -64,13 +70,6 @@ class AdminCompanyController extends Controller
             'phone_number' => $req->phone_number,
             'email' => $req->email,
         ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors(),
-            ], 400);
-        }
-
-        // return "ccc";
         Company::create([
             'company_name' => $req->company_name,
             'caption' => $req->caption,
