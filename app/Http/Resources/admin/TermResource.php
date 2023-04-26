@@ -18,8 +18,8 @@ class TermResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
+            // 'start_date' => $this->start_date,
+            // 'end_date' => $this->end_date,
             'students' => $this->students->count(),
             'masters' => $this->masters->count(),
         ];

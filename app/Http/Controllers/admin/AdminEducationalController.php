@@ -91,8 +91,30 @@ class AdminEducationalController extends Controller
     // ###############                #####
     public function allTerms(Request $req)
     {
-        return Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req, TermResource::class);
-        // ! TODO add name filter
+        // ! every term should be seperated by faculties
+        // ! for example if the term is 1440 and we have 4 univ. faculties 
+        // ! we need to show 1440 term with every single one of faculties and their student and masters count
+        // return Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req, TermResource::class);
+        // $terms =  Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->get();
+        $terms =  Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req);
+        $faculties = University_faculty::all();
+        $termsAndFaculties = [];
+        for ($i = 0; $i < count($terms["data"]); $i++) {
+            for ($j = 0; $j < count($faculties); $j++) {
+                $termWithFaculty = [
+                    'id' => $terms["data"][$i]->id,
+                    'name' => $terms["data"][$i]->name,
+                    'faculty' => $faculties[$j]->faculty_name,
+                    'students' => $terms["data"][$i]->students()->where('faculty_id', $faculties[$j]->id)->count(),
+                    'masters' => $terms["data"][$i]->masters()->where('faculty_id', $faculties[$j]->id)->count(),
+                ];
+                array_push($termsAndFaculties, $termWithFaculty);
+            }
+        }
+        return response()->json([
+            'meta' => $terms["meta"],
+            "data" => $termsAndFaculties,
+        ]);
     }
     public function singleTerm($id)
     {
@@ -190,6 +212,5 @@ class AdminEducationalController extends Controller
     // data passing -> ، نام سر ترم ، نام دانشکده ، تعداد دانشجو ، تعداد استاد و مشاهده جزییات .
     public function TermAndFaculty()
     {
-        
     }
 }
