@@ -299,7 +299,7 @@ class Student extends Model
                         $thisWeek,
                         [
                             'title' => self::DAYSOFWEEK[$i],
-                            'date' => $firstWorkingDayDate->addDays($i - $lasti)->format('Y/n/j'),
+                            'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y/n/j'),
                             'is_done' => false,
                         ]
                     );
@@ -313,7 +313,7 @@ class Student extends Model
             }
             array_push($allowedDays, [
                 'week_number' => $weekCounter,
-                'first_day_of_week' => $firstWorkingDayDateBackUp->format('Y/n/j'),
+                'first_day_of_week' => $firstWorkingDayDateBackUp->DateTime()->format('Y/n/j'),
                 'is_done' => false,
                 'days' => $thisWeek,
             ]);
