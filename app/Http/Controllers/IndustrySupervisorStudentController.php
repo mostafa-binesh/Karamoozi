@@ -8,7 +8,6 @@ use App\Models\Report;
 use App\Models\Options;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use App\Http\Resources\pashm;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\StudentResource;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +16,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use App\Http\Resources\IndustrySupervisorStudentsList;
 use App\Http\Resources\IndustrySupervisor\CheckStudent;
 use App\Http\Resources\IndustrySupervisor\IndustrySupervisorsStudent;
+use App\Http\Resources\IndustrySupervisor\StudentEvaluationResource;
 use App\Models\StudentEvaluation;
 use App\Models\WeeklyReport;
 
@@ -29,47 +29,7 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function index(Request $req)
     {
-        // return Student::find(1)->user;
-        // return Student::all()->filter($req->all())->get();
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, pashm::class); //->get();
-        $h = auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5);
-        // return $hgf;
-        return new IndustrySupervisorStudentsList(auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(5));
-        // $x = auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req);
-        // $x = auth()->user()->industrySupervisor->industrySupervisorStudents()->cpagination($req, pashm::class);
-        // // return $asdas;
-        // return $x;
-        // $x = auth()->user()->industrySupervisor->industrySupervisorStudents;
-        // return new UserPaginationResource($x);
-        return new pashm($x);
-        return IndustrySupervisorStudentsList::collection(auth()->user()->industrySupervisor->industrySupervisorStudents->paginate(5));
-
-
-        // return new  IndustrySupervisorStudentsList(auth()->user()->industrySupervisor->industrySupervisorStudents()->paginate(2));
-        // return new  IndustrySupervisorStudentsList(Student::paginate(1));
-        // return 1;
-        // return Student::jsonPaginate();
-
-        // return new IndustrySupervisorStudentsList(Student::find(1),$req);
-        return Student::cpagination($req);
-        return Student::cpagination($req)[0];
-        return Student::cpagination($req)[1];
-
-        $student = Student::paginate(2);
-        return response()->json([
-            'current_page' => $student->currentPage(),
-            'total_page' => $student->total(),
-            'data' => $student->collection(),
-        ]);
-        return $student->currentPage();
-        // return IndustrySupervisorStudentsList::collection();
-        return response()->json(Student::paginate(5));
-
-        // return IndustrySupervisorStudentsList::collection(User::paginate(1));
-
-        return Student::paginate(3);
-        // $data->current_page = 100;
-        return response()->json($data, 200);
+        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, StudentEvaluationResource::class);
     }
 
     /**
@@ -131,7 +91,7 @@ class IndustrySupervisorStudentController extends Controller
             'introduction_letter_date' => $req->introduction_letter_date,
             'internship_department' => $req->internship_department,
             'supervisor_position' => $req->supervisor_position,
-            'internship_start_date' => $req->internship_start_date,
+            'internship_started_at' => $req->internship_start_date,
             'internship_website' => $req->internship_website,
             'description' => $req->description,
             'schedule_table' => $req->schedule_table ?? null,
@@ -151,11 +111,6 @@ class IndustrySupervisorStudentController extends Controller
         }
         // set the reports attr. of the weeklyReports table for this student
         $studentWeeklyReport = $student->weeklyReport;
-        // !
-        // WeeklyReport::create([
-        //     'student_id' => $student->id,
-        //     'reports' => $student->calculateAllWorkingDaysDate()
-        // ]);
         WeeklyReport::updateOrCreate(
             ['student_id' => $student->id],
             [
