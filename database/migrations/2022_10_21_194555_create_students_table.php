@@ -48,6 +48,7 @@ return new class extends Migration
             $table->bigInteger('company_id')->unsigned()->nullable(); // shows the submitted company for this student
             $table->foreign('company_id')->references('id')
                 ->on('companies')->onDelete('cascade');
+            // ! verified = init reg
             $table->unsignedTinyInteger('verified')->default(0); // first step of verification, verified by someone like dorosti
             $table->boolean('pre_reg_done')->default(0);
             $table->boolean('faculty_verified')->default(0); // fourth step of verification before being able to do anything, faculty approval
