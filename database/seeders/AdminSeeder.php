@@ -57,7 +57,7 @@ class AdminSeeder extends Seeder
             'national_code' => '5300053261',
             'email' => 'hasan@admin.com',
             'phone_number' => '09390565601',
-            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+            'password' => '$2y$10$qJ0ZjeCzCgUqphfLDXg7GuyRKENRvfzMAueszq37Qk5pZU8ijWWmy', // 123
         ])->assignRole('student');
         Student::create([
             'user_id' => $secondStudent->id,
@@ -74,7 +74,7 @@ class AdminSeeder extends Seeder
             'national_code' => '5300053262',
             'email' => 'ehsan@admin.com',
             'phone_number' => '09390565602',
-            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+            'password' => '$2y$10$qJ0ZjeCzCgUqphfLDXg7GuyRKENRvfzMAueszq37Qk5pZU8ijWWmy', // 123
         ])->assignRole('student');
         Student::create([
             'user_id' => $thirdStudent->id,
@@ -92,7 +92,7 @@ class AdminSeeder extends Seeder
             'national_code' => '1234',
             'email' => 'mohsen@admin.com',
             'phone_number' => '09852145',
-            'password' => '$2y$10$GZG/xGdZ1QuEeiWgpbI8BecvE5VQeo0GJV5ksiv3DctY8D06XhdK.', // 1234
+            'password' => '$2y$10$qJ0ZjeCzCgUqphfLDXg7GuyRKENRvfzMAueszq37Qk5pZU8ijWWmy', // 123
         ])->assignRole('student');
         // ? should i remove supervisorID for $fs
         $fs = Student::create([
