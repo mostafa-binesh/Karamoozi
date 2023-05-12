@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Term extends Model
 {
-    use HasFactory, CPaginationTrait;
-    use Filterable;
+    use HasFactory, CPaginationTrait, Filterable;
     protected $guarded = [];
     // ###############################################
     // ################## RELATIONSHIPS ###################
