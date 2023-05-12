@@ -69,6 +69,7 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'student_number' => $req->student_number,
             'entrance_year' => Student::university_entrance_year_static($req->student_number),
+            'verified' => 1,
         ]);
         $token = Auth::login($user);
         return response()->json([
