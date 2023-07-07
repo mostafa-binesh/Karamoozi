@@ -4,7 +4,7 @@ namespace App\ModelFilters;
 
 use EloquentFilter\ModelFilter;
 
-class CompanyFilter extends ModelFilter
+class NewsFilter extends ModelFilter
 {
     /**
     * Related Models that have ModelFilters as well as the method on the ModelFilter
@@ -15,8 +15,8 @@ class CompanyFilter extends ModelFilter
     public $relations = [];
     public function search($search)
     {
-        $this->where("company_name", "LIKE", "%{$search}%")->orWhere('company_number', 'LIKE', "%{$search}%")
-            ->orWhere('company_registry_code', 'LIKE', "%{$search}%")->orWhere("company_phone", "LIKE", "%{$search}%");
+        
+        $this->where("title", "LIKE", "%{$search}%")->orWhere('body', 'LIKE', "%{$search}%");
         return $this;
     }
 }
