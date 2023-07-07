@@ -16,6 +16,7 @@ class WeeklyReportResource extends JsonResource
     {
         // i didn't create a new resource for day
         // didn't know how to handle 
+        // return parent::toArray($request);
         $notCompletedDays = [];
         foreach ($this['days'] as $day) {
             if(!$day['is_done']) {

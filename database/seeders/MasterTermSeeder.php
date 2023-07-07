@@ -16,6 +16,6 @@ class MasterTermSeeder extends Seeder
     public function run()
     {
         $firstTerm = Term::findorfail(1);
-        $firstTerm->masters()->attach(1);
+        $firstTerm->masters()->attach(1, ['students_count' => 10]);
     }
 }

@@ -113,6 +113,9 @@ class AuthController extends Controller
             case 'industry_supervisor':
                 $user->load('industrySupervisor');
                 break;
+            case 'master':
+                $user->load('master');
+                break;
             case 'admin':
                 // do nothing i guess
                 break;

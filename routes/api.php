@@ -24,6 +24,8 @@ use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AdminStudentsController;
 use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
+use App\Http\Controllers\masters\MasterController;
+use App\Http\Controllers\masters\StudentsController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Spatie\Permission\Contracts\Role;
 
@@ -164,7 +166,24 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('companies', AdminCompanyController::class);
 });
-
+// ###############                        #####
+// ! ##################### MASTER  #####################
+// ###############                       #####
+Route::controller(MasterController::class)->middleware(['auth:api', 'role:master'])->prefix('masters')->group(function () {
+    // students
+    Route::prefix('students')->controller(StudentsController::class)->group(function() {
+        Route::get('count', 'count');
+        Route::put('count', 'updateCount');
+        // Route::get('/', 'verifiedStudents');
+        Route::get('/verified', 'verifiedStudents');
+        Route::get('/pending', 'pendingStudents');
+        Route::get('/{id}', 'singleStudent');
+        Route::put('/{id}/verify', 'verifyStudent');
+        Route::put('/{id}/unverify', 'unverifyStudent');
+    });
+    // master routes 
+    //
+});
 
 
 // ###############                        #####

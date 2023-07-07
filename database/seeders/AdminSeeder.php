@@ -130,7 +130,8 @@ class AdminSeeder extends Seeder
             'national_code' => '5300053263',
             'email' => 'shir@admin.com',
             'phone_number' => '09390565603',
-            'password' => '$2y$10$QNMSMZ1NLq7HwrRXjLCjC.nZbWbOseajSIS4k6IY.aimBXS/wocPq',
+            'password' => '$2y$10$QeXM/HHqvc.O3l/Q0nnGwujblP8hAXj1aZ6e7LSAlSXHoax5eFLYS', // = 12345
+
         ])->assignRole('master');
         Employee::create([
             'user_id' => $firstEmployee->id,

@@ -33,6 +33,7 @@ return new class extends Migration
                 ->on('students')->onDelete('cascade');
             $table->date("date");
             $table->text("description");
+            $table->boolean('verified');
             $table->timestamps();
         });
     }

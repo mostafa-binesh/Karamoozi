@@ -17,13 +17,13 @@ class IndustrySupervisorsStudent extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        // this is student 
         return [
             'introduction_letter_number' => $this->introduction_letter_number,
             'introduction_letter_date' => $this->introduction_letter_date,
             'internship_department' => $this->internship_department,
             'supervisor_position' => $this->supervisor_position,
-            'internship_start_date' => $this->internship_start_date,
+            'internship_start_date' => $this->internship_started_at,
             'internship_website' => $this->internship_website,
             'description' => $this->description,
             'schedule_table' => $this->schedule_table,

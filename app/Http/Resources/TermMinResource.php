@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReportResource extends JsonResource
+class TermMinResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,10 +14,13 @@ class ReportResource extends JsonResource
      */
     public function toArray($request)
     {
+        // return parent::toArray($request);
+        // $this is term 
         return [
             'id' => $this->id,
-            'date' => $this->date,
-            'description' => $this->description,
+            'name' => $this->name,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
         ];
     }
 }

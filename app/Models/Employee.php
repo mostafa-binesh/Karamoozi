@@ -23,7 +23,7 @@ class Employee extends Model
     }
     public function terms()
     {
-        return $this->belongsToMany(Term::class);
+        return $this->belongsToMany(Term::class,'master_term','term_id', 'master_id');
     }
     // ###############################################
     // ################## FUNCTIONS ###################
@@ -32,9 +32,9 @@ class Employee extends Model
     {
         return $this->user->first_name . " " . $this->user->last_name;
     }
-    public function studentMaster()
+    public function MasterStudents()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Student::class,'professor_id');
     }
     public function get_faculty_id()
     {

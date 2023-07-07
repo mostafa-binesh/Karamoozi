@@ -197,14 +197,21 @@ class Student extends Model
         $this->save();
     }
     // * i guess it would be better to the name of editable be isEditable
-    public function editable()
+    public function editableAsIndSup()
     { // can be edited by industry supervisor or not
-        return $this->internship_status == SELF::INTERNSHIP_STATUS[1];
+        // return $this->internship_status == SELF::INTERNSHIP_STATUS[1];
+        return $this->form2->verified != 2;
     }
     public function IndustrySupervisorVerified()
     {
         $form2 = Form2s::where('student_id', Auth::user()->student->id)->first();
-        return isset($form2);
+        if (!isset($form2)) {
+            return false;
+        } else {
+            return $form2->verified == 2;
+        }
+        return false;
+
     }
     // calculate how many working hours per week student works based on schedule
     public function howManyDaysMustWork($schedule_table)
@@ -299,6 +306,7 @@ class Student extends Model
                         $thisWeek,
                         [
                             'title' => self::DAYSOFWEEK[$i],
+                            // 'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y/n/j'),
                             'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y-m-d'),
                             'is_done' => false,
                         ]
@@ -348,5 +356,8 @@ class Student extends Model
     public function preRegDone()
     {
         return $this->pre_reg_verified == 2;
+    }
+    public function degree() {
+        return SELF::DEGREE[$this->grade];
     }
 }

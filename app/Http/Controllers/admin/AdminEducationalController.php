@@ -138,10 +138,32 @@ class AdminEducationalController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
+        // check if the new term doesn't overlap with existing terms
+        // $existingTerms = Term::all();
+        // foreach ($existingTerms as $term) {
+        //     $startDate = $term->start_date;
+        //     $endDate = $term->end_date;
+        //     if (($req->start_date >= $startDate && $req->start_date <= $endDate) || ($req->end_date >= $startDate && $req->end_date <= $endDate)) {
+        //         // The new term overlaps with an existing term.
+        //         return response()->json([
+        //             'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
+        //         ], 400);   
+        //     }
+        // }
+        $startDate = $req->start_date;
+        $endDate = $req->end_date;
+        $terms = Term::whereBetween('start_date', [$startDate, $endDate])
+             ->orWhereBetween('end_date', [$startDate, $endDate])
+             ->get();
+        if ($terms->count() > 0) {
+            return response()->json([
+               'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
+            ], 400);
+        }
         Term::create([
             'name' => $req->name,
-            'start_date' => $req->start_date,
-            'end_date' => $req->end_date,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
         return response()->json([
             'message' => 'سر ترم با موفقیت افزوده شد',

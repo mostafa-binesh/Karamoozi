@@ -12,7 +12,7 @@ class Term extends Model
     use HasFactory, CPaginationTrait, Filterable;
     protected $guarded = [];
     // ###############################################
-    // ################## RELATIONSHIPS ###################
+    // ! ################## RELATIONSHIPS ###################
     // ###############################################
     public function masters()
     {
@@ -27,6 +27,35 @@ class Term extends Model
         return University_faculty::get()->all();
     }
     // ###############################################
-    // ################## FUNCTIONS ###################
+    // ! ################## FUNCTIONS ###################
     // ###############################################
+    // current active term 
+    // ! usage: $currentTerm = Term::currentTerm()->first();
+    // ! usage: $currentTerm = Term::currentTerm();
+    public function scopeCurrentTerm($query)
+    {
+        $now = now()->format('Y-m-d H:i:s');
+        return $query->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now); //->first(); // ->first();
+    }
+    // public static function
+    public static function currentTermExists()
+    {
+        $now = now()->format('Y-m-d H:i:s');
+        $term = SELF::where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)->first();
+        if (!$term) {
+            return response()->json([
+                'message' => 'ترم فعالی وجود ندارد',
+            ], 400);
+        } else {
+            return null;
+        }
+    }
+    public static function noTermError() {
+        return response()->json([
+            'message' => 'ترم فعالی وجود ندارد',
+        ], 400);
+    }
+    
 }

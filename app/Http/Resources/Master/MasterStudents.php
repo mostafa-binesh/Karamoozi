@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Master;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReportResource extends JsonResource
+class MasterStudents extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,10 +14,14 @@ class ReportResource extends JsonResource
      */
     public function toArray($request)
     {
+        // return parent::toArray($request);
+        // $this is student 
         return [
             'id' => $this->id,
-            'date' => $this->date,
-            'description' => $this->description,
+            'first_name' => $this->user->first_name,
+            'last_name' => $this->user->last_name,
+            'student_number' => $this->student_number,
+            'entrance_year' => $this->entrance_year,
         ];
     }
 }

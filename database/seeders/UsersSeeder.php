@@ -15,6 +15,7 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
+        // ! this model has not been submitted in DatabaseSeeder!
         User::create([
             'first_name' => 'Mostafa',
             'last_name' => 'Binesh',

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->date('introduction_letter_date');
             $table->string('internship_department');
             $table->string('supervisor_position');
-            $table->date("internship_start_date");
+            $table->date("internship_started_at");
             $table->string('internship_website')->nullable();
             $table->json('schedule_table');
             $table->text('description')->nullable();

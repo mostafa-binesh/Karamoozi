@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('supervisor_id')->nullable(); // this is for industry supervisor
-            // ! manzoor az grade, degree (maghta' tahisilie :) )
+            // ! manzoor az grade, degree e (maghta' tahisilie :) )
             // $table->float('grade')->nullable(); 
             $table->unsignedInteger('grade')->nullable();
             // ! FIX: there is no value for grade in pre-reg
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->bigInteger('faculty_id')->unsigned()->nullable();
             $table->foreign('faculty_id')->references('id')
                 ->on('university_faculties')->onDelete('cascade');
-            $table->bigInteger('professor_id')->unsigned()->nullable();
+            $table->bigInteger('professor_id')->unsigned()->nullable(); // ! equals to master_id
             $table->foreign('professor_id')->references('id')
                 ->on('employees')->onDelete('cascade');
 
@@ -50,7 +50,7 @@ return new class extends Migration
                 ->on('companies')->onDelete('cascade');
             // ! verified = init reg
             $table->unsignedTinyInteger('verified')->default(0); // first step of verification, verified by someone like dorosti
-            $table->boolean('pre_reg_done')->default(0);
+            $table->boolean('pre_reg_done')->default(0); // pre registration done by the student
             $table->boolean('faculty_verified')->default(0); // fourth step of verification before being able to do anything, faculty approval
             $table->unsignedTinyInteger('stage')->default(1);
             // first stage | academic status page on figma | pre-internship | something between starting of pre-reg 

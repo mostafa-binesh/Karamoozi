@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Students;
+namespace App\Http\Resources\Master;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use function PHPUnit\Framework\isNull;
-
-class StudentSubmittedCompanyResource extends JsonResource
+class StudentCompany extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,7 +17,7 @@ class StudentSubmittedCompanyResource extends JsonResource
         // $this is company
         return [
             'name' => $this->company_name,
-            'type' => $this->company_type,
+            'type' => $this->companyType(),
             'number' => $this->company_number,
             'postal_code' => $this->company_postal_code,
             'address' => $this->company_address,

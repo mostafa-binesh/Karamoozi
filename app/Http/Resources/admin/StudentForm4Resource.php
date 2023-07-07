@@ -26,7 +26,7 @@ class StudentForm4Resource extends JsonResource
                 'last_name' => $this->user->last_name,
                 'faculty_name' => $this->facultyName(),
                 'student_number' => $this->student_number,
-                'internship_start_date' => $this->form2->internship_start_date,
+                'internship_start_date' => $this->form2->internship_started_at,
                 'internship_finish_date' => $this->form2->internship_finished_at,
             ],
             'company' => [

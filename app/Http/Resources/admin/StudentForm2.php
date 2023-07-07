@@ -29,7 +29,7 @@ class StudentForm2 extends JsonResource
             'form2' => [
                 'created_at' => $this->form2->created_at->format('Y-m-d'),
                 'introduction_letter_number' => $this->form2->introduction_letter_number,
-                'internship_start_date' => $this->form2->internship_start_date,
+                'internship_start_date' => $this->form2->internship_started_at,
                 // 'schedule_table' => $this->form2->schedule_table,
                 'schedule_table' => ScheduleTableResource::make($this->form2->schedule_table),
                 'status' => $this->form2->verified,

@@ -21,7 +21,7 @@ class FinishInternshipLetterResource extends JsonResource
             'full_name' => $this->user->fullName(),
             'duration' => 240, // ! harcoded
             'student_number' => $this->student_number,
-            'internship_start_date' => $this->form2->internship_start_date,
+            'internship_start_date' => $this->form2->internship_started_at,
             'internship_finish_date' => $this->form2->internship_finished_at,
             'company' => $this->companyName(),
             'internship_supervisor' => $this->industrySupervisor->user->fullName(),

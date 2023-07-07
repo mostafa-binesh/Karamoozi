@@ -387,7 +387,8 @@ class AdminStudentsController extends Controller
             }
             array_push($weeks, [
                 'id' => $week['week_number'],
-                'first_day_of_week' => Verta::parse($week['first_day_of_week'])->datetime()->format('Y-m-d'),
+                // 'first_day_of_week' => Verta::parse($week['first_day_of_week'])->datetime()->format('Y-m-d'),
+                'first_day_of_week' => $week['first_day_of_week'],
                 // 'status' => $week['is_done'] == true ? 2 : 0,
                 'status' => rand(0, 3),
                 'not_available' => $status0,
@@ -419,7 +420,7 @@ class AdminStudentsController extends Controller
                     'last_name' => $student->user->last_name,
                     'faculty_name' => $student->facultyName(),
                     'student_number' => $student->student_number,
-                    'internship_start_date' => $student->form2->internship_start_date,
+                    'internship_start_date' => $student->form2->internship_started_at,
                     'internship_finish_date' => $student->form2->internship_finished_at,
                 ],
                 'company' => [
@@ -440,17 +441,19 @@ class AdminStudentsController extends Controller
     public function showWeeklyReport($id, $weekID)
     { // arguments: studentID, weekID
         $student = Student::findorfail($id)->first();
-        // return $student->weeklyReport['reports'][$weekID]['days'];
         $dates = [];
-        foreach ($student->weeklyReport['reports'][$weekID]['days'] as $day) {
-            array_push($dates, Verta::parse($day['date'])->datetime()->format('Y-m-d'));
+        foreach ($student->weeklyReport['reports'][$weekID - 1]['days'] as $day) {
+            // array_push($dates, Verta::parse($day['date'])->datetime()->format('Y-m-d'));
+            array_push($dates, $day['date']);
         }
         return [
             'data' =>
             [
-                'reports' => Report::whereIn('date', $dates)->get(['date', 'description']),
-                // 'dates' => $dates,
-                // 'dd' => $student->weeklyReport['reports'][$weekID]['days'],
+                'reports' => Report::where('student_id',$id)->whereIn('date', $dates)->get(['date', 'description']),
+                // 'reports' => Report::whereIn('date', $dates)->get(['date', 'description']),
+                'dates_debugOnly' => $dates,
+                'week_id_debugOnly' => $student->weeklyReport['reports'][$weekID - 1],
+                'student_id_debugOnly' => $id,
             ]
         ];
     }

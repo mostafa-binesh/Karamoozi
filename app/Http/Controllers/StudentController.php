@@ -220,13 +220,14 @@ class StudentController extends Controller
                 'data' => [
                     [
                         'name' => 'تاییدیه سرپرست دانشکده',
-                        'done' => $student->verified == '0' ? false : true,
+                        'done' => $student->verified == 2 ? true : false,
                         // ! TODO: tell frontend that need to change it
                         // ! for now, i will change the verified to true and false
                     ],
                     [
                         'name' => 'انجام پیش ثبت نام',
-                        'done' => $student->pre_reg_done,
+                        // 'done' => $student->pre_reg_done,
+                        'done' => $student->pre_reg_verified == 2 ? true : false,
                     ],
                     [
                         'name' => 'تاییدیه سرپرست صنعت',
