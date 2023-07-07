@@ -29,7 +29,6 @@ use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Spatie\Permission\Contracts\Role;
 
 
-Route::resource('news',AdminNewsController::class);
 // ! install 'better comments' plugin on vs code to see the code more clear
 // ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 // ###############                        #####
@@ -144,7 +143,7 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
         //news
-
+        Route::resource('news',AdminNewsController::class);
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
