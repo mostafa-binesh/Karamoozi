@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\admin\StudentEvaluationResource;
+use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use App\Http\Resources\chats\message as ChatsMessage;
 use App\Http\Resources\chats\receive;
 use App\Http\Resources\chats\send;
@@ -10,7 +12,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Resources\UserPaginationResource;
 use App\Models\Chat;
+use App\Models\Company;
+use App\Models\Form2s;
 use App\Models\Message;
+use App\Models\Student;
+use App\Models\StudentEvaluation;
+use App\Models\WeeklyReport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Hekmatinasser\Verta\Verta;
@@ -253,4 +260,98 @@ class TestController extends Controller
 
         return implode(' ', $num_words);
     }
+
+    public function user_function(Request $req) {
+        return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
+    }
+
+    public function studentTest() {
+        $student = Student::findorfail(1);
+        return $student->weeklyReport->reports;
+        // return $student->calculateAllWorkingDaysDate();
+        // return $student->howManyDaysMustWork($student->schedule());
+    }
+
+    public  function howManyDaysMustWork(Request $req) {
+        // $student = Student::findorfail();
+        $student = Student::where('student_number', $req->student_number)->firstorfail();
+
+        return $student->howManyDaysMustWork($student->schedule());
+        // return $student->calculateAllWorkingDaysDate();
+        // return $student->howManyDaysMustWork($student->schedule());
+    }
+
+    public function allstudent(Request $req) {
+        return Student::all();
+    }
+
+    public  function studentEval($id) {
+        $student = Student::findorfail($id)->with('studentEvaluations')->first();
+        return StudentEvaluationResource::collection($student->studentEvaluations);
+    }
+
+    public  function studentEvaluation($id) {
+        // $student = Student::findorfail($id)->with('studentEvaluations')->first();
+        $studentEvalution = StudentEvaluation::findorfail($id)->getRelations();
+        return StudentEvaluationResource::collection($studentEvalution);
+    }
+
+    public function alluser(Request $req) {
+        return User::all();
+    }
+
+    public function Form2(Request $req) {
+        return Form2s::all();
+    }
+
+    public  function RoleUser(Request $req) {
+        return User::find(1)->loadRoleInfo();
+    }
+
+    public function Null_test(Request $req) {
+        return null;
+    }
+
+    public function allCompany(Request $req) {
+        return Company::all();
+    }
+
+    public  function ReportWeekly(Request $req) {
+        return WeeklyReport::all();
+    }
+
+    public function single_weeklyReport(Request $req, $id) {
+        return WeeklyReport::where('student_id', $id)->get();
+    }
+
+    public function delete_weeklyReports(Request $req) {
+        return WeeklyReport::where('student_id', $req->student_id)->delete();
+    }
+
+    public function dupliq(Request $req) {
+        // ! it seems two where clouses with same names doesn't work as expected
+        $students = Student::where('verified', 0)->where('verified', 1)->get();
+        // ! return query would be something like this where verified = 0 and where verified = 1
+        // return $x;
+        return $students;
+    }
+
+    public function TstValidation(Request $req) {
+        $validator = Validator::make($req->all(), [
+            // 15 fields
+            'age' => 'required|numeric|between:18,85',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors(),
+            ], 400);
+        }
+        return "problem solved";
+    }
+
+    public function queryTest(Request $req) {
+        Student::where('id', '>', 1)->orWhere('id', '<', 100)->with('user')->get();
+        // return $z;
+    }
 }
+

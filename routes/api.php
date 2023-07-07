@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\admin\AdminEducationalController;
+use App\Http\Controllers\AdminEducationalController;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Company;
@@ -20,6 +20,7 @@ use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\AdminMasterController;
 use App\Http\Controllers\AdminCompanyController;
+use App\Http\Controllers\AdminNewsController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AdminStudentsController;
 use App\Http\Resources\admin\StudentEvaluationResource;
@@ -27,6 +28,8 @@ use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Spatie\Permission\Contracts\Role;
 
+
+Route::resource('news',AdminNewsController::class);
 // ! install 'better comments' plugin on vs code to see the code more clear
 // ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
 // ###############                        #####
@@ -38,7 +41,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('industrySupervisorReg', 'industryBossRegistration');
     Route::post('login', 'login')->name('login');
     Route::get('user', 'user');
-
     Route::post('forget-password', 'send_reset_password');
     Route::get('check-password', 'check_password');
     Route::get('reset-password', 'reset_password')->name('password.reset');
@@ -67,12 +69,10 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         // ######### EVALUATE COMPANY #########
         // get the options
         Route::get('evaluateCompany', 'evaluateCompany');
-
         Route::post('evaluateCompany', 'submitEvaluateCompany');
         Route::put('evaluateCompany', 'editEvaluateCompany');
         // get the student company evaluations
         Route::get('companyEvaluations', 'studentCompanyEvaluations');
-
         // ######### WEEKLY REPORT #########
         Route::put('weeklyReports/verifyWeek', [WeeklyReportController::class, 'verifyWeek']);
         Route::resource("weeklyReports", WeeklyReportController::class);
@@ -85,7 +85,8 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
 
 // ###############                        #####
 // ! ################ INDUSTRY SUPERVISOR ##############
-// ###############                       #####
+// ###############                        #####
+
 Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:industry_supervisor'])->prefix('industrySupervisor')->group(function () {
     Route::get('profile', 'industrySupervisorProfile');
     Route::put('profile', 'editIndustrySupervisorProfile');
@@ -102,9 +103,11 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
     });
     Route::resource('messages', MessageController::class);
 });
+
 // ###############                        #####
 // ! ##################### ADMIN  #####################
 // ###############                       #####
+
 Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
     Route::controller(AdminStudentsController::class)->prefix('students')->group(function () {
         Route::get('home', 'studentsHomePage');
@@ -140,6 +143,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
+        //news
+
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -165,12 +170,11 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::resource('companies', AdminCompanyController::class);
 });
 
-
-
 // ###############                        #####
 // ################ DEVELOPER ONLY ##############
 // ###############                       #####
 // ! DELETE ON PRODUCTION
+
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
     Route::get("freshMigrate", function () {
         Artisan::call("migrate:fresh --seed");
@@ -185,93 +189,35 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         return "Migration completed successfully";
     });
 });
+
 // // //
 // TEST CONTROLLER
 // // //
+
+
 Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('send/{id}', 'sender');
     Route::get('receive/{id}', 'receive');
     Route::post('create_chat', 'create_chat');
     Route::post('create_message', 'create_message');
-
-
     Route::get('pagination', 'usersPagination');
-    Route::get('user-function', function (Request $req) {
-        return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
-    });
+    Route::get('user-function', 'user_function' );
     Route::get('verta', 'verta');
-    Route::get('studentTest', function () {
-        $student = Student::findorfail(1);
-        return $student->weeklyReport->reports;
-        // return $student->calculateAllWorkingDaysDate();
-        // return $student->howManyDaysMustWork($student->schedule());
-    });
-    Route::get('howManyDaysMustWork', function (Request $req) {
-        // $student = Student::findorfail();
-        $student = Student::where('student_number', $req->student_number)->firstorfail();
-
-        return $student->howManyDaysMustWork($student->schedule());
-        // return $student->calculateAllWorkingDaysDate();
-        // return $student->howManyDaysMustWork($student->schedule());
-    });
-    Route::get('allStudents', function (Request $req) {
-        return Student::all();
-    });
-    Route::get('student/{id}/studentEvaluation', function ($id) {
-        $student = Student::findorfail($id)->with('studentEvaluations')->first();
-        return StudentEvaluationResource::collection($student->studentEvaluations);
-    });
-    Route::get('studentEvaluation/{id}', function ($id) {
-        // $student = Student::findorfail($id)->with('studentEvaluations')->first();
-        $studentEvalution = StudentEvaluation::findorfail($id)->getRelations();
-        return StudentEvaluationResource::collection($studentEvalution);
-    });
-    Route::get('allUsers', function (Request $req) {
-        return User::all();
-    });
-    Route::get('allForms', function (Request $req) {
-        return Form2s::all();
-    });
-    Route::get('allUsersWithRole', function (Request $req) {
-        return User::find(1)->loadRoleInfo();
-    });
-    Route::get('null', function (Request $req) {
-        return null;
-    });
-    Route::get('allCompanies', function (Request $req) {
-        return Company::all();
-    });
-    Route::get('weeklyReports', function (Request $req) {
-        return WeeklyReport::all();
-    });
-    Route::get('weeklyReports/{id}', function (Request $req, $id) {
-        return WeeklyReport::where('student_id', $id)->get();
-    });
-    Route::delete('deleteWeeklyReports', function (Request $req) {
-        return WeeklyReport::where('student_id', $req->student_id)->delete();
-    });
-    Route::get('duplicateQuery', function (Request $req) {
-        // ! it seems two where clouses with same names doesn't work as expected
-        $students = Student::where('verified', 0)->where('verified', 1)->get();
-        // ! return query would be something like this where verified = 0 and where verified = 1
-        // return $x;
-        return $students;
-    });
+    Route::get('studentTest', 'studentTest');
+    Route::get('howManyDaysMustWork', 'howManyDaysMustWork');
+    Route::get('allStudents', 'allstudent');
+    Route::get('student/{id}/studentEvaluation', 'studentEval');
+    Route::get('studentEvaluation/{id}', 'studentEvaluation');
+    Route::get('allUsers', 'alluser');
+    Route::get('allForms', 'Form2');
+    Route::get('allUsersWithRole','RoleUser');
+    Route::get('null', 'Null_test');
+    Route::get('allCompanies', 'allCompany');
+    Route::get('weeklyReports','ReportWeekly');
+    Route::get('weeklyReports/{id}', 'single_weeklyReport');
+    Route::delete('deleteWeeklyReports', 'delete_weeklyReports');
+    Route::get('duplicateQuery', 'dupliq');
     Route::get('num2word', 'num2word');
-    Route::post("validationTest", function (Request $req) {
-        $validator = Validator::make($req->all(), [
-            // 15 fields
-            'age' => 'required|numeric|between:18,85',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors(),
-            ], 400);
-        }
-        return "problem solved";
-    });
-    Route::get("queryTest", function (Request $req) {
-        Student::where('id', '>', 1)->orWhere('id', '<', 100)->with('user')->get();
-        // return $z;
-    });
+    Route::post("validationTest", 'TstValidation');
+    Route::get("queryTest", 'queryTest');
 });
