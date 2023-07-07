@@ -395,20 +395,6 @@ class AdminStudentsController extends Controller
                 'not_checked' => $status1,
                 'rejected' => $status2,
                 'accepted' => $status3,
-                // 'days_status' => [
-                //     [
-                //         'status' => 0,
-                //         'count' => 0
-                //     ], [
-                //         'status' => 1,
-                //         'count' => 0
-                //     ], [
-                //         'status' => 2,
-                //         'count' => 0
-                //     ], [
-                //         'status' => 3,
-                //         'count' => 0
-                //     ],
             ]);
         }
         return $weeks = [
@@ -449,7 +435,7 @@ class AdminStudentsController extends Controller
         return [
             'data' =>
             [
-                'reports' => Report::where('student_id',$id)->whereIn('date', $dates)->get(['date', 'description']),
+                'reports' => Report::where('student_id', $id)->whereIn('date', $dates)->get(['date', 'description']),
                 // 'reports' => Report::whereIn('date', $dates)->get(['date', 'description']),
                 'dates_debugOnly' => $dates,
                 'week_id_debugOnly' => $student->weeklyReport['reports'][$weekID - 1],

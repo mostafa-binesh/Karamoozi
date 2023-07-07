@@ -32,39 +32,16 @@ class StudentController extends Controller
     // ##########################################
     public function get_pre_registration()
     {
-        // return null;
-        // before submitting the pre reg form,
-        // we need to send some data
-        // such as masters name, 'sarterm' and ...
-        // $masters = User::role('master')->get();
-        // $returnMasters = [];
         // TODO: replace this foreach with a api resource collection
-        // foreach ($masters as $master) {
-        //     array_push($returnMasters, ['id' => $master->employee->id, 'name' => $master->first_name . " " . $master->last_name]);
-        // }
         $studentSubmittedCompany = Company::where('student_id', Auth::user()->student->id)->first();
         $x = [
-            // 'masters' => $returnMasters,
             // ! one of the most complicated queries of this project
-            // https://stackoverflow.com/questions/71462515/nested-relation-wherehas-in-laravel
-            // 'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function($query) {
-            //     $query->with(['user' => function($query2) {
-            //         $query2->role('master');
-            //     }]);
-            // }])->get()),
-            // previous one with collection
-            // 'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function($query) {
-            //     $query->with(['user' => function($query2) {
-            //         $query2->role('master');
-            //     }]);
-            // }])->get()),
             // ? this query's problem was i couldn't get the user and i needed to send a query to the database to get user for every employee
             'faculties' => preRegFacultiesWithMasters::collection(University_faculty::with(['employees' => function ($query) {
                 $query->whereHas('user', function ($query2) {
                     $query2->role('master');
                 });
             }])->get()),
-            // 'faculties' => University_faculty::all(),
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
             'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
             'academic_year' => [
@@ -77,23 +54,14 @@ class StudentController extends Controller
     public function post_pre_registration(Request $req)
     {
         // ! REWORK THIS PRE REG CHECK SECTION
-        // check pre-reg was not done already
         $student = Auth::user()->student;
-        // if ($student->verified) {
-        //     return response()->json([
-        //         'message' => 'پیش ثبت نام شما از قبل انجام شده است'
-        //     ], 400);
-        // }
         $validator = Validator::make($req->all(), [
-            // 15 fields
             'first_name' => 'required',
             'last_name' => 'required',
             'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
             'internship_master' => 'required|numeric',
-            // 'midterm' => 'required', // nim saale avval
-            // 'internship_year' => 'required', // 1401
             'internship_type' => 'required|numeric',
             'company_id' => 'nullable'
         ]);
@@ -141,11 +109,6 @@ class StudentController extends Controller
         // ! REWORK THIS PRE REG CHECK SECTION
         // check pre-reg was not done already
         $student = Auth::user()->student;
-        // if ($student->verified) {
-        //     return response()->json([
-        //         'message' => 'پیش ثبت نام شما از قبل انجام شده است'
-        //     ], 400);
-        // }
         $validator = Validator::make($req->all(), [
             // 15 fields
             'first_name' => 'required',
@@ -154,8 +117,6 @@ class StudentController extends Controller
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
             'internship_master' => 'required|numeric',
-            // 'midterm' => 'required', // nim saale avval
-            // 'internship_year' => 'required'  , // 1401
             'internship_type' => 'required|numeric',
             'company_id' => 'nullable'
         ]);
@@ -226,7 +187,6 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'انجام پیش ثبت نام',
-                        // 'done' => $student->pre_reg_done,
                         'done' => $student->pre_reg_verified == 2 ? true : false,
                     ],
                     [
@@ -234,9 +194,7 @@ class StudentController extends Controller
                         'done' => $student->IndustrySupervisorVerified(),
                     ],
                     [
-                        // 'name' => 'تاییدیه مراحل توسط دانشکده',
                         'name' => 'تاییدیه فرم 2 توسط دانشکده',
-                        // 'done' => $student->form2->verified ?? false,
                         'done' => $form2Verification,
                     ],
                 ]
@@ -247,24 +205,6 @@ class StudentController extends Controller
                 'industry_supervisor_name' => $student->industrySupervisor->user->fullName(),
             ]);
         }
-        // if (
-        //     !$student->IndustrySupervisorVerified()
-        //     || !$student->pre_reg_done
-        //     // || !$student->verified
-        //     // || $student->verified != Student::VERIFIED[1]
-        //     || $student->verified != 2
-        //     // || !$student->form2->university_approval
-        //     // || !$student->faculty_verified
-        // ) {
-        //     $stage = 1;
-        //     if (isset($student->form2->verified)) {
-        //         $ss = $student->form2->verified == '3' ? true : false;
-        //     } else {
-        //         $ss = false;
-        //     }
-
-        // } elseif (false) {
-        // }
     }
     // ##########################################
     // ########## COMPANY RELATED FUNCTIONS ###############

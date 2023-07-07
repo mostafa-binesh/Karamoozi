@@ -27,9 +27,6 @@ class DevToolController extends Controller
     }
     public function handler(Request $req)
     {
-        // dd($req);
-        // return $req->verifyIndustrySupervisor;
-
         if (isset($req->verifyIndustrySupervisor)) {
             $i = User::where('username', $req->in)->first();
             // $i ?? notFound();
@@ -46,7 +43,6 @@ class DevToolController extends Controller
         }
         if (isset($req->unverifyIndustrySupervisor)) {
             $i = User::where('username', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
             $i = $i->industrySupervisor;
             if (!isset($i) || $i == null) return $this->notFound();
@@ -59,30 +55,19 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->deleteIndustryOfStudent)) {
-            // dd($req);
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->supervisor_id = null;
                 $i->save();
             } catch (Exception $e) {
                 return $this->error($e->getMessage());
             }
-            // dd($i);
             return $this->successful();
         }
-        // dd($req);
         if (isset($req->unevaluateStudent)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->unevaluate();
                 $i->save();
@@ -92,12 +77,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->workingStudent)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->working();
                 $i->save();
@@ -107,12 +88,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->evaluateStudent)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->evaluate();
                 $i->save();
@@ -122,12 +99,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->verifyStudent)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->verified = true;
                 $i->save();
@@ -137,12 +110,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->unVerifyStudent)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->verified = false;
                 $i->save();
@@ -152,12 +121,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->doStudentPreReg)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->pre_reg_done = true;
                 $i->save();
@@ -167,12 +132,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->unDoStudentPreReg)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->pre_reg_done = false;
                 $i->save();
@@ -182,12 +143,8 @@ class DevToolController extends Controller
             return $this->successful();
         }
         if (isset($req->unDoStudentPreReg)) {
-            // return 'delete';
             $i = Student::where('student_number', $req->in)->first();
-            // $i ?? notFound();
             if (!isset($i) || $i == null) return $this->notFound();
-            // $i = $i->student;
-            // if (!isset($i) || $i == null) return $this->notFound();
             try {
                 $i->pre_reg_done = false;
                 $i->save();

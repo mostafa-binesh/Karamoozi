@@ -179,20 +179,7 @@ class AuthController extends Controller
 
         // Delete all old code that user send before.
         Password_reset::where('email', $req->email)->delete();
-
-        // Generate random code
-        // $data['token'] = mt_rand(100000, 999999);
-
-        // Create a new code
-        // $user = User::where('email',$req->email);
         return Password::createToken($req->email);
-        // Password::createToken()
-
-        $token = mt_rand(100000, 999999);
-        $codeData = Password_reset::create([
-            'token' => $token,
-            'email' => $req->email
-        ]);
 
         // Send email to user
         Mail::to($req->email)->send(new send_code_reset_password($token));

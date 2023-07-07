@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 class NumberToWords
 {
     protected $words;
@@ -16,25 +18,20 @@ class NumberToWords
             // add more suffixes as needed
         ];
     }
-
     public function convert($number)
     {
         if (!is_numeric($number)) {
             return false;
         }
-
         $num_words = array();
-
         // Split the number into integer and decimal parts
         $parts = explode('.', $number);
-
         // Handle the integer part
         $integer_part = $parts[0];
         if ($integer_part < 0) {
             $num_words[] = 'منفی';
             $integer_part = abs($integer_part);
         }
-
         // Convert the integer part to words
         $suffix = '';
         foreach ($this->suffixes as $digits => $suffix_value) {
@@ -44,7 +41,6 @@ class NumberToWords
                 break;
             }
         }
-
         while ($integer_part > 0) {
             if ($integer_part < 21) {
                 $num_words[] = $this->words[$integer_part];
@@ -57,11 +53,9 @@ class NumberToWords
                 $integer_part %= 100;
             }
         }
-
         if (!empty($suffix)) {
             $num_words[] = $suffix;
         }
-
         // Handle the decimal part
         if (count($parts) > 1 && is_numeric($parts[1])) {
             $decimal_part = $parts[1];
@@ -77,7 +71,6 @@ class NumberToWords
                 }
             }
         }
-
         // Add separators
         $num_words = array_reverse($num_words);
         $num_words_with_separators = array();

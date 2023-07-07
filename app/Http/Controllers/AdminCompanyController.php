@@ -54,7 +54,6 @@ class AdminCompanyController extends Controller
             'last_name' => 'required',
             'email' => 'email|required|unique:users',
             'national_code' => 'required|digits:10|unique:users,national_code',
-            // 'username' => 'required|digits:10|unique:users,username',
             'username' => 'required|unique:users,username',
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'

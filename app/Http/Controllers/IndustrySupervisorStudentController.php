@@ -75,7 +75,6 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        // return $req;
         $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
         if ($form2 != null) {
             return response()->json([

@@ -94,8 +94,6 @@ class AdminEducationalController extends Controller
         // ! every term should be seperated by faculties
         // ! for example if the term is 1440 and we have 4 univ. faculties 
         // ! we need to show 1440 term with every single one of faculties and their student and masters count
-        // return Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req, TermResource::class);
-        // $terms =  Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->get();
         $terms =  Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req);
         $faculties = University_faculty::all();
         $termsAndFaculties = [];
@@ -138,26 +136,14 @@ class AdminEducationalController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
-        // check if the new term doesn't overlap with existing terms
-        // $existingTerms = Term::all();
-        // foreach ($existingTerms as $term) {
-        //     $startDate = $term->start_date;
-        //     $endDate = $term->end_date;
-        //     if (($req->start_date >= $startDate && $req->start_date <= $endDate) || ($req->end_date >= $startDate && $req->end_date <= $endDate)) {
-        //         // The new term overlaps with an existing term.
-        //         return response()->json([
-        //             'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
-        //         ], 400);   
-        //     }
-        // }
         $startDate = $req->start_date;
         $endDate = $req->end_date;
         $terms = Term::whereBetween('start_date', [$startDate, $endDate])
-             ->orWhereBetween('end_date', [$startDate, $endDate])
-             ->get();
+            ->orWhereBetween('end_date', [$startDate, $endDate])
+            ->get();
         if ($terms->count() > 0) {
             return response()->json([
-               'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
+                'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
             ], 400);
         }
         Term::create([

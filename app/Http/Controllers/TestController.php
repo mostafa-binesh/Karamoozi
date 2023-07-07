@@ -41,13 +41,9 @@ class TestController extends Controller
     {
         // if entered day wasn't saturday, look for next saturday
         $datetime = verta('2023-01-7');
-        // echo $datetime->addDay()->addDay()->addDay();
-        // echo $datetime->addDay()->addDay();
         echo $datetime->addDays(3);
         if ($datetime->dayOfWeek != 0) {
         }
-        // if now friday
-        // echo ;
     }
 
 
@@ -234,15 +230,6 @@ class TestController extends Controller
                 }
             }
         }
-        // Add separator between the words
-        // $separator = ' و ';
-        // $num_words = array_filter($num_words);
-        // $last_word = array_pop($num_words);
-        // if (count($num_words) > 0) {
-        //     $num_words[] = $separator;
-        // }
-        // $num_words[] = $last_word;
-        // Handle the decimal part
         if (count($parts) > 1 && is_numeric($parts[1])) {
             $decimal_part = $parts[1];
             $num_words[] = 'ممیز';
@@ -261,84 +248,91 @@ class TestController extends Controller
         return implode(' ', $num_words);
     }
 
-    public function user_function(Request $req) {
+    public function user_function(Request $req)
+    {
         return ModelsIndustrySupervisor::find(1)->industrySupervisorStudents->ss($req);
     }
 
-    public function studentTest() {
+    public function studentTest()
+    {
         $student = Student::findorfail(1);
         return $student->weeklyReport->reports;
-        // return $student->calculateAllWorkingDaysDate();
-        // return $student->howManyDaysMustWork($student->schedule());
     }
 
-    public  function howManyDaysMustWork(Request $req) {
-        // $student = Student::findorfail();
+    public  function howManyDaysMustWork(Request $req)
+    {
         $student = Student::where('student_number', $req->student_number)->firstorfail();
-
         return $student->howManyDaysMustWork($student->schedule());
-        // return $student->calculateAllWorkingDaysDate();
-        // return $student->howManyDaysMustWork($student->schedule());
     }
 
-    public function allstudent(Request $req) {
+    public function allstudent(Request $req)
+    {
         return Student::all();
     }
 
-    public  function studentEval($id) {
+    public  function studentEval($id)
+    {
         $student = Student::findorfail($id)->with('studentEvaluations')->first();
         return StudentEvaluationResource::collection($student->studentEvaluations);
     }
 
-    public  function studentEvaluation($id) {
-        // $student = Student::findorfail($id)->with('studentEvaluations')->first();
+    public  function studentEvaluation($id)
+    {
         $studentEvalution = StudentEvaluation::findorfail($id)->getRelations();
         return StudentEvaluationResource::collection($studentEvalution);
     }
 
-    public function alluser(Request $req) {
+    public function alluser(Request $req)
+    {
         return User::all();
     }
 
-    public function Form2(Request $req) {
+    public function Form2(Request $req)
+    {
         return Form2s::all();
     }
 
-    public  function RoleUser(Request $req) {
+    public  function RoleUser(Request $req)
+    {
         return User::find(1)->loadRoleInfo();
     }
 
-    public function Null_test(Request $req) {
+    public function Null_test(Request $req)
+    {
         return null;
     }
 
-    public function allCompany(Request $req) {
+    public function allCompany(Request $req)
+    {
         return Company::all();
     }
 
-    public  function ReportWeekly(Request $req) {
+    public  function ReportWeekly(Request $req)
+    {
         return WeeklyReport::all();
     }
 
-    public function single_weeklyReport(Request $req, $id) {
+    public function single_weeklyReport(Request $req, $id)
+    {
         return WeeklyReport::where('student_id', $id)->get();
     }
 
-    public function delete_weeklyReports(Request $req) {
+    public function delete_weeklyReports(Request $req)
+    {
         return WeeklyReport::where('student_id', $req->student_id)->delete();
     }
 
-    public function dupliq(Request $req) {
+    public function dupliq(Request $req)
+    {
         // ! it seems two where clouses with same names doesn't work as expected
         $students = Student::where('verified', 0)->where('verified', 1)->get();
         // ! return query would be something like this where verified = 0 and where verified = 1
-        // return $x;
         return $students;
     }
 
-    public function TstValidation(Request $req) {
+    public function TstValidation(Request $req)
+    {
         $validator = Validator::make($req->all(), [
-            // 15 fields
             'age' => 'required|numeric|between:18,85',
         ]);
         if ($validator->fails()) {
@@ -349,9 +343,8 @@ class TestController extends Controller
         return "problem solved";
     }
 
-    public function queryTest(Request $req) {
+    public function queryTest(Request $req)
+    {
         Student::where('id', '>', 1)->orWhere('id', '<', 100)->with('user')->get();
-        // return $z;
     }
 }
-

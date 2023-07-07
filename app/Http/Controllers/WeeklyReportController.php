@@ -46,8 +46,6 @@ class WeeklyReportController extends Controller
                 // if is_done is true, save the date to the array
                 foreach ($week['days'] as $day) {
                     if ($day['is_done']) {
-                        // array_push($unfinishedWeekDays, $day['date']);
-                        // array_push($unfinishedWeekDays, Verta::parse()->datetime());
                         array_push($unfinishedWeekDays, $day['date']);
                     }
                 }
@@ -56,10 +54,9 @@ class WeeklyReportController extends Controller
         // then go to the Reports database and return all of reports in the array
         return response()->json([
             'weeks_todo' => 1, // chand hafte be joz in hafte moonde ke bayad takmil beshe
-            'reports' => ReportResource::collection(Report::where('student_id',$student->id)->whereIn('date', $unfinishedWeekDays)->get()),
+            'reports' => ReportResource::collection(Report::where('student_id', $student->id)->whereIn('date', $unfinishedWeekDays)->get()),
             'unfinished_week' => WeeklyReportResource::make($student->getLatestUncompletedReportWeek()),
         ]);
-        // return WeeklyReportResource::make($student->getLatestUncompletedReportWeek());
     }
 
     /**
@@ -90,14 +87,9 @@ class WeeklyReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        // $dbReports = [];
         $student = Auth::user()->student;
         $errors = [];
         $reports = $student->weeklyReport->reports;
-        // return [
-        //         'sentReport' => $req->report,
-        //         'reports' => $reports,
-        //     ];
         // loop of request report
         $dbReports = null;
         foreach ($req->report as $re) {
@@ -177,40 +169,26 @@ class WeeklyReportController extends Controller
         $reports = $student->weeklyReport->reports;
         $dbReport = Report::find($id);
         if (!$dbReport) {
-            return response()->json([ 
+            return response()->json([
                 'message' => 'گزارش پیدا نشد',
-            ],400);
+            ], 400);
         }
         $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
-        // foreach ($req->report as $re) {
-            // return [
-            //     'dbReportDate' => $dbDate,
-            //     'reports' => $reports,
-            // ];
-            $found = false;
-            for ($i = 0; $i < count($reports); $i++) {
-                for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    // if ($dbReport['date'] == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                    if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                        // $reports[$i]['days'][$j]['is_done'] = false;
-                        // return 'found';
-                        $found = true;
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                        $dbReport->description = $req->description;
-                        $dbReport->save();
-                        break;
-                    } else {
-                        // return 'not found' . $dbDate . " | " . $reports[$i]['days'][$j]['date'];
-                    }
+        $found = false;
+        for ($i = 0; $i < count($reports); $i++) {
+            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
+                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
+                    $found = true;
+                    $dbReport->description = $req->description;
+                    $dbReport->save();
+                    break;
                 }
-                if ($found) break;
             }
-            if (!$found) {
-                array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-            }
-            // insert the report into the database
-            // Report::insert($dbReports);
-        // }
+            if ($found) break;
+        }
+        if (!$found) {
+            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
+        }
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
         $weeklyReport->reports = $reports; // save the modified report
         $weeklyReport->save();
@@ -233,32 +211,29 @@ class WeeklyReportController extends Controller
         $reports = $student->weeklyReport->reports;
         $dbReport = Report::find($id);
         if (!$dbReport) {
-            return response()->json([ 
+            return response()->json([
                 'message' => 'گزارش پیدا نشد',
-            ],400);
+            ], 400);
         }
         $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
         // foreach ($req->report as $re) {
-            $found = false;
-            for ($i = 0; $i < count($reports); $i++) {
-                for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                        $reports[$i]['days'][$j]['is_done'] = false;
-                        $found = true;
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                        $dbReport->delete();
-                        // $dbReport->save();
-                        break;
-                    }
+        $found = false;
+        for ($i = 0; $i < count($reports); $i++) {
+            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
+                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
+                    $reports[$i]['days'][$j]['is_done'] = false;
+                    $found = true;
+                    // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
+                    $dbReport->delete();
+                    // $dbReport->save();
+                    break;
                 }
-                if ($found) break;
             }
-            if (!$found) {
-                array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-            }
-            // insert the report into the database
-            // Report::insert($dbReports);
-        // }
+            if ($found) break;
+        }
+        if (!$found) {
+            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
+        }
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
         $weeklyReport->reports = $reports; // save the modified report
         $weeklyReport->save();
@@ -272,9 +247,7 @@ class WeeklyReportController extends Controller
         $student = Auth::user()->student;
         // find the first unfinished week and get all the the days of it 
         $reports =  $student->weeklyReport->reports;
-        // foreach ($reports as $week) {
         for ($i = 0; $i < count($reports); $i++) {
-            # code...
             if ($reports[$i]['is_done']) {
                 continue;
             } else {
