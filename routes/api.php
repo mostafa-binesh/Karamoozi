@@ -142,8 +142,6 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
-        //news
-        Route::resource('news',AdminNewsController::class);
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -167,6 +165,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('companies', AdminCompanyController::class);
+    //news
+    Route::resource('news',AdminNewsController::class);
 });
 
 // ###############                        #####
