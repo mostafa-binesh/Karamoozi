@@ -21,7 +21,6 @@ return new class extends Migration
             $table->unsignedBigInteger('faculty_id');
             $table->foreign('faculty_id')->references('id')
                 ->on('university_faculties')->onDelete('cascade'); // FIX: add foregin key bigint and table name should be the same
-            // $table->boolean('verified')->default(true);
             $table->timestamps();
         });
     }

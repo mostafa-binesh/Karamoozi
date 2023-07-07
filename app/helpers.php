@@ -4,15 +4,6 @@
 if (!function_exists('slugMaker')) {
     function slugMaker($string)
     {
-        // return str_replace(" ","-",$string);
-        // // 2 APPROACH
-        // $string = str_replace(array('[\', \']'), '', $string);
-        // $string = preg_replace('/\[.*\]/U', '', $string);
-        // // $string = preg_replace('/&(amp;)?#?[a-z0-9]+;/i', '-', $string);
-        // $string = htmlentities($string, ENT_COMPAT, 'utf-8');
-        // // $string = preg_replace('/&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);/i', '\\1', $string);
-        // // $string = preg_replace(array('/[^a-z0-9]/i', '/[-]+/'), '-', $string);
-        // return strtolower(trim($string, '-'));
         // 3rd APPROACH
         $separator = '-';
         // function ($string, ) {
@@ -96,13 +87,6 @@ if (!function_exists('persianConvert')) {
 if (!function_exists('reqConvert')) {
     function reqConvert(&$req, ...$params)
     {
-        // $persinaDigits1 = array('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹');
-        // $persinaDigits2 = array('٩', '٨', '٧', '٦', '٥', '٤', '٣', '٢', '١', '٠');
-        // $allPersianDigits = array_merge($persinaDigits1, $persinaDigits2);
-        // $replaces = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
-        // // return $req->string;
-        // if ($toPersian) return str_replace($replaces, $allPersianDigits, $string); // to persian
-        // else return str_replace($allPersianDigits, $replaces, $string); // to english
         foreach ($params as $par) {
             $req->$par = persianConvert($req->$par);
         }

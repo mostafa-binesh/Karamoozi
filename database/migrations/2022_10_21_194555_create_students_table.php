@@ -17,7 +17,6 @@ return new class extends Migration
             // https://www.figma.com/file/bWf9Ptmonm5qIUBZl4v8tc/%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87-%DA%A9%D8%A7%D8%B1%D8%A7%D9%85%D9%88%D8%B2%DB%8C-%D8%AF%D8%A7%D9%86%D8%B4%DA%AF%D8%A7%D9%87-%D8%B4%D9%87%DB%8C%D8%AF-%D8%B1%D8%AC%D8%A7%DB%8C%DB%8C?node-id=407%3A1527
             // FIX: some of these fields should be unique
             $table->id();
-            // $table->bigInteger('student_number')->nullable();
             $table->string('student_number')->nullable();
             $table->integer('entrance_year')->nullable();
             $table->unsignedBigInteger('user_id');
@@ -25,7 +24,6 @@ return new class extends Migration
                 ->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('supervisor_id')->nullable(); // this is for industry supervisor
             // ! manzoor az grade, degree e (maghta' tahisilie :) )
-            // $table->float('grade')->nullable(); 
             $table->unsignedInteger('grade')->nullable();
             // ! FIX: there is no value for grade in pre-reg
             $table->unsignedTinyInteger('passed_units')->nullable();
@@ -35,15 +33,11 @@ return new class extends Migration
             $table->bigInteger('professor_id')->unsigned()->nullable(); // ! equals to master_id
             $table->foreign('professor_id')->references('id')
                 ->on('employees')->onDelete('cascade');
-
-
             $table->unsignedTinyInteger('semester')->nullable(); // ! needs to be replaced by term_id
             $table->unsignedInteger('internship_year')->nullable();
-
             $table->unsignedBigInteger('term_id')->nullable();
             $table->foreign('term_id')->references('id')->on('terms')
                 ->onDelete('cascade');
-
             $table->unsignedInteger('internship_type')->nullable();
             $table->bigInteger('company_id')->unsigned()->nullable(); // shows the submitted company for this student
             $table->foreign('company_id')->references('id')
@@ -59,7 +53,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('pre_reg_verified')->default(0);
             $table->string('init_reg_rejection_reason')->nullable(); // this field controller is verified
             $table->string('pre_reg_rejection_reason')->nullable();
-
             $table->boolean('expert_verification')->default(0);
             $table->boolean('supervisor_in_faculty_verification')->default(0);
             $table->boolean('internship_master_verification')->default(0);
@@ -67,31 +60,15 @@ return new class extends Migration
             $table->date('internship_started_at')->nullable();
             $table->date('internship_finished_at')->nullable();
             $table->unsignedTinyInteger('internship_status')->default(1);
-
             // second stage 
-
-
-            // $table->json('evaluations')->nullable();
             $table->text('evaluations')->nullable();
             $table->unsignedTinyInteger('evaluations_verified')->default(0); // = form3 verified
-
             $table->unsignedTinyInteger('form4_verified')->default(0); // = companyEvaluations
-
-
-            // start of internship (apprent.) figma
-
-            // $table->boolean('supervisor_submitted')->default(0); // it can be handled in another way 
             $table->boolean('supervisor_verification')->default(0);
-
             $table->boolean('internship_finished')->default(0);
-            // $table->boolean('done_pre_registration')->default(false);
             // user auth added fields
             $table->timestamp('email_verified_at')->nullable();
-            // $table->uui
-            // $table->rememberToken();
             $table->timestamps();
-            // FIX: change compayn
-
         });
     }
 
@@ -102,6 +79,5 @@ return new class extends Migration
      */
     public function down()
     {
-        //
     }
 };

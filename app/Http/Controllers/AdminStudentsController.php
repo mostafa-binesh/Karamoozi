@@ -169,7 +169,6 @@ class AdminStudentsController extends Controller
     public function forms(Request $req)
     {
         // ! inja preRegStudentsFilter nabayad pre_reg_verified filter dashte bashe
-        // $students = Student::filter($req->all(), PreRegStudentsFilter::class)->whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
         $students = Student::whereHas("form2")->with(['user', 'universityFaculty', 'company'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
@@ -298,7 +297,6 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($StudentID);
-        // $student->form2->verified = Student::VERIFIED[2];
         $student->form2->verified = 3;
         $student->form2->rejection_reason = $req->rejection_reason;
         $student->form2->save();
@@ -387,9 +385,7 @@ class AdminStudentsController extends Controller
             }
             array_push($weeks, [
                 'id' => $week['week_number'],
-                // 'first_day_of_week' => Verta::parse($week['first_day_of_week'])->datetime()->format('Y-m-d'),
                 'first_day_of_week' => $week['first_day_of_week'],
-                // 'status' => $week['is_done'] == true ? 2 : 0,
                 'status' => rand(0, 3),
                 'not_available' => $status0,
                 'not_checked' => $status1,
@@ -436,7 +432,6 @@ class AdminStudentsController extends Controller
             'data' =>
             [
                 'reports' => Report::where('student_id', $id)->whereIn('date', $dates)->get(['date', 'description']),
-                // 'reports' => Report::whereIn('date', $dates)->get(['date', 'description']),
                 'dates_debugOnly' => $dates,
                 'week_id_debugOnly' => $student->weeklyReport['reports'][$weekID - 1],
                 'student_id_debugOnly' => $id,
@@ -447,8 +442,6 @@ class AdminStudentsController extends Controller
     public function finishInternship($id)
     {
         $student = Student::where("id", $id)->with(["form2", 'user'])->first();
-        // return $student;
         return FinishInternshipLetterResource::make($student);
     }
-    // return $days;
 }

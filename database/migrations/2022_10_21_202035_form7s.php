@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('student_id');
             $table->foreign("student_id")->references("id")
-           ->on("students")->onDelete("cascade");
-           $table->date("letter_date");
-           $table->string("letter_number");
-           $table->boolean("supervisor_approval");
+                ->on("students")->onDelete("cascade");
+            $table->date("letter_date");
+            $table->string("letter_number");
+            $table->boolean("supervisor_approval");
         });
     }
 

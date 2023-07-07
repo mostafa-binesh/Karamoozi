@@ -16,9 +16,9 @@ return new class extends Migration
         //یک خبر ، عنوان داره متن داره آیدی داره تاریخ ایجاد داره. عکس هم داره
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->string('title',100)->unique();
+            $table->string('title', 100)->unique();
             $table->text('body');
-            $table->string('image',255);
+            $table->string('image', 255);
             $table->timestamps();
         });
     }
@@ -33,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('news');
     }
 };
-

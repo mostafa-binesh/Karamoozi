@@ -25,9 +25,5 @@ class University_faculty extends Model
     }
     public function masters()
     {
-        // return $this->hasMany(Employee::class,'faculty_id')->user()->role('master')->get();
-        // return $this->employees()->user()->role('master')->get();
-        // return $this->employees()->hasRole('master');
-        // return $this->employees;
     }
 }

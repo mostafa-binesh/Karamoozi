@@ -22,7 +22,6 @@ return new class extends Migration
             $table->unsignedBigInteger('chat_id');
             $table->foreign('chat_id')->references('id')
                 ->on('chats')->onDelete('cascade');
-            // $table->boolean('read')->default(false);
             // need to add media here, or use spatie media library
             $table->timestamps();
         });

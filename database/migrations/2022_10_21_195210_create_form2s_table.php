@@ -20,10 +20,6 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign("student_id")->references("id")
                 ->on("students")->onDelete("cascade");
-            //    $table->unsignedBigInteger('industry_supervisor_id');
-            //    $table->foreign("student_id")->references("id")
-            //    ->on("students")->onDelete("cascade");
-
             $table->string('introduction_letter_number');
             $table->date('introduction_letter_date');
             $table->string('internship_department');

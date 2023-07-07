@@ -24,7 +24,6 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')
                 ->on('students');
-            // $table->text('evaluations'); // before implementation
             $table->unsignedBigInteger('option_id')->nullable();
             $table->foreign('option_id')->references('id')
                 ->on('options')->onDelete('cascade');

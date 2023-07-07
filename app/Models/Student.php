@@ -35,7 +35,6 @@ class Student extends Model
     // it uses EnumTrait
     protected static $enums = [
         'ROLES' => 'role',
-        // 'INTERNSHIP_TYPE' => 'internship_type',
         'INTERNSHIP_STATUS' => 'internship_status',
     ];
     /**
@@ -199,7 +198,6 @@ class Student extends Model
     // * i guess it would be better to the name of editable be isEditable
     public function editableAsIndSup()
     { // can be edited by industry supervisor or not
-        // return $this->internship_status == SELF::INTERNSHIP_STATUS[1];
         return $this->form2->verified != 2;
     }
     public function IndustrySupervisorVerified()
@@ -211,24 +209,10 @@ class Student extends Model
             return $form2->verified == 2;
         }
         return false;
-
     }
     // calculate how many working hours per week student works based on schedule
     public function howManyDaysMustWork($schedule_table)
     {
-        // https://stackoverflow.com/questions/11556731/how-we-can-add-two-date-intervals-in-php
-
-        // calculate how many hours this student works per week
-        // created by chatGPT
-        // an example of schedule table:
-        // $schedule_table = [
-        //     "08:00,12:00,14:00,18:00",
-        //     "08:00,12:00,14:00,18:00",
-        //     "00:00,00:00,00:00,00:00",
-        //     "08:00,12:00,14:00,18:00",
-        //     "08:00,13:00,13:30,18:00",
-        //     "00:00,00:00,00:00,00:00"
-        // ];
         $total_duration = 0; // in seconds for a week
         foreach ($schedule_table as $row) {
             // return $row;
@@ -240,14 +224,7 @@ class Student extends Model
                 $total_duration += $duration;
             }
         }
-
         $total_hours = $total_duration / 3600;
-
-        // return "Total working hours: $total_hours hours\n";
-
-        // calculate how many days it has to work
-
-        // loop through each day and sub its duration from total_duration
         $totalInternshipDuration = 3600 * 240;
         $totalWorkingDaysCount = 0;
         while (true) {
@@ -268,9 +245,7 @@ class Student extends Model
                 if ($totalInternshipDuration < 0) {
                     break;
                 }
-                // print('first week done, totalInternshipDuration: ' . $totalInternshipDuration);
             }
-            // print('this week duration: ' . $thisWeekDuration . " | working days so far: " . $totalWorkingDaysCount . "\n");
             if ($totalInternshipDuration < 0) {
                 break;
             }
@@ -306,7 +281,6 @@ class Student extends Model
                         $thisWeek,
                         [
                             'title' => self::DAYSOFWEEK[$i],
-                            // 'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y/n/j'),
                             'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y-m-d'),
                             'is_done' => false,
                         ]
@@ -357,7 +331,8 @@ class Student extends Model
     {
         return $this->pre_reg_verified == 2;
     }
-    public function degree() {
+    public function degree()
+    {
         return SELF::DEGREE[$this->grade];
     }
 }
