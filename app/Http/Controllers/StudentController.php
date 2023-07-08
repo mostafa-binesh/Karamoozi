@@ -125,7 +125,6 @@ class StudentController extends Controller
                 'message' => $validator->errors(),
             ], 400);
         }
-        return $student->customCompany;
         if (!(isset($req->company_id) || isset($student->customCompany->id))) {
             return response()->json([
                 'message' => 'شرکتی برای شما معرفی نشده است',
