@@ -109,11 +109,16 @@ class IndustrySupervisorStudentController extends Controller
             ]);
         }
         // set the reports attr. of the weeklyReports table for this student
-        $studentWeeklyReport = $student->weeklyReport;
+        $allWorkingDaysDate = $student->calculateAllWorkingDaysDate();
+        if ($allWorkingDaysDate == 0) {
+            return response()->json([
+                'message' => 'لطفا برنامه ی معتبری را وارد کنید',
+            ], 400);
+        }
         WeeklyReport::updateOrCreate(
             ['student_id' => $student->id],
             [
-                'reports' => $student->calculateAllWorkingDaysDate()
+                'reports' => $allWorkingDaysDate
             ]
         );
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
@@ -166,7 +171,6 @@ class IndustrySupervisorStudentController extends Controller
         // ! OPTIMIZATION queries in this request are not OPTIMIZED
         $validator = Validator::make($req->all(), [
             'student_number' => 'required|exists:students,student_number',
-            // 'national_code' => 'required|exists:users,national_code',
             'introduction_letter_number' => 'required',
             'introduction_letter_date' => 'required|date',
             'internship_department' => 'required',
@@ -174,7 +178,6 @@ class IndustrySupervisorStudentController extends Controller
             'internship_start_date' => 'required|date',
             'internship_website' => 'present',
             'description' => 'nullable',
-            // 'schedule_table' => 'required|array|size:6',
             'reports' => 'required|array',
             'reports.*.id' => 'present',
             'reports.*.date' => 'required|date',
@@ -185,8 +188,7 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        // return $req;
-        $student = Student::where('student_number', $req->student_number)->first();
+        $student = Student::where('student_number', $req->student_number)->with(['WeeklyReport'])->first();
         $form2 = Form2s::where('student_id', $student->id)->first();
         if ($form2 == null) {
             return response()->json([
@@ -194,7 +196,6 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         $form2->industry_supervisor_id = auth()->user()->id;
-        // $form2->student_id = User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404);
         $form2->student_id = Student::where('student_number', $req->student_number)->first()->id;
         // !! fix later, dry | theres two search in this page, one in form2 where student, and second is user where
         $form2->schedule_table = $req->schedule_table;
@@ -211,17 +212,28 @@ class IndustrySupervisorStudentController extends Controller
         // array to store all of reports id to delete ones who ind. supervisor deleted
         $industrySupervisorReports = [];
         foreach ($req->reports as $report) {
-            $id =  Report::updateOrCreate(
+            $newReport =  Report::updateOrCreate(
                 ['id' => $report['id']],
                 ['form2_id' => $form2->id, 'date' => $report['date'], 'description' => $report['desc']],
             );
-            array_push($industrySupervisorReports, $id->id);
+            array_push($industrySupervisorReports, $newReport->id);
         }
         // delete the reports where ind. supervisor deleted
         Report::where('form2_id', $form2->id)->whereNotIn('id', $industrySupervisorReports)->delete();
         // set the reports attr. of the weeklyReports table for this student
-        $studentWeeklyReport = $student->weeklyReport;
-        $studentWeeklyReport->reports = $student->calculateAllWorkingDaysDate();
+        // check if schedule duration is more than 0
+        $allWorkingDaysDate = $student->calculateAllWorkingDaysDate();
+        if ($allWorkingDaysDate == 0) {
+            return response()->json([
+                'message' => 'لطفا برنامه ی معتبری را وارد کنید',
+            ], 400);
+        }
+        WeeklyReport::updateOrCreate(
+            ['student_id' => $student->id],
+            [
+                'reports' => $allWorkingDaysDate
+            ]
+        );
         return response()->json(['message' => 'اطلاعات دانشجو با موفقیت ویرایش شد']);
     }
 
@@ -272,7 +284,6 @@ class IndustrySupervisorStudentController extends Controller
             ], 404);
         }
         $user->student->where('student_number', $req->student_number)->first();
-        // $user = User::where('national_code',$req->national_code)->firstorfail();
         if ($user == null) {
             return response()->json([
                 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'
@@ -301,7 +312,6 @@ class IndustrySupervisorStudentController extends Controller
             'data' => [
                 'options' => Options::where('type', 'industry_supervisor_evaluation')->get(),
                 'student' => new StudentResource(Student::where('student_number', $req->student_number)->with('user')->first()),
-                // 'student' => Student::where('student_number', $req->student_number)->first(),
             ]
         ], 200);
     }
@@ -311,14 +321,12 @@ class IndustrySupervisorStudentController extends Controller
         // ! FIX: two queries for same purpose!
         // ! FIX: internship_finish_date doesn't have a column on student table
         $validator = Validator::make($req->all(), [
-            // 'data' => 'required|array|size:8',
             'student_number' => 'required|exists:students,student_number',
             'internship_finish_date' => 'required|date',
             'data' => 'required|array|max:20', // max 20 items
             'data.*.id' => 'required|exists:options,id',
             'data.*.value' => 'required',
         ], [
-            // 'data.*.id.exists' => 'مقدار id برای هر آیتم مورد ارزیابی مورد نیاز است',
             'data.*.id.exists' => 'این مورد ارزیابی در دیتابیس موجود نیست. لطفا صفحه را رفرش کنید',
             'data.*.value.required' => 'مقدار value برای هر آیتم مورد ارزیابی مورد نیاز است',
         ]);
@@ -334,7 +342,6 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // ! previous implementation: save all evaluation in a text column and retrieve it as a json file
-        // $student->evaluations = $req->data;
         // ! fix: delete evaluation column in students table
         // ! new implementation: save it on another table
         foreach ($req->data as $evaluation) {
@@ -370,7 +377,6 @@ class IndustrySupervisorStudentController extends Controller
             ], 404);
         }
         $student = $user->student->where('student_number', $req->student_number)->first();
-        // $user = User::where('national_code',$req->national_code)->firstorfail();
         if ($student == null) {
             return response()->json([
                 'message' => 'دانشجویی با اطلاعات وارد شده یافت نشد'

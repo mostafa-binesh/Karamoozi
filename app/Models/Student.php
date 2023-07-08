@@ -224,6 +224,9 @@ class Student extends Model
                 $total_duration += $duration;
             }
         }
+        if ($total_duration == 0) {
+            return 0;
+        }
         $total_hours = $total_duration / 3600;
         $totalInternshipDuration = 3600 * 240;
         $totalWorkingDaysCount = 0;
@@ -266,6 +269,7 @@ class Student extends Model
         $schedule = $this->schedule();
         // calculate how many days student have to work based on schedule, eg: 30
         $howManyDaysMustWork = self::howManyDaysMustWork($schedule);
+        return $howManyDaysMustWork;
         // calculate all working days date, an array of dates
         $allWorkingDaysDate = [];
         $allowedDays = [];
