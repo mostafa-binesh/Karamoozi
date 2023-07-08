@@ -198,7 +198,7 @@ class Student extends Model
     // * i guess it would be better to the name of editable be isEditable
     public function editableAsIndSup()
     { // can be edited by industry supervisor or not
-        return $this->form2->verified != 2;
+        return $this->form2?->verified != 2;
     }
     public function IndustrySupervisorVerified()
     {

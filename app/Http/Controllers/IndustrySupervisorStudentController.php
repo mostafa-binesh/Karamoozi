@@ -29,7 +29,7 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function index(Request $req)
     {
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, StudentEvaluationResource::class);
+        return auth()->user()->industrySupervisor->industrySupervisorStudents()->with(['form2'])->filter($req->all())->cpagination($req, StudentEvaluationResource::class);
     }
 
     /**
