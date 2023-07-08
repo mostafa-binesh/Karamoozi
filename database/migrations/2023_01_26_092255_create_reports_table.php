@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             // TODO: remove form_reports and weeklyReports tables
-            
             // !notes:
             // report have two types
             // first type is when ind. supervisor submits it when is submitting form2s (submitting new student form) | report_type = 1
@@ -24,7 +23,6 @@ return new class extends Migration
             // second type is when student wanna send a report about his/her internship | report_type = 2
             // -- when it's first type report, we have student_id and don't have form2_id 
             // $table->unsignedSmallInteger('report_type');  // ! it's not necessary
-            
             $table->unsignedBigInteger('form2_id')->nullable();
             $table->foreign('form2_id')->references('id')
                 ->on('form2s')->onDelete('cascade');
@@ -33,7 +31,7 @@ return new class extends Migration
                 ->on('students')->onDelete('cascade');
             $table->date("date");
             $table->text("description");
-            $table->boolean('verified');
+            $table->boolean('verified')->default(0); // i'm back after a long time. so i don't know what default value should be, 0 or 1 (based on 4 possible state)
             $table->timestamps();
         });
     }
