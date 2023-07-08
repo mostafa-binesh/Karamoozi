@@ -49,7 +49,7 @@ class AdminNewsController extends Controller
             ], 400);
         }
 
-        $imageName = time() . 'png';
+        $imageName = time() .'.png';
         $request->file('image')->storeAs('public/news', $imageName);
 
         News::create([
@@ -126,7 +126,7 @@ class AdminNewsController extends Controller
 
         if ($request->image != null) {
             Storage::delete('storage/news/' . $news->image);
-            $imageName = time() . 'png';
+            $imageName = time() . '.png';
             $request->file('image')->storeAs('public/news', $imageName);
             $news->image= $imageName;
         }
