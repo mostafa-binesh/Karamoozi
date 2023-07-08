@@ -202,7 +202,7 @@ class IndustrySupervisorStudentController extends Controller
         $form2->introduction_letter_date = $req->introduction_letter_date;
         $form2->internship_department = $req->internship_department;
         $form2->supervisor_position = $req->supervisor_position;
-        $form2->internship_start_date = $req->internship_start_date;
+        $form2->internship_started_at = $req->internship_start_date;
         $form2->internship_website = $req->internship_website;
         $form2->description = $req->description;
         $form2->schedule_table = $req->schedule_table;
