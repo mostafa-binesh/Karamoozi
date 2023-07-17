@@ -15,9 +15,11 @@ class NewsResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
             'title'=> $this->title,
             'body'=>$this->body,
-            'image'=>$this->image
+            'image'=>asset('storage/news/'.$this->image),
+            'created_at'=>$this->created_at
         ];
     }
 }

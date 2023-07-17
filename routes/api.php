@@ -27,6 +27,7 @@ use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
+use App\Http\Controllers\NewsController;
 use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
 use Spatie\Permission\Contracts\Role;
 
@@ -83,6 +84,18 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         return null;
     })->middleware(['fullyVerifiedStudent']);
 });
+
+// ###############                       ######
+// ! ################# HOME #####################
+// ###############                       ######
+
+Route::prefix('home')->group(function(){
+
+    // news
+    Route::resource('news',NewsController::class);
+
+});
+
 
 // ###############                        #####
 // ! ################ INDUSTRY SUPERVISOR ##############
@@ -185,7 +198,7 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::put('/{id}/verify', 'verifyStudent');
         Route::put('/{id}/unverify', 'unverifyStudent');
     });
-    // master routes 
+    // master routes
     //
 });
 
