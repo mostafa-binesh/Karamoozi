@@ -149,6 +149,7 @@ class StudentController extends Controller
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => 'ویرایش پیش ثبت نام با موفقیت انجام شد',
