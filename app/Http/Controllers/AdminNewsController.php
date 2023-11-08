@@ -2,162 +2,209 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\NewsResource;
-use App\ModelFilters\NewsFilter;
-use App\Models\News;
+
+use App\Repositories\NewsRepo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AdminNewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    private $news;
+    public function __construct(NewsRepo $news)
+    {
+        $this->news = $news;
+    }
+    private $public_path_image = "storage/news/";
+    private $public_path_store = "public/news";
+    private function delete_image($image_name)
+    {
+        Storage::delete($this->public_path_image . $image_name);
+        try {
+            unlink(public_path($this->public_path_image . $image_name));
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'در حذف فایل مشکلی به وجود آمده است'
+            ], 400);
+        }
+    }
+
     public function index(Request $req)
     {
-        return News::filter($req->all(), NewsFilter::class)->cpagination($req, NewsResource::class);
+        try {
+            return $this->news->paginat($req);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $val = Validator::make($request->all(), [
-            'title' => 'required|string|max:100|unique:news,title',
-            'body' => 'required|string',
-            'image' => 'file|required|mimes:png,jpg,jpeg'
-        ]);
-        if ($val->fails()) {
+        try {
+            //! Validation
+            $val = Validator::make($request->all(), [
+                'title' => 'required|string|max:100|unique:news,title',
+                'body' => 'required|string',
+                'image' => 'file|required|mimes:png,jpg,jpeg'
+            ]);
+            if ($val->fails()) {
+                return response()->json([
+                    'error' => $val->errors(),
+                ], 400);
+            }
+
+            //! image name
+            $imageName = 'news-' . time() . '.png';
+
+            //! create news
+            $this->news->create([
+                'title' => $request->title,
+                'body' => $request->body,
+                'image' => $imageName,
+            ]);
+
+            //! store image news
+            $request->file('image')->storeAs($this->public_path_store, $imageName);
+
             return response()->json([
-                'error' => $val->errors(),
-            ], 400);
+                'succses' => 'خبر با موفقیت اضافه شد',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage(),
+            ]);
         }
-
-        $imageName = time() .'.png';
-        $request->file('image')->storeAs('public/news', $imageName);
-
-        News::create([
-            'title' => $request->title,
-            'body' => $request->body,
-            'image' => $imageName,
-        ]);
-
-        return response()->json([
-            'succses' => 'خبر با موفقیت اضافه شد',
-        ]);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function show($id)
     {
-        $news = News::where('id', $id)->first();
-        if (!isset($news->id)) {
+        try {
+            return $this->news->getById($id);
+        } catch (\Exception $e) {
             return response()->json([
-                'error' => 'خبری یافت نشد'
-            ], 400);
+                "error" => $e->getMessage(),
+            ]);
         }
-        return response()->json([
-            'data' => $news,
-        ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        $news = News::where('id', $id)->first();
-        if (!isset($news->id)) {
-            return response()->json([
-                'error' => 'خبری یافت نشد'
-            ], 400);
-        }
-        return response()->json([
-            'data' => $news,
-        ], 200);
+        return $this->show($id);
     }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, $id)
     {
-        $news = News::where('id', $id)->first();
-        if (!isset($news->id)) {
+        // try {
+            //! Validation
+            $val = Validator::make($request->all(), [
+                'title' => 'required|string|max:100|unique:news,title,' . $id,
+                'body' => 'required|string'
+            ]);
+            if ($val->fails()) {
+                return response()->json([
+                    'error' => $val->errors(),
+                ], 400);
+            }
+
+            //! Found news
+            $news = $this->news->getById($id);
+            if ($news == false) {
+                return response()->json([
+                    'error' => "خبر یافت نشد",
+                ], 404);
+            }
+
+            //! update news
+            $this->news->update($request, $news);
+
             return response()->json([
-                'error' => 'خبری یافت نشد'
-            ], 400);
-        }
-        return response()->json([
-            'data' => $news,
-        ], 200);
+                'messagw' => 'خبر با موفقیت ویرایش شد'
+            ], 200);
 
-        $val = Validator::make($request->all(), [
-            'title' => 'required|string|max:100|unique:news,title' . $news->id,
-            'body' => 'required|string',
-            //'image'=>'file|required|mimes:png,jpg,jpeg'
-        ]);
-
-        if ($request->image != null) {
-            Storage::delete('storage/news/' . $news->image);
-            $imageName = time() . '.png';
-            $request->file('image')->storeAs('public/news', $imageName);
-            $news->image= $imageName;
-        }
-        $news->title = $request->title;
-        $news->body = $request->body;
-        $news->save();
-
-        return response()->json([
-            'sucsses'=>'خبر با موفقیت ویرایش شد'
-        ],200);
+        // }
+        //  catch (\Exception $e) {
+        //     return response()->json([
+        //         "error" => $e->getMessage(),
+        //     ],400);
+        // }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $news = News::where('id',$id)->first();
-        if(!isset($news->id)){
-            return response()->json([
-                'error'=> 'خبری یافت نشد'
-            ],400);
-        }
-        Storage::delete('storage/news/' . $news->image);
-        News::destroy($news->id);
+        try {
+            //! check to exist news
+            $news = $this->news->getById($id);
+            if ($news == false) {
+                return response()->json([
+                    'error' => "خبر یافت نشد",
+                ], 404);
+            }
+            //!delete image news
 
-        return response()->json([
-            'sucsses'=>'خبر با موفقیت حذف شد'
-        ],200);
+            $this->delete_image($news->image);
+
+            //!delete news
+            $this->news->delete($id);
+
+            return response()->json([
+                'message' => 'خبر با موفقیت حذف شد'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function updateImage(Request $request, $id)
+    {
+        try {
+            $news = $this->news->getById($id);
+            if ($news == false) {
+                return response()->json([
+                    'error' => "خبر یافت نشد",
+                ], 404);
+            }
+
+            $imageName = 'news-' . time() . '.png';
+            $request->file('image')->storeAs($this->public_path_store, $imageName);
+            $news->image = $imageName;
+
+            return response()->json([
+                'message' => 'تصویر خبر با موفقیت ادیت شد'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function destroyImage(Request $request, $id)
+    {
+        try {
+            //! found news
+            $news = $this->news->getById($id);
+            if ($news == false) {
+                return response()->json([
+                    'error' => "خبر یافت نشد",
+                ], 404);
+            }
+
+            //! delete image news
+            $this->delete_image($news->image);
+            $news->image = null;
+            $news->save();
+            return response()->json([
+                "message" => "تصویر خبر حذف شد"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage(),
+            ]);
+        }
     }
 }

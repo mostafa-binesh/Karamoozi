@@ -19,10 +19,15 @@ class CompanyResource extends JsonResource
             'company_name'=>$this->company_name,
             'caption'=>$this->caption,
             'company_grade'=>$this->company_grade,
-            'company_boss_name'=>$this->user->fullname(),
             'company_number'=>$this->company_number,
             'company_phone'=>$this->company_phone,
             'company_registry'=>$this->company_registry_code,
+            'company_address'=>$this->company_address,
+            'company_category'=>$this->company_category,
+            'company_postal_code'=>$this->company_postal_code,
+            'company_type'=>$this->company_type,
+            'company_boss_data'=>$this->user->resource_user(),
+
         ];
     }
 }

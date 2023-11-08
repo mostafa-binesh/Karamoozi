@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminEducationalController;
+use App\Http\Controllers\CompaniesController;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Company;
@@ -28,8 +29,6 @@ use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
 use App\Http\Controllers\NewsController;
-use App\Models\IndustrySupervisor as ModelsIndustrySupervisor;
-use Spatie\Permission\Contracts\Role;
 
 
 // ! install 'better comments' plugin on vs code to see the code more clear
@@ -89,10 +88,13 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
 // ! ################# HOME #####################
 // ###############                       ######
 
-Route::prefix('home')->group(function(){
+Route::prefix('home')->group(function () {
 
     // news
-    Route::resource('news',NewsController::class);
+    Route::resource('news', NewsController::class);
+
+    // companies
+    Route::get('companies', [CompaniesController::class, 'index']);
 
 });
 
@@ -129,11 +131,14 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('initReg', 'initialRegistrationStudents');
         // list of students waiting for pre registration approval
         Route::get('preReg', 'preRegStudents');
+        //get faculty
+        Route::get('faculty', 'faculty');
         // init reg
         Route::put('{id}/initReg/verify', 'initRegVerifyStudent');
         Route::put('{id}/initReg/unverify', 'initRegUnVerifyStudent');
         Route::get('{id}/initReg/desc', 'initRegDesc');
         // pre reg
+        Route::get('entrance', 'entrance_years');
         Route::put('{id}/preReg/verify', 'preRegVerifyStudent');
         Route::put('{id}/preReg/unverify', 'preRegUnVerifyStudent');
         Route::get('{id}/preReg/desc', 'preRegDesc');
@@ -180,15 +185,19 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('companies', AdminCompanyController::class);
+    Route::delete('companies/image/{id}',[AdminCompanyController::class,'delete_image']);
+    Route::post('companies/image/{id}', [AdminCompanyController::class,'upload_image']);
     //news
-    Route::resource('news',AdminNewsController::class);
+    Route::resource('news', AdminNewsController::class);
+    Route::delete('news/image/{id}',[AdminNewsController::class,'destroyImage']);
+    Route::post('news/image/{id}', [AdminNewsController::class,'updateImage']);
 });
 // ###############                        #####
 // ! ##################### MASTER  #####################
 // ###############                       #####
 Route::controller(MasterController::class)->middleware(['auth:api', 'role:master'])->prefix('masters')->group(function () {
     // students
-    Route::prefix('students')->controller(StudentsController::class)->group(function() {
+    Route::prefix('students')->controller(StudentsController::class)->group(function () {
         Route::get('count', 'count');
         Route::put('count', 'updateCount');
         // Route::get('/', 'verifiedStudents');
@@ -221,6 +230,9 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         Artisan::call("migrate:fresh --seed");
         return "Migration completed successfully";
     });
+    Route::get("role",function(){
+        return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
+    });
 });
 
 // // //
@@ -234,7 +246,7 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::post('create_chat', 'create_chat');
     Route::post('create_message', 'create_message');
     Route::get('pagination', 'usersPagination');
-    Route::get('user-function', 'user_function' );
+    Route::get('user-function', 'user_function');
     Route::get('verta', 'verta');
     Route::get('studentTest', 'studentTest');
     Route::get('howManyDaysMustWork', 'howManyDaysMustWork');
@@ -243,14 +255,22 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
     Route::get('studentEvaluation/{id}', 'studentEvaluation');
     Route::get('allUsers', 'alluser');
     Route::get('allForms', 'Form2');
-    Route::get('allUsersWithRole','RoleUser');
+    Route::get('allUsersWithRole', 'RoleUser');
     Route::get('null', 'Null_test');
     Route::get('allCompanies', 'allCompany');
-    Route::get('weeklyReports','ReportWeekly');
+    Route::get('weeklyReports', 'ReportWeekly');
     Route::get('weeklyReports/{id}', 'single_weeklyReport');
     Route::delete('deleteWeeklyReports', 'delete_weeklyReports');
     Route::get('duplicateQuery', 'dupliq');
     Route::get('num2word', 'num2word');
     Route::post("validationTest", 'TstValidation');
     Route::get("queryTest", 'queryTest');
+    Route::get('', function () {
+        Artisan::call('storage:link');
+    });
+});
+
+
+Route::get('mytest', function () {
+    return "sssss";
 });

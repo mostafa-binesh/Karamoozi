@@ -142,4 +142,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->first_name . ' ' . $this->last_name;
     }
+
+    public function resource_user()
+    {
+        return [
+            "id" => $this->id,
+            "first_name" => $this->first_name,
+            "last_name" => $this->last_name,
+            "username" => $this->username,
+            "national_code" => $this->national_code,
+            "email" => $this->email,
+            "phone_number" => $this->phone_number,
+        ];
+    }
 }

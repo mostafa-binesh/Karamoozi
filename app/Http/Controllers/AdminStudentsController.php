@@ -149,10 +149,12 @@ class AdminStudentsController extends Controller
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
-                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
         ]);
+    }
+    public function entrance_years(){
+         return Student::select('entrance_year')->distinct('entrance_year')->get();
     }
     public function preRegStudents(Request $req)
     {
@@ -160,11 +162,12 @@ class AdminStudentsController extends Controller
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
-                'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
-                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
         ]);
+    }
+    public function faculty(){
+       return UniversityFacultyResource::collection(University_faculty::all());
     }
     public function forms(Request $req)
     {
@@ -174,7 +177,6 @@ class AdminStudentsController extends Controller
             'meta' => $students['meta'],
             'data' => [
                 'faculties' => UniversityFacultyResource::collection(University_faculty::all()),
-                'entrance_years' => Student::select('entrance_year')->distinct('entrance_year')->get(),
                 'students' => $students['data'],
             ]
         ]);
@@ -263,7 +265,7 @@ class AdminStudentsController extends Controller
         // ! need to add other forms, now just form2nd has been added
         $student = Student::where("id", $id)->with(['form2', 'user', 'studentEvaluations'])->first();
         return StudentFormsStatus::make($student);
-        return $student;
+        // return $student;
     }
     // ######################################
     // ############## FORM2 #####################
@@ -272,7 +274,7 @@ class AdminStudentsController extends Controller
     {
         $student = Student::where("id", $id)->with(["form2"])->first();
         return StudentForm2::make($student);
-        return $student;
+        // return $student;
     }
     public function form2Verify($id)
     {

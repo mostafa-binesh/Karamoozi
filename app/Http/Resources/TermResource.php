@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\admin;
+namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,14 +14,12 @@ class TermResource extends JsonResource
      */
     public function toArray($request)
     {
-        // $this is term
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'students' => $this->students->count(),
-            'masters' => $this->masters->count(),
-        ];
+        return
+            [
+                "id" => $this->id,
+                "name" => $this->name,
+                "start_date" => $this->start_date,
+                "end_date" => $this->end_date,
+            ];
     }
 }
