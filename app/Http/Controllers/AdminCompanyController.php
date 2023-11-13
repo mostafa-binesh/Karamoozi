@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Providers\FileProvider;
 use App\Repositories\CompanyRepo;
-use App\Traits\FileProvider;
 use Illuminate\Http\Request;
 use App\Http\Resources\admin\CompanyResource;
 use App\Models\User;

@@ -16,7 +16,8 @@ class CompanyFilter extends ModelFilter
     public function search($search)
     {
         $this->where("company_name", "LIKE", "%{$search}%")->orWhere('company_number', 'LIKE', "%{$search}%")
-            ->orWhere('company_registry_code', 'LIKE', "%{$search}%")->orWhere("company_phone", "LIKE", "%{$search}%");
+            ->orWhere('company_registry_code', 'LIKE', "%{$search}%")->orWhere("company_phone", "LIKE", "%{$search}%")
+            ->orWhere('');
         return $this;
     }
 }

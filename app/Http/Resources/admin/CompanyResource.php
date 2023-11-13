@@ -26,8 +26,8 @@ class CompanyResource extends JsonResource
             'company_category'=>$this->company_category,
             'company_postal_code'=>$this->company_postal_code,
             'company_type'=>$this->company_type,
-            'company_boss_data'=>$this->user->resource_user(),
-
+            'company_boss_data'=>$this->user==null ? '' : $this->user->resource_user(),
+            'company_image' => asset('/storage/companies/'.$this->image),
         ];
     }
 }
