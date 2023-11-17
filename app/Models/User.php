@@ -123,7 +123,7 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
         return true;
     }
     public function getFilamentName(): string {
-        return $this->fullName();
+        return $this->fullName;
     }
 
 
