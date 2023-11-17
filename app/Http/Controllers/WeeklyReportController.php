@@ -32,10 +32,10 @@ class WeeklyReportController extends Controller
     ];
     public function index()
     {
-        // ! todo: eager loading too inja aslan rayat nashode   
+        // ! todo: eager loading too inja aslan rayat nashode
         // $student = Auth::user()->student->with('weeklyReport');
         $student = Auth::user()->student;
-        // find the first unfinished week and get all the the days of it 
+        // find the first unfinished week and get all the the days of it
         $reports =  $student->weeklyReport->reports;
         $unfinishedWeekDays = [];
         foreach ($reports as $week) {
@@ -115,7 +115,7 @@ class WeeklyReportController extends Controller
                 Report::create($dbReports);
             }
         }
-        // set week done to true    
+        // set week done to true
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
         $weeklyReport->reports = $reports; // save the modified report
         $weeklyReport->save();
@@ -245,7 +245,7 @@ class WeeklyReportController extends Controller
     public function verifyWeek()
     {
         $student = Auth::user()->student;
-        // find the first unfinished week and get all the the days of it 
+        // find the first unfinished week and get all the the days of it
         $reports =  $student->weeklyReport->reports;
         for ($i = 0; $i < count($reports); $i++) {
             if ($reports[$i]['is_done']) {

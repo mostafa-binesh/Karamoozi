@@ -13,8 +13,8 @@ class FacultyFilter extends ModelFilter
      * @var array
      */
     public $relations = [];
-    public function name($name)
+    public function name($search)
     {
-        $this->where('faculty_name', 'LIKE', "%{$name}%");
+        $this->where('faculty_name', 'LIKE', "%{$search}%");
     }
 }

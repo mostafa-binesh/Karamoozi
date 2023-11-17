@@ -16,13 +16,21 @@ class Company extends Model
     use HasFactory, Notifiable, Filterable;
 
     use CPaginationTrait;
-    // Protected $fillable = [
-    //     'company_name',
-    //     'company_phone',
-    //     'company_type',
-    //     'company_postal',
-    //     'company_address',
-    // ];
+    protected $fillable = [
+        'company_name',
+        'caption',
+        'company_grade',
+        'company_number',
+        'company_registry_code',
+        'company_phone',
+        'company_address',
+        'company_category',
+        'company_postal_code',
+        'company_type',
+        'company_boss_id',
+        'verified',
+        'image_logo'
+    ];
     public const COMPANY_TYPE = [
         1 => 'دولتی',
         2 => 'خصوصی',
@@ -38,10 +46,12 @@ class Company extends Model
     // ###############################################
     public function user()
     {
-        return $this->belongsTo(User::class,'company_boss_id');
+        return $this->belongsTo(User::class, 'company_boss_id');
     }
-    public function companyType() {
-        return SELF::COMPANY_TYPE[$this->company_type];
+    
+    public function companyType()
+    {
+        return self::COMPANY_TYPE[$this->company_type];
     }
     // ###############################################
     // ################## FUNCTIONS ###################

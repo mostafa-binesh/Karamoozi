@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\NewsResource;
-use App\ModelFilters\NewsFilter;
 use App\Models\News;
+use App\Repositories\NewsRepo;
 use Illuminate\Http\Request;
+
 
 class NewsController extends Controller
 {
+    private $news;
+
+    public function __construct(NewsRepo $news){
+        $this->news = $news;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +21,7 @@ class NewsController extends Controller
      */
     public function index(Request $req)
     {
-        return News::filter($req->all(), NewsFilter::class)->cpagination($req, NewsResource::class);
+        return $this->news->paginat($req);
     }
 
     /**
@@ -48,15 +53,7 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        $news = News::where('id', $id)->first();
-        if (!isset($news->id)) {
-            return response()->json([
-                'error' => 'خبری یافت نشد'
-            ], 400);
-        }
-        return response()->json([
-            'data' => $news,
-        ], 200);
+        return $this->news->getById($id);
     }
 
     /**

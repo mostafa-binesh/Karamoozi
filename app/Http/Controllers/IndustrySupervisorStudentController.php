@@ -29,7 +29,7 @@ class IndustrySupervisorStudentController extends Controller
      */
     public function index(Request $req)
     {
-        return auth()->user()->industrySupervisor->industrySupervisorStudents()->with(['form2'])->filter($req->all())->cpagination($req, StudentEvaluationResource::class);
+        return auth()->user()->industrySupervisor->industrySupervisorStudents()->filter($req->all())->cpagination($req, StudentEvaluationResource::class);
     }
 
     /**
@@ -94,7 +94,8 @@ class IndustrySupervisorStudentController extends Controller
             'internship_website' => $req->internship_website,
             'description' => $req->description,
             'schedule_table' => $req->schedule_table ?? null,
-            'verified' => 1, // waiting
+            'verified' => 1,
+            // waiting
         ]);
         $student = Student::where("student_number", $req->student_number)->first();
         $student->supervisor_id = Auth::id();
@@ -212,7 +213,7 @@ class IndustrySupervisorStudentController extends Controller
         // array to store all of reports id to delete ones who ind. supervisor deleted
         $industrySupervisorReports = [];
         foreach ($req->reports as $report) {
-            $newReport =  Report::updateOrCreate(
+            $newReport = Report::updateOrCreate(
                 ['id' => $report['id']],
                 ['form2_id' => $form2->id, 'date' => $report['date'], 'description' => $report['desc']],
             );
@@ -323,7 +324,8 @@ class IndustrySupervisorStudentController extends Controller
         $validator = Validator::make($req->all(), [
             'student_number' => 'required|exists:students,student_number',
             'internship_finish_date' => 'required|date',
-            'data' => 'required|array|max:20', // max 20 items
+            'data' => 'required|array|max:20',
+            // max 20 items
             'data.*.id' => 'required|exists:options,id',
             'data.*.value' => 'required',
         ], [
