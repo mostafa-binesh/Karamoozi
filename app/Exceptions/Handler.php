@@ -62,7 +62,6 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->renderable(function (\Illuminate\Auth\AuthenticationException  $e, $request) {
-            // dd($e);
             return response()->json(['error' => 'شما باید احراز هویت انجام داده باشید.'], 401);
         });
         $this->renderable(function (\PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException  $e, $request) {
