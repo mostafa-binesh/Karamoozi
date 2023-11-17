@@ -42,7 +42,7 @@ class StudentForm3 extends JsonResource
                 'address' => $this->company->company_address,
             ],
             'industry_supervisor' => [
-                'full_name' => $this->industrySupervisor->user->fullName(),
+                'full_name' => $this->industrySupervisor->user->fullName,
                 'position' => $this->form2->supervisor_position,
             ],
             'student_evaluations' => isset($this->studentEvaluations) ? StudentEvaluationResource::collection($this->studentEvaluations) : null,

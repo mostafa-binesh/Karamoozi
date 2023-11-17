@@ -159,10 +159,12 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     {
         $this->notify(new PasswordReset($token, $this->email));
     }
-    public function fullName()
-    {
-        return $this->first_name . ' ' . $this->last_name;
-    }
+    // DEPREACTED
+    // USE fullName attribute
+    // public function fullName()
+    // {
+    //     return $this->first_name . ' ' . $this->last_name;
+    // }
 
     public function resource_user()
     {

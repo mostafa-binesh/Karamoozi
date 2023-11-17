@@ -16,12 +16,12 @@ class preRegMasters extends JsonResource
     {
         // return [
         //     'id' => $this->id,
-        //     'name' => $this->user->fullName(),
+        //     'name' => $this->user->fullName,
         // ];
         if ($this->user != []) {
             return [
                 'id' => $this->id,
-                'name' => $this->user->fullName(),
+                'name' => $this->user->fullName,
             ];
         } else {
             return null;

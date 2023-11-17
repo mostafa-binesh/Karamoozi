@@ -420,7 +420,7 @@ class AdminStudentsController extends Controller
                     'address' => $student->company->company_address,
                 ],
                 'industry_supervisor' => [
-                    'full_name' => $student->industrySupervisor->user->fullName(),
+                    'full_name' => $student->industrySupervisor->user->fullName,
                     'position' => $student->form2->supervisor_position,
                 ],
             ]
