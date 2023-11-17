@@ -106,6 +106,14 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     {
         return $this->hasMany(Chat::class, 'sender_id');
     }
+
+    # scopes
+
+    # attributes
+    public function getFullNameAttribute() {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################

@@ -93,27 +93,22 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('user.fullName')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('faculty_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('universityFaculty.faculty_name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('professor_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('professor.fullName')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('term_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('term.name')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('company_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('company.company_name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('student_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('entrance_year')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('supervisor_id')
+                Tables\Columns\TextColumn::make('industrySupervisor.user.fullName')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('grade')
