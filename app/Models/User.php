@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Filament\Panel;
 use Illuminate\Support\Str;
+use EloquentFilter\Filterable;
 use App\Traits\CPaginationTrait;
 use Spatie\Permission\Models\Role;
 use App\Notifications\PasswordReset;
-use EloquentFilter\Filterable;
+use Filament\Models\Contracts\HasName;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
 {
     use HasFactory, Notifiable, HasRoles, Filterable;
     use CPaginationTrait;
@@ -103,9 +106,27 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Chat::class, 'sender_id');
     }
+
+    # scopes
+
+    # attributes
+    public function getFullNameAttribute() {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################
+
+    // filament functions
+    public function canAccessPanel(Panel $panel): bool {
+        return true;
+    }
+    public function getFilamentName(): string {
+        return $this->fullName;
+    }
+
+
     // custom role function
     // ! wtf is this function ?!
     // ! needs to change the function to relationship in this case (see the used case)
@@ -138,10 +159,12 @@ class User extends Authenticatable implements JWTSubject
     {
         $this->notify(new PasswordReset($token, $this->email));
     }
-    public function fullName()
-    {
-        return $this->first_name . ' ' . $this->last_name;
-    }
+    // DEPREACTED
+    // USE fullName attribute
+    // public function fullName()
+    // {
+    //     return $this->first_name . ' ' . $this->last_name;
+    // }
 
     public function resource_user()
     {

@@ -25,6 +25,14 @@ class Employee extends Model
     {
         return $this->belongsToMany(Term::class,'master_term','term_id', 'master_id');
     }
+
+    // scopes
+
+    // attributes
+    public function getFullNameAttribute() {
+        return $this->user->first_name . " " . $this->user->last_name;
+    } 
+
     // ###############################################
     // ################## FUNCTIONS ###################
     // ###############################################

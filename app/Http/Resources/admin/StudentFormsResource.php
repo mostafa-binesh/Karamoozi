@@ -16,7 +16,7 @@ class StudentFormsResource extends JsonResource
     {
         // $this is student
         return [
-            'full_name' => $this->user->fullName(),
+            'full_name' => $this->user->fullName,
             'student_number' => $this->student_number,
             'entrance_year' => $this->entrance_year, 
         ];

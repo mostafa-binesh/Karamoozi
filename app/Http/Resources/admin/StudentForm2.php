@@ -44,7 +44,7 @@ class StudentForm2 extends JsonResource
                 'address' => $this->company->company_address,
             ],
             'industry_supervisor' => [
-                'full_name' => $this->industrySupervisor->user->fullName(),
+                'full_name' => $this->industrySupervisor->user->fullName,
                 'position' => $this->form2->supervisor_position,
             ],
             'reports' => IndustrySupervisorReportResource::collection($this->indSupervisorReports()),

@@ -38,7 +38,7 @@ class StudentForm4Resource extends JsonResource
                 'address' => $this->company->company_address,
             ],
             'industry_supervisor' => [
-                'full_name' => $this->industrySupervisor->user->fullName(),
+                'full_name' => $this->industrySupervisor->user->fullName,
                 'position' => $this->form2->supervisor_position,
             ],
 
