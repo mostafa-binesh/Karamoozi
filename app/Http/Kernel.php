@@ -5,7 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\Students\FullyVerified;
 use App\Http\Middleware\Students\Verified;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middlewares\RoleMiddleware;
 
 class Kernel extends HttpKernel
 {

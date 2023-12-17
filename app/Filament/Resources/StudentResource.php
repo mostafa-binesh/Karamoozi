@@ -2,15 +2,18 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\VerificationStatusEnum;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StudentResource extends Resource
@@ -19,6 +22,10 @@ class StudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['user']);
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -38,8 +45,14 @@ class StudentResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('entrance_year')
                     ->numeric(),
-                Forms\Components\TextInput::make('supervisor_id')
-                    ->numeric(),
+                Forms\Components\Select::make('supervisor_id')
+                    ->relationship(
+                        name: 'industrySupervisor',
+                        titleAttribute: null,
+                        modifyQueryUsing: fn (Builder $query) => $query->with('user')
+                    )
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->user->fullName}")
+                    ->preload(),
                 Forms\Components\TextInput::make('grade')
                     ->numeric(),
                 Forms\Components\Toggle::make('passed_units'),
@@ -48,15 +61,18 @@ class StudentResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('internship_type')
                     ->numeric(),
-                Forms\Components\Toggle::make('verified')
+                Select::make('verified')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
-                Forms\Components\Toggle::make('pre_reg_done')
+                Select::make('pre_reg_done')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
                 Forms\Components\Toggle::make('faculty_verified')
                     ->required(),
                 Forms\Components\Toggle::make('stage')
                     ->required(),
-                Forms\Components\Toggle::make('pre_reg_verified')
+                Select::make('pre_reg_verified')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
                 Forms\Components\TextInput::make('init_reg_rejection_reason')
                     ->maxLength(255),
@@ -77,9 +93,11 @@ class StudentResource extends Resource
                 Forms\Components\Textarea::make('evaluations')
                     ->maxLength(65535)
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('evaluations_verified')
+                Select::make('evaluations_verified')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
-                Forms\Components\Toggle::make('form4_verified')
+                Select::make('form4_verified')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
                 Forms\Components\Toggle::make('supervisor_verification')
                     ->required(),

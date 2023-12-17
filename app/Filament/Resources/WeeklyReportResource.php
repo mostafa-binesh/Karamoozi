@@ -23,14 +23,14 @@ class WeeklyReportResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('reports')
+                Forms\Components\TextInput::make('student_id')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('report.*.date')
-                    ->required(),
-                Forms\Components\TextInput::make('report.*.description')
-                    ->required(),
-
+                    ->numeric(),
+                Forms\Components\Textarea::make('reports')
+                    ->required()
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+                    // ->json_encode(),
             ]);
     }
 
@@ -38,12 +38,17 @@ class WeeklyReportResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('reports')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('report.*.date')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('report.*.description')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('student_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -60,14 +65,14 @@ class WeeklyReportResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
@@ -75,5 +80,5 @@ class WeeklyReportResource extends Resource
             'create' => Pages\CreateWeeklyReport::route('/create'),
             'edit' => Pages\EditWeeklyReport::route('/{record}/edit'),
         ];
-    }
+    }    
 }

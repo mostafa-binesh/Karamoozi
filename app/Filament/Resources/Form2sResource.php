@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\VerificationStatusEnum;
 use App\Filament\Resources\Form2sResource\Pages;
 use App\Filament\Resources\Form2sResource\RelationManagers;
 use App\Models\Form2s;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -50,7 +52,8 @@ class Form2sResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('rejection_reason')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('verified')
+                Select::make('verified')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
             ]);
     }
@@ -107,14 +110,14 @@ class Form2sResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -122,5 +125,5 @@ class Form2sResource extends Resource
             'create' => Pages\CreateForm2s::route('/create'),
             'edit' => Pages\EditForm2s::route('/{record}/edit'),
         ];
-    }    
+    }
 }

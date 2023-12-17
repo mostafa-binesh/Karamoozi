@@ -16,4 +16,16 @@ class EditWeeklyReport extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['reports'] = json_encode($data['reports']);
+
+        return $data;
+    }
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['reports'] = json_decode($data['reports']);
+
+        return $data;
+    }
 }
