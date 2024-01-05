@@ -144,7 +144,7 @@ class Student extends Model
     }
     public function professorName()
     {
-        return $this->professor->fullName();
+        return $this->professor?->fullName;
     }
     public function companyName()
     {

@@ -230,9 +230,9 @@ class AdminCompanyController extends Controller
                 'message' => 'شرکت یافت نشد'
             ], 400);
         }
-        $imageName = $this->file->create_name();
-        $file = $this->file->StrogeFile($req);
-        $company->image_name = $imageName;
+        $imageName = time().'.png';
+        $req->file('image')->storeAs('public/companies/', $imageName);
+        $company->image = $imageName;
         $company->save();
         return response()->json([
             'message'=> 'عکس با موفقیت آپلود شد'

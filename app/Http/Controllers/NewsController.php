@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NewsResource;
 use App\Models\News;
 use App\Repositories\NewsRepo;
 use Illuminate\Http\Request;
@@ -53,7 +54,13 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        return $this->news->getById($id);
+       $news = News::where('id',$id)->first();
+       if(!isset($news->id)){
+           return response()->json([
+            'error'=>'خبری یافت نشد'
+           ]);
+       }
+       return NewsResource::make($news);
     }
 
     /**

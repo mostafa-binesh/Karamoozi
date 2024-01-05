@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class StudentResource extends Resource
@@ -61,11 +62,11 @@ class StudentResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('internship_type')
                     ->numeric(),
-                Select::make('verified')
-                    ->options(VerificationStatusEnum::class)
-                    ->required(),
-                Select::make('pre_reg_done')
-                    ->options(VerificationStatusEnum::class)
+                // Forms\Components\Toggle::make('verified')
+                //     ->required(),
+                Forms\Components\Select::make('verified')
+                    ->options(),
+                Forms\Components\Toggle::make('pre_reg_done')
                     ->required(),
                 Forms\Components\Toggle::make('faculty_verified')
                     ->required(),

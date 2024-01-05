@@ -171,7 +171,7 @@ class AdminNewsController extends Controller
             $imageName = 'news-' . time() . '.png';
             $request->file('image')->storeAs($this->public_path_store, $imageName);
             $news->image = $imageName;
-
+            $news->save();
             return response()->json([
                 'message' => 'تصویر خبر با موفقیت ادیت شد'
             ]);

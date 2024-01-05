@@ -89,8 +89,9 @@ class WeeklyReportController extends Controller
         }
         $student = Auth::user()->student;
         $errors = [];
-        $reports = $student->weeklyReport->reports;
+        $reports = $student?->weeklyReport?->reports;
         // loop of request report
+        if($reports){
         $dbReports = null;
         foreach ($req->report as $re) {
             $found = false;
@@ -115,9 +116,10 @@ class WeeklyReportController extends Controller
                 Report::create($dbReports);
             }
         }
+    }
         // set week done to true
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
+        $weeklyReport?->reports = $reports; // save the modified report
         $weeklyReport->save();
         return response()->json([
             'message' => 'گزارشات با موفقیت ثبت شد',

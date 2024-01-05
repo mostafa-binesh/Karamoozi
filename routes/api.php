@@ -53,6 +53,7 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(StudentController::class)->middleware(['auth:api', 'role:student'])->prefix('student')->group(function () {
     // ######### PRE REGISTRATION #########
+    Route::get('info', 'studentInfo');
     Route::middleware(['verifiedStudent'])->group(function () {
         Route::get('pre-reg', 'get_pre_registration');
         Route::post('pre-reg', 'post_pre_registration');

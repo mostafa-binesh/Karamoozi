@@ -180,21 +180,21 @@ class StudentController extends Controller
                 'stage' => 1,
                 'data' => [
                     [
-                        'name' => 'تاییدیه سرپرست دانشکده',
+                        'name' => 'initialRegistrationVerification',
                         'done' => $student->verified == 2 ? true : false,
                         // ! TODO: tell frontend that need to change it
                         // ! for now, i will change the verified to true and false
                     ],
                     [
-                        'name' => 'انجام پیش ثبت نام',
+                        'name' => 'preRegistrationVerification',
                         'done' => $student->pre_reg_verified == 2 ? true : false,
                     ],
                     [
-                        'name' => 'تاییدیه سرپرست صنعت',
+                        'name' => 'industrySupervisorVerification',
                         'done' => $student->IndustrySupervisorVerified(),
                     ],
                     [
-                        'name' => 'تاییدیه فرم 2 توسط دانشکده',
+                        'name' => 'form2Verification',
                         'done' => $form2Verification,
                     ],
                 ]
@@ -233,6 +233,7 @@ class StudentController extends Controller
             'company_postal_code' => $req->postal_code,
             'company_address' => $req->address,
             'verified' => false,
+            'image' => 'ss', // todo: make image nullable in the database
         ]);
         return response()->json([
             'message' => 'شرکت با موفقیت ثبت شد',
@@ -296,7 +297,7 @@ class StudentController extends Controller
     public function studentCompanyEvaluations()
     {
         // ! not optimized (2 queries), i wanna give this structure, any idea?
-        // ! -- ideas: create two resources, or create the response data manually without using resources 
+        // ! -- ideas: create two resources, or create the response data manually without using resources
         // get all company evaluations of the student + description
         $student = Auth::user()->student;
         $studentEvalution = CompanyEvaluation::where('student_id', $student->id)->first();
@@ -338,7 +339,7 @@ class StudentController extends Controller
             ], 400);
         }
         // update the evaluation without comment
-        // ! data['id'] is evaluation table id ! 
+        // ! data['id'] is evaluation table id !
         // ! i wish i would handle it in companyEvaluation id way
         foreach ($req->data as $data) {
             CompanyEvaluation::updateOrCreate(['option_id' => $data['id'], 'student_id' => $student->id, 'company_id' => $student->company_id], ['evaluation' => $data['value']]);
@@ -359,7 +360,7 @@ class StudentController extends Controller
     }
     public function editStudentProfile(Request $req)
     {
-        // ! parameters? 
+        // ! parameters?
         // password
         // email
         // phone number
@@ -395,5 +396,21 @@ class StudentController extends Controller
         return response()->json([
             'message' => 'پروفایل با موفقیت ویرایش شد',
         ], 200);
+    }
+    public function studentInfo() {
+        $user = auth()->user();
+        $student = $user->student;
+        $data = [
+            'first_name' => $user->first_name,
+        'last_name' => $user->last_name,
+        'student_number' => $student->student_number,
+        'faculty_name' => $student->facultyName(),
+        'grade' => $student->grade, // TODO not sure
+        'passed_units_count' => $student->passed_units,
+        'term' => $student->term?->name,
+        'entrance_year' => $student->entrance_year(),
+        'professor_name' => $student->professorName(),
+        ];
+        return response()->json($data);
     }
 }
