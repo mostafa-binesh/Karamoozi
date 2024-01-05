@@ -40,7 +40,7 @@ class EditStudent extends EditRecord
                             titleAttribute: null,
                             modifyQueryUsing: fn (Builder $query) => $query->with('user')
                         )
-                        ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->user->fullName}")
+                        ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record?->user?->fullName}")
                         ->preload(),
                 ])
                 ->requiresConfirmation()

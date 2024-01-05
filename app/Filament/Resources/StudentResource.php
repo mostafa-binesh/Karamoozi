@@ -51,7 +51,7 @@ class StudentResource extends Resource
                         titleAttribute: null,
                         modifyQueryUsing: fn (Builder $query) => $query->with('user')
                     )
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->user->fullName}")
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record?->user?->fullName}")
                     ->preload(),
                 Forms\Components\TextInput::make('grade')
                     ->numeric(),
@@ -64,12 +64,14 @@ class StudentResource extends Resource
                 // Forms\Components\Toggle::make('verified')
                 //     ->required(),
                 Forms\Components\Select::make('verified')
-                    ->options(),
+                    ->options(VerificationStatusEnum::class)
+                    ->required(),
                 Forms\Components\Toggle::make('pre_reg_done')
                     ->required(),
                 Forms\Components\Toggle::make('faculty_verified')
                     ->required(),
-                Forms\Components\Toggle::make('stage')
+                Forms\Components\TextInput::make('stage')
+                    ->numeric()
                     ->required(),
                 Select::make('pre_reg_verified')
                     ->options(VerificationStatusEnum::class)
@@ -78,13 +80,17 @@ class StudentResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('pre_reg_rejection_reason')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('expert_verification')
+                Forms\Components\Select::make('expert_verification')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
-                Forms\Components\Toggle::make('supervisor_in_faculty_verification')
+                Forms\Components\Select::make('supervisor_in_faculty_verification')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
-                Forms\Components\Toggle::make('internship_master_verification')
+                Forms\Components\Select::make('internship_master_verification')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
-                Forms\Components\Toggle::make('educational_assistant_verification')
+                Forms\Components\Select::make('educational_assistant_verification')
+                    ->options(VerificationStatusEnum::class)
                     ->required(),
                 Forms\Components\DatePicker::make('internship_started_at'),
                 Forms\Components\DatePicker::make('internship_finished_at'),
