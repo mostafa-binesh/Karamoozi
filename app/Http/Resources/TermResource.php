@@ -20,6 +20,7 @@ class TermResource extends JsonResource
                 "name" => $this->name,
                 "start_date" => $this->start_date,
                 "end_date" => $this->end_date,
+                "is_active" => $this->is_active,
             ];
     }
 }
