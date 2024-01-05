@@ -172,7 +172,7 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         if ($student->stage == 1) {
             if (isset($student->form2->verified)) {
-                $form2Verification = $student->form2->verified == '3' ? true : false;
+                $form2Verification = $student->form2->verified == '2' ? true : false;
             } else {
                 $form2Verification = false;
             }
