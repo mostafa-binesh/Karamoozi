@@ -47,6 +47,10 @@ class StudentController extends Controller
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
             'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
             'academic_year' => $activeTerm->name,
+            // 'academic_year' => [
+            //     'semester' => 'نیم سال اول',
+            //     'year' => '1401',
+            // ]
         ];
         return response()->json($x);
     }
