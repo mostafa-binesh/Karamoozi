@@ -30,6 +30,8 @@ class TermResource extends Resource
                     ->required(),
                 Forms\Components\DatePicker::make('end_date')
                     ->required(),
+                Forms\Components\Toggle::make('is_active')
+                    ->required(),
             ]);
     }
 

@@ -322,6 +322,7 @@ class Student extends Model
                 return $week;
             }
         }
+        return null;
     }
     public function entrance_year()
     {

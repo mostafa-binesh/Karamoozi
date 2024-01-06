@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminEducationalController;
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\StudentFinalReportController;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Company;
@@ -78,6 +79,8 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         // ######### WEEKLY REPORT #########
         Route::put('weeklyReports/verifyWeek', [WeeklyReportController::class, 'verifyWeek']);
         Route::resource("weeklyReports", WeeklyReportController::class);
+        Route::resource("finalReport", StudentFinalReportController::class)->except('destory');
+        Route::delete("finalReport", [StudentFinalReportController::class, 'destroy']);
     });
     Route::get('internshipStatus', 'internshipStatus');
     Route::get('testFullyVerifiedMiddleware', function () {

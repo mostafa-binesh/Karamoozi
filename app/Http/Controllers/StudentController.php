@@ -19,6 +19,7 @@ use App\Http\Resources\Students\preRegFacultiesWithMasters;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Http\Resources\Students\SubmittedCompanyEvaluation;
 use App\Models\CompanyEvaluation;
+use App\Models\Term;
 use Faker\Extension\CompanyExtension;
 
 class StudentController extends Controller
@@ -34,6 +35,7 @@ class StudentController extends Controller
     {
         // TODO: replace this foreach with a api resource collection
         $studentSubmittedCompany = Company::where('student_id', Auth::user()->student->id)->first();
+        $activeTerm = Term::where('is_active', true)->firstOrFail();
         $x = [
             // ! one of the most complicated queries of this project
             // ? this query's problem was i couldn't get the user and i needed to send a query to the database to get user for every employee
@@ -44,20 +46,18 @@ class StudentController extends Controller
             }])->get()),
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
             'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
-            'academic_year' => [
-                'semester' => 'نیم سال اول',
-                'year' => '1401',
-            ]
+            'academic_year' => $activeTerm->name,
         ];
         return response()->json($x);
     }
     public function post_pre_registration(Request $req)
     {
         // ! REWORK THIS PRE REG CHECK SECTION
-        $student = Auth::user()->student;
+        $user = Auth::user();
+        $student = $user->student;
         $validator = Validator::make($req->all(), [
-            'first_name' => 'required',
-            'last_name' => 'required',
+            // 'first_name' => 'required',
+            // 'last_name' => 'required',
             'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
@@ -79,10 +79,6 @@ class StudentController extends Controller
             $company_id = $req->company_id ?? $student->customCompany->id;
         }
         // TODO: check: submitted company must be verified
-        $user = Auth::user();
-        $user->first_name = $req->first_name;
-        $user->last_name = $req->last_name;
-        $user->save();
         // edit assigned student to this user
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
@@ -172,7 +168,7 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         if ($student->stage == 1) {
             if (isset($student->form2->verified)) {
-                $form2Verification = $student->form2->verified == '3' ? true : false;
+                $form2Verification = $student->form2->verified == '2' ? true : false;
             } else {
                 $form2Verification = false;
             }
@@ -203,6 +199,10 @@ class StudentController extends Controller
             return response()->json([
                 'stage' => 2,
                 'industry_supervisor_name' => $student->industrySupervisor->user->fullName,
+            ]);
+        } else if ($student->stage == 3) {
+            return response()->json([
+                'stage' => 3,
             ]);
         }
     }

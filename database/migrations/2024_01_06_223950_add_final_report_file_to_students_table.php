@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->string('image')->nullable();
+        Schema::table('students', function (Blueprint $table) {
+            $table->text('final_report_path')->nullable();
         });
     }
 
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('nullable_in_companies', function (Blueprint $table) {
+        Schema::table('students', function (Blueprint $table) {
             //
         });
     }

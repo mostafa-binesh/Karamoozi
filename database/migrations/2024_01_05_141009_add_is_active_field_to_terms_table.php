@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->string('image')->nullable();
+        Schema::table('terms', function (Blueprint $table) {
+            $table->boolean('is_active')->default(false);
         });
     }
 
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('nullable_in_companies', function (Blueprint $table) {
+        Schema::table('terms', function (Blueprint $table) {
             //
         });
     }

@@ -225,6 +225,7 @@ return [
         'company_number' => 'شماره شرکت',
         'company_registry_code' => 'شماره ثبت شرکت',
         'company_postal_code' => 'کد پستی شرکت',
+        'final_report' => 'گزارش نهایی',
     ),
 
     // 'attributes' => [],
