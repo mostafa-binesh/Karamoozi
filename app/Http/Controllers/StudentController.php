@@ -112,8 +112,8 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         $validator = Validator::make($req->all(), [
             // 15 fields
-            'first_name' => 'required',
-            'last_name' => 'required',
+            // 'first_name' => 'required',
+            // 'last_name' => 'required',
             'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
@@ -135,9 +135,9 @@ class StudentController extends Controller
         }
         // TODO: check: submitted company must be verified
         $user = Auth::user();
-        $user->first_name = $req->first_name;
-        $user->last_name = $req->last_name;
-        $user->save();
+        // $user->first_name = $req->first_name;
+        // $user->last_name = $req->last_name;
+        // $user->save();
         // edit assigned student to this user
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
@@ -160,10 +160,10 @@ class StudentController extends Controller
     {
         $user = Auth::user();
         // todo: why we're checking the master pending here?!
-        if ($user->student->pre_reg_verified != PreRegVerificationStatusEnum::MasterPending) {
+        if ($user->student->pre_reg_verified == PreRegVerificationStatusEnum::NotAvailable) {
             return response()->json([
-                'message' => 'شرکتی برای شما معرفی نشده است',
-            ], 400);
+                'message' => 'پیش ثبت نامی برای شما وجود ندارد',
+            ], 400); // todo 201 ? 404
         }
         // ! TODO optimize eager loading
         return StudentPreRegInfo::make(Auth::user());

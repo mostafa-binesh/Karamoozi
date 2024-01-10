@@ -59,7 +59,7 @@ class StudentsController extends Controller
     public function verifiedStudents(Request $req)
     {
         $master = auth()->user()->master;
-        return $master->MasterStudents()->with('user')->where('stage', 2)->cpagination($req, MasterStudents::class);
+    return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
     }
     public function pendingStudents(Request $req)
     {
