@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Option;
@@ -96,7 +97,7 @@ class StudentController extends Controller
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
-        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterPending; // this field shows pre reg has been done by student or not
         $student->term_id = 1; // ! TODO needs to be dynamic
         $student->save();
         return response()->json([
@@ -149,7 +150,7 @@ class StudentController extends Controller
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
-        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterPending; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => 'ویرایش پیش ثبت نام با موفقیت انجام شد',
@@ -158,7 +159,8 @@ class StudentController extends Controller
     public function studentPreRegInfo()
     {
         $user = Auth::user();
-        if ($user->student->pre_reg_verified != 1) {
+        // todo: why we're checking the master pending here?!
+        if ($user->student->pre_reg_verified != PreRegVerificationStatusEnum::MasterPending) {
             return response()->json([
                 'message' => 'شرکتی برای شما معرفی نشده است',
             ], 400);
@@ -187,7 +189,7 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'preRegistrationVerification',
-                        'done' => $student->pre_reg_verified == 2 ? true : false,
+                        'done' => $student->pre_reg_verified,
                     ],
                     [
                         'name' => 'industrySupervisorVerification',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Traits\EnumTrait;
 use EloquentFilter\Filterable;
 use App\Traits\CPaginationTrait;
@@ -25,6 +26,7 @@ class Student extends Model
         // 'passed_units' => 'int',
         'student_number' => 'int',
         'stage' => 'int',
+        'pre_reg_verified' => PreRegVerificationStatusEnum::class,
         // 'verified' => 'integer',
     ];
     /**
@@ -334,7 +336,7 @@ class Student extends Model
     }
     public function preRegDone()
     {
-        return $this->pre_reg_verified == 2;
+        return $this->pre_reg_verified == PreRegVerificationStatusEnum::Verified;
     }
     public function degree()
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Student;
@@ -123,11 +124,11 @@ class AdminStudentsController extends Controller
             } else if ($student->verified == 1) {
                 $init_waiting++;
             }
-            if ($student->pre_reg_verified == 2) {
+            if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminApproved) {
                 $preReg_verified++;
-            } else if ($student->pre_reg_verified == 3) {
+            } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminRefused) {
                 $preReg_unVerified++;
-            } else if ($student->pre_reg_verified == 1) {
+            } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
                 $preReg_waiting++;
             }
         }
@@ -158,7 +159,10 @@ class AdminStudentsController extends Controller
     }
     public function preRegStudents(Request $req)
     {
-        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)
+        // only search for students where approved by their masters
+        ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
+        ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -221,7 +225,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 2;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminApproved;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -239,7 +243,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 3;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminRefused;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->stage = 1;
         $student->save();
