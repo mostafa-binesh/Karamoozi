@@ -213,6 +213,9 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
     });
     // master routes
     //
+    // ! سناریو اینطوری هست که وقتی که استاد کسی را رد میکنه نباید فرم پیش ثبت نامش برای ادمین ارسال بشه.
+    // ! اگر تایید شد فرم برای ادمین ارسال میشه و  در صورت تایید ادمین به سراغ بقیه مراحل میره
+    
 });
 
 
@@ -277,4 +280,10 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
 
 Route::get('mytest', function () {
     return "sssss";
+});
+
+Route::get('pass' , function(){
+    $user = User::where('username', '5001')->first();
+    $user->password = Hash::make('12345');
+    $user->save();
 });
