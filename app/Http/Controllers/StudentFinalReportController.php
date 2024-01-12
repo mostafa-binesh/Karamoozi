@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Student;
 use Illuminate\Http\Request;
-use Storage;
-use Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class StudentFinalReportController extends Controller
 {
@@ -13,6 +14,10 @@ class StudentFinalReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $final_report_path = 'storage/final_reports/';
+    private function resource($fileName){
+        return $this->final_report_path.$fileName;
+    }
     public function index()
     {
         $filePath = auth()->user()->student->final_report_path;
@@ -52,9 +57,9 @@ class StudentFinalReportController extends Controller
             ], 400);
         }
         $fileName = time() . $request->file('final_report')->getClientOriginalName();
-        $path = Storage::disk('public')->putFileAs('final-reports', $request->file('final_report'), $fileName);
+        $request->file('image')->storeAs('public/final_reports/', $fileName);
         $student = auth()->user()->student;
-        $student->final_report_path = $path;
+        $student->final_report_path = $fileName;
         $student->save();
         return response()->json([
             'message' => 'فایل با موفقیت آپلود شد',
@@ -69,7 +74,20 @@ class StudentFinalReportController extends Controller
      */
     public function show($id)
     {
-
+        $student = Student::where('id',$id)->first();
+        if(!isset($student->id)){
+            return response()->json([
+                'error'=>'دانشجو یافت نشد'
+            ],404);
+        }
+        if($student->final_report_path == null){
+            return response()->json([
+                'error'=>'گزارش پایانی برای این دانشجو ثبت نشده است'
+            ],404);
+        }
+        return response()->json([
+            'final_report'=>asset($this->resource($student->final_report_path)),
+        ]);
     }
 
     /**
@@ -98,12 +116,19 @@ class StudentFinalReportController extends Controller
     public function destroy()
     {
         $student = auth()->user()->student;
-        if ($student->final_report_path != null ) {
+        if ($student->final_report_path == null ) {
             return response()->json([
                 'message' => 'گزارش پایانی برای شما یافت نشد',
             ], 404);
         }
-        Storage::disk('public')->delete($student->final_report_path);
+        Storage::delete($this->final_report_path . $student->final_report_path);
+        try {
+            unlink(public_path($this->final_report_path . $student->final_report_path));
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'در حذف فایل مشکلی به وجود آمده است'
+            ], 400);
+        }
         $student->final_report_path = null;
         $student->save();
         return response()->json([

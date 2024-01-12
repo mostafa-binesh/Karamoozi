@@ -30,7 +30,7 @@ use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
 use App\Http\Controllers\NewsController;
-
+use Illuminate\Support\Facades\Hash;
 
 // ! install 'better comments' plugin on vs code to see the code more clear
 // ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
@@ -86,6 +86,9 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
     Route::get('testFullyVerifiedMiddleware', function () {
         return null;
     })->middleware(['fullyVerifiedStudent']);
+
+    Route::resource('final_report', StudentFinalReportController::class);
+
 });
 
 // ###############                       ######
@@ -166,6 +169,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
+        // final_reports
+        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -210,6 +215,9 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::get('/{id}', 'singleStudent');
         Route::put('/{id}/verify', 'verifyStudent');
         Route::put('/{id}/unverify', 'unverifyStudent');
+        Route::get('forms/{id}/form3', [AdminStudentsController::class,'form3']);
+        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
+
     });
     // master routes
     //

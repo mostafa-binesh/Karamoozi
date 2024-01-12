@@ -26,6 +26,7 @@ use App\Http\Resources\admin\StudentForm4Resource;
 use App\Http\Resources\admin\StudentPreRegDescription;
 use App\Http\Resources\admin\CompanyEvaluationResource;
 use App\Http\Resources\admin\FinishInternshipLetterResource;
+use Illuminate\Support\Facades\Auth;
 
 class AdminStudentsController extends Controller
 {
@@ -128,9 +129,10 @@ class AdminStudentsController extends Controller
                 $preReg_verified++;
             } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminRefused) {
                 $preReg_unVerified++;
-            } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
-                $preReg_waiting++;
             }
+            //else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
+              //  $preReg_waiting++;
+            //}
         }
         return response()->json([
             'data' => [
@@ -316,6 +318,16 @@ class AdminStudentsController extends Controller
     }
     public function form3($id)
     {
+        $user = Auth::user();
+        if($user->hasAnyRole(['master'])){
+            $student = Student::where("id", $id)->with("studentEvaluations")->first();
+            if($student->professor_id != $user->id){
+                return response()->json([
+                    'error'=>'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
+                ],400);
+            }
+            return StudentForm3::make($student);
+        }
         $student = Student::where("id", $id)->with("studentEvaluations")->first();
         // return $student->studentEvaluations;
         return StudentForm3::make($student);
