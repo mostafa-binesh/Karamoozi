@@ -56,8 +56,8 @@ class StudentFinalReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $fileName = time() . $request->file('final_report')->getClientOriginalName();
-        $request->file('image')->storeAs('public/final_reports/', $fileName);
+        $fileName = time() .'.'. $request->file('final_report')->getClientOriginalExtension();
+        $request->file('final_report')->storeAs('public/final_reports/', $fileName);
         $student = auth()->user()->student;
         $student->final_report_path = $fileName;
         $student->save();
@@ -74,7 +74,7 @@ class StudentFinalReportController extends Controller
      */
     public function show($id)
     {
-        $student = Student::where('id',$id)->first();
+        $student = Student::where('user_id',$id)->first();
         if(!isset($student->id)){
             return response()->json([
                 'error'=>'دانشجو یافت نشد'
@@ -87,6 +87,15 @@ class StudentFinalReportController extends Controller
         }
         return response()->json([
             'final_report'=>asset($this->resource($student->final_report_path)),
+            'student' => [
+                'id' => $student->id,
+                'first_name' => $student->user->first_name,
+                'last_name' => $student->user->last_name,
+                'faculty_name' => $student->facultyName(),
+                'student_number' => $student->student_number,
+                'internship_start_date' => $student->form2->internship_started_at,
+                'internship_finish_date' => $student->form2->internship_finished_at,
+            ],
         ]);
     }
 

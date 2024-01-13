@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\DeveloperController;
@@ -29,6 +28,7 @@ use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
+use App\Http\Controllers\MessagesResourceController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Hash;
 
@@ -124,7 +124,6 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
         Route::Resource('students', IndustrySupervisorStudentController::class);
     });
-    Route::resource('messages', MessageController::class);
 });
 
 // ###############                        #####
@@ -226,7 +225,12 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
 
 });
 
-
+// // //
+//! Message Routing
+// // //
+Route::middleware('auth:api')->prefix('messages')->group(function(){
+    Route::resource('/',MessagesResourceController::class);
+});
 // ###############                        #####
 // ################ DEVELOPER ONLY ##############
 // ###############                       #####
@@ -249,6 +253,11 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
     });
 });
+
+
+
+
+
 
 // // //
 // TEST CONTROLLER
@@ -291,7 +300,7 @@ Route::get('mytest', function () {
 });
 
 Route::get('pass' , function(){
-    $user = User::where('username', '5001')->first();
-    $user->password = Hash::make('12345');
+    $user = User::where('username', '3981231020')->first();
+    $user->password = Hash::make('5300053260');
     $user->save();
 });

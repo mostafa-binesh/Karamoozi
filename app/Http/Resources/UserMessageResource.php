@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\chats;
+namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-// ! name doesn't represent concept perfectly! name needs to be changed later probably
-class ReceiveResource extends JsonResource
+
+class UserMessageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,8 @@ class ReceiveResource extends JsonResource
     {
         return [
             'id'=>$this->id,
-            'sender'=>$this->sender->fullName(),
-            'title'=>$this->title,
+            'name'=>$this->first_name . ' '. $this->last_name,
+            'user_name'=>$this->username
         ];
     }
 }

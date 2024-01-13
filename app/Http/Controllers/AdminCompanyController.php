@@ -39,6 +39,7 @@ class AdminCompanyController extends Controller
      */
     public function create()
     {
+        
     }
 
     /**
