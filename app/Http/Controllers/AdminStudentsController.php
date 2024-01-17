@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Student;
@@ -25,6 +26,7 @@ use App\Http\Resources\admin\StudentForm4Resource;
 use App\Http\Resources\admin\StudentPreRegDescription;
 use App\Http\Resources\admin\CompanyEvaluationResource;
 use App\Http\Resources\admin\FinishInternshipLetterResource;
+use Illuminate\Support\Facades\Auth;
 
 class AdminStudentsController extends Controller
 {
@@ -123,13 +125,14 @@ class AdminStudentsController extends Controller
             } else if ($student->verified == 1) {
                 $init_waiting++;
             }
-            if ($student->pre_reg_verified == 2) {
+            if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminApproved) {
                 $preReg_verified++;
-            } else if ($student->pre_reg_verified == 3) {
+            } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminRefused) {
                 $preReg_unVerified++;
-            } else if ($student->pre_reg_verified == 1) {
-                $preReg_waiting++;
             }
+            //else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
+              //  $preReg_waiting++;
+            //}
         }
         return response()->json([
             'data' => [
@@ -158,7 +161,10 @@ class AdminStudentsController extends Controller
     }
     public function preRegStudents(Request $req)
     {
-        $students = Student::filter($req->all(), PreRegStudentsFilter::class)->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+        $students = Student::filter($req->all(), PreRegStudentsFilter::class)
+        // only search for students where approved by their masters
+        // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
+        ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -221,7 +227,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 2;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::Verified;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -239,7 +245,7 @@ class AdminStudentsController extends Controller
             ], 400);
         }
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = 3;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminRefused;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->stage = 1;
         $student->save();
@@ -312,6 +318,16 @@ class AdminStudentsController extends Controller
     }
     public function form3($id)
     {
+        $user = Auth::user();
+        if($user->hasAnyRole(['master'])){
+            $student = Student::where("id", $id)->with("studentEvaluations")->first();
+            if($student->professor_id != $user->id){
+                return response()->json([
+                    'error'=>'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
+                ],400);
+            }
+            return StudentForm3::make($student);
+        }
         $student = Student::where("id", $id)->with("studentEvaluations")->first();
         // return $student->studentEvaluations;
         return StudentForm3::make($student);
@@ -365,6 +381,7 @@ class AdminStudentsController extends Controller
         // counters
         $weeks = [];
         // ! put this foreach in Weeklyreportresource
+        // dd($student->weeklyReport['reports'], $student->weeklyReport);
         foreach ($student->weeklyReport['reports'] as $week) {
             $status0 = 0;
             $status1 = 0;

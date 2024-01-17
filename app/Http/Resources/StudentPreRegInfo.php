@@ -28,13 +28,13 @@ class StudentPreRegInfo extends JsonResource
             ],
             'degree' => [
                 'id' => $student->grade,
-                'degree' => Student::DEGREE[$student->grade],
+                'degree' => !empty($student->grade) ? Student::DEGREE[$student->grade] : null,
             ],
             'passed_units' => $student->passed_units,
             'semester' => Student::SEMESTER[1],
             'academic_year' => 1401,
             'master' => [
-                'id' => $student->professor->id,
+                'id' => $student->professor?->id,
                 'name' => $student->professorName(),
             ],
             'company' => [
@@ -43,7 +43,7 @@ class StudentPreRegInfo extends JsonResource
             ],
             'internship' => [
                 'id' => $student->internship_type,
-                'internship_type' => Student::INTERNSHIP_TYPE[$student->internship_type],
+                'internship_type' => !empty($student->internship_type) ? Student::INTERNSHIP_TYPE[$student->internship_type] : null,
             ],
         ];
     }

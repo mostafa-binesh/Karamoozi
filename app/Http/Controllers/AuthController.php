@@ -26,6 +26,7 @@ use App\Models\IndustrySupervisor;
 
 class AuthController extends Controller
 {
+    
 
     public function __construct()
     {
@@ -199,7 +200,7 @@ class AuthController extends Controller
         }
         $user =  Password_reset::where('email', $req->email)->first() ?? 'not found';
         return Hash::check($req->token, $user->token);
-        // ! add: if result was true, we have to redirect the user to reset password page 
+        // ! add: if result was true, we have to redirect the user to reset password page
         // ! otherwise to login page with some error message
 
     }
@@ -280,3 +281,4 @@ class AuthController extends Controller
         ], 201);
     }
 }
+

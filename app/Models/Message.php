@@ -9,6 +9,10 @@ class Message extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    protected $fillable = [
+        'title' , 'body' , 'image' , 'receiver_id', 'sender_id' 
+    ];
     // ###############################################
     // ################## RELATIONSHIPS ###################
     // ###############################################
@@ -24,4 +28,4 @@ class Message extends Model
     public function scopeRead($query) {
         return $query->where('read',true);
     }
-} 
+}

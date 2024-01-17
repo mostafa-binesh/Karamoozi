@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PreRegVerificationStatusEnum;
+use App\Enums\VerificationStatusEnum;
 use App\Traits\EnumTrait;
 use EloquentFilter\Filterable;
 use App\Traits\CPaginationTrait;
@@ -25,6 +27,7 @@ class Student extends Model
         // 'passed_units' => 'int',
         'student_number' => 'int',
         'stage' => 'int',
+        'pre_reg_verified' => PreRegVerificationStatusEnum::class,
         // 'verified' => 'integer',
     ];
     /**
@@ -203,12 +206,7 @@ class Student extends Model
     public function IndustrySupervisorVerified()
     {
         $form2 = Form2s::where('student_id', Auth::user()->student->id)->first();
-        if (!isset($form2)) {
-            return false;
-        } else {
-            return $form2->verified == 2;
-        }
-        return false;
+        return $form2?->verified ?? VerificationStatusEnum::NotAvailable;
     }
     // calculate how many working hours per week student works based on schedule
     public function howManyDaysMustWork($schedule_table)
@@ -339,7 +337,7 @@ class Student extends Model
     }
     public function preRegDone()
     {
-        return $this->pre_reg_verified == 2;
+        return $this->pre_reg_verified == PreRegVerificationStatusEnum::Verified;
     }
     public function degree()
     {

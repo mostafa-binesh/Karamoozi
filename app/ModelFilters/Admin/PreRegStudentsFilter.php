@@ -2,6 +2,8 @@
 
 namespace App\ModelFilters\Admin;
 
+use App\Enums\PreRegVerificationStatusEnum;
+use App\Enums\VerificationStatusEnum;
 use EloquentFilter\ModelFilter;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
@@ -28,7 +30,13 @@ class PreRegStudentsFilter extends ModelFilter
     // pre reg verified
     public function verified($verified)
     {
-        $this->where('pre_reg_verified', $verified);
+        $convertedVerification = match($verified) {
+            '0' => PreRegVerificationStatusEnum::AdminPending,
+            '1' => PreRegVerificationStatusEnum::AdminPending,
+            '2' => PreRegVerificationStatusEnum::AdminApproved,
+            '3' => PreRegVerificationStatusEnum::AdminRefused,
+        };
+        $this->where('pre_reg_verified', $convertedVerification);
     }
     public function faculty($faculty)
     {

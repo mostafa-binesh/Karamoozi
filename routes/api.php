@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminEducationalController;
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\StudentFinalReportController;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Company;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\IndustrySupervisor;
 use App\Http\Controllers\DeveloperController;
@@ -28,8 +28,9 @@ use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
+use App\Http\Controllers\MessagesResourceController;
 use App\Http\Controllers\NewsController;
-
+use Illuminate\Support\Facades\Hash;
 
 // ! install 'better comments' plugin on vs code to see the code more clear
 // ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
@@ -78,11 +79,16 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
         // ######### WEEKLY REPORT #########
         Route::put('weeklyReports/verifyWeek', [WeeklyReportController::class, 'verifyWeek']);
         Route::resource("weeklyReports", WeeklyReportController::class);
+        Route::resource("finalReport", StudentFinalReportController::class)->except('destory');
+        Route::delete("finalReport", [StudentFinalReportController::class, 'destroy']);
     });
     Route::get('internshipStatus', 'internshipStatus');
     Route::get('testFullyVerifiedMiddleware', function () {
         return null;
     })->middleware(['fullyVerifiedStudent']);
+
+    Route::resource('final_report', StudentFinalReportController::class);
+
 });
 
 // ###############                       ######
@@ -118,7 +124,6 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
         Route::Resource('students', IndustrySupervisorStudentController::class);
     });
-    Route::resource('messages', MessageController::class);
 });
 
 // ###############                        #####
@@ -163,6 +168,8 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
+        // final_reports
+        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -207,12 +214,23 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::get('/{id}', 'singleStudent');
         Route::put('/{id}/verify', 'verifyStudent');
         Route::put('/{id}/unverify', 'unverifyStudent');
+        Route::get('forms/{id}/form3', [AdminStudentsController::class,'form3']);
+        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
+
     });
     // master routes
     //
+    // ! سناریو اینطوری هست که وقتی که استاد کسی را رد میکنه نباید فرم پیش ثبت نامش برای ادمین ارسال بشه.
+    // ! اگر تایید شد فرم برای ادمین ارسال میشه و  در صورت تایید ادمین به سراغ بقیه مراحل میره
+
 });
 
-
+// // //
+//! Message Routing
+// // //
+Route::middleware('auth:api')->group(function(){
+    Route::resource('messages',MessagesResourceController::class);
+});
 // ###############                        #####
 // ################ DEVELOPER ONLY ##############
 // ###############                       #####
@@ -235,6 +253,11 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
     });
 });
+
+
+
+
+
 
 // // //
 // TEST CONTROLLER
@@ -274,4 +297,10 @@ Route::prefix('test')->controller(TestController::class)->group(function () {
 
 Route::get('mytest', function () {
     return "sssss";
+});
+
+Route::get('pass' , function(){
+    $user = User::where('username', '3981231020')->first();
+    $user->password = Hash::make('5300053260');
+    $user->save();
 });

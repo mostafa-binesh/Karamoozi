@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class MessageController extends Controller
+class ChatController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,13 +13,8 @@ class MessageController extends Controller
      */
     public function index()
     {
-        return [
-            'data' => [
-                'received_massages' => auth()->user()->receivedMessages,
-                'send_messages' => auth()->user()->sentMessages,
-            ]
-        ];
-        return auth()->user()->message;
+        // get user id and pass 2 group data : reciver and sender
+        
     }
 
     /**
@@ -52,7 +47,6 @@ class MessageController extends Controller
     public function show($id)
     {
         //
-        return auth()->user()->message->findorFail($id);
     }
 
     /**

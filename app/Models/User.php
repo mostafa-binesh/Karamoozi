@@ -166,6 +166,10 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     //     return $this->first_name . ' ' . $this->last_name;
     // }
 
+    public static function getName($id){
+        $user = User::where('id',$id)?->first();
+        return $user->first_name . ' '. $user->last_name;
+    }
     public function resource_user()
     {
         return [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\masters;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Models\Term;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -48,7 +49,7 @@ class StudentsController extends Controller
             return Term::noTermError();
         }
         $master = auth()->user()->employee;
-        // create new record in master-term, if exists, update it  
+        // create new record in master-term, if exists, update it
         $master->terms()->sync([$term->id => ['students_count' => $req->students_count]]);
         // return response
         return [
@@ -58,12 +59,12 @@ class StudentsController extends Controller
     public function verifiedStudents(Request $req)
     {
         $master = auth()->user()->master;
-        return $master->MasterStudents()->with('user')->where('stage', 2)->cpagination($req, MasterStudents::class);
+    return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
     }
     public function pendingStudents(Request $req)
     {
         $master = auth()->user()->master;
-        return $master->MasterStudents()->with('user')->where('pre_reg_verified', 1)->cpagination($req, MasterStudents::class);
+        return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterPending)->cpagination($req, MasterStudents::class);
     }
     public function singleStudent(Request $req, $id)
     {
@@ -85,12 +86,14 @@ class StudentsController extends Controller
                 'message' => 'این دانشجو به شما تعلق ندارد',
             ], 400);
         }
-        if ($student->pre_reg_verified == 2 || $student->pre_reg_verified == 0) {
+        if (!($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
+                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterRefused)
+        ) {
             return response()->json([
                 'message' => 'نمی توانید این دانشجو را تایید کنید',
             ], 400);
         }
-        $student->pre_reg_verified = 2;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminPending;
         $student->save();
         return response()->json([
             'message' => 'دانشجو تایید شد',
@@ -105,15 +108,17 @@ class StudentsController extends Controller
                 'message' => 'این دانشجو به شما تعلق ندارد',
             ], 400);
         }
-        if ($student->pre_reg_verified == 3 || $student->pre_reg_verified == 0) {
+        if ($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
+                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterApproved
+        ) {
             return response()->json([
-                'message' => 'نمی توانید این دانشجو را تایید کنید',
+                'message' => 'نمی توانید این دانشجو را رد کنید',
             ], 400);
         }
-        $student->pre_reg_verified = 3;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterRefused;
         $student->save();
         return response()->json([
-            'message' => 'دانشجو تایید شد',
+            'message' => 'دانشجو رد شد',
         ]);
     }
 }

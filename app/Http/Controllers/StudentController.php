@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PreRegVerificationStatusEnum;
+use App\Enums\VerificationStatusEnum;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Option;
@@ -92,7 +94,7 @@ class StudentController extends Controller
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
-        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterPending; // this field shows pre reg has been done by student or not
         $student->term_id = 1; // ! TODO needs to be dynamic
         $student->save();
         return response()->json([
@@ -107,8 +109,8 @@ class StudentController extends Controller
         $student = Auth::user()->student;
         $validator = Validator::make($req->all(), [
             // 15 fields
-            'first_name' => 'required',
-            'last_name' => 'required',
+            // 'first_name' => 'required',
+            // 'last_name' => 'required',
             'faculty_id' => 'required|numeric', // FIX later: add exists in faculties
             'degree' => 'required|numeric', // maghta'e tahsili
             'passed_units' => 'required|numeric',
@@ -130,9 +132,9 @@ class StudentController extends Controller
         }
         // TODO: check: submitted company must be verified
         $user = Auth::user();
-        $user->first_name = $req->first_name;
-        $user->last_name = $req->last_name;
-        $user->save();
+        // $user->first_name = $req->first_name;
+        // $user->last_name = $req->last_name;
+        // $user->save();
         // edit assigned student to this user
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
@@ -145,7 +147,7 @@ class StudentController extends Controller
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
-        $student->pre_reg_verified = 1; // this field shows pre reg has been done by student or not
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterPending; // this field shows pre reg has been done by student or not
         $student->save();
         return response()->json([
             'message' => 'ویرایش پیش ثبت نام با موفقیت انجام شد',
@@ -154,10 +156,11 @@ class StudentController extends Controller
     public function studentPreRegInfo()
     {
         $user = Auth::user();
-        if ($user->student->pre_reg_verified != 1) {
+        // todo: why we're checking the master pending here?!
+        if ($user->student->pre_reg_verified == PreRegVerificationStatusEnum::NotAvailable) {
             return response()->json([
-                'message' => 'شرکتی برای شما معرفی نشده است',
-            ], 400);
+                'message' => 'پیش ثبت نامی برای شما وجود ندارد',
+            ], 400); // todo 201 ? 404
         }
         // ! TODO optimize eager loading
         return StudentPreRegInfo::make(Auth::user());
@@ -167,23 +170,23 @@ class StudentController extends Controller
     {
         $student = Auth::user()->student;
         if ($student->stage == 1) {
-            if (isset($student->form2->verified)) {
-                $form2Verification = $student->form2->verified == '2' ? true : false;
-            } else {
-                $form2Verification = false;
-            }
+            // if (isset($student->form2->verified)) {
+            //     $form2Verification = $student->form2->verified == '2' ? true : false;
+            // } else {
+            //     $form2Verification = false;
+            // }
             return response()->json([
                 'stage' => 1,
                 'data' => [
                     [
                         'name' => 'initialRegistrationVerification',
-                        'done' => $student->verified == 2 ? true : false,
+                        'done' => $student->verified,
                         // ! TODO: tell frontend that need to change it
                         // ! for now, i will change the verified to true and false
                     ],
                     [
                         'name' => 'preRegistrationVerification',
-                        'done' => $student->pre_reg_verified == 2 ? true : false,
+                        'done' => $student->pre_reg_verified,
                     ],
                     [
                         'name' => 'industrySupervisorVerification',
@@ -191,8 +194,8 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'form2Verification',
-                        'done' => $form2Verification,
-                    ],
+                        'done' => $student->form2?->verified ?? VerificationStatusEnum::NotAvailable,
+                    ],  
                 ]
             ]);
         } else if ($student->stage == 2) {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PreRegVerificationStatusEnum;
 use App\Enums\VerificationStatusEnum;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
@@ -72,12 +73,13 @@ class StudentResource extends Resource
                     ->numeric()
                     ->required(),
                 Select::make('pre_reg_verified')
-                    ->options(VerificationStatusEnum::class)
+                    ->options(PreRegVerificationStatusEnum::class)
                     ->required(),
                 Forms\Components\TextInput::make('init_reg_rejection_reason')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('pre_reg_rejection_reason')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('final_report_path'),
                 Forms\Components\Select::make('expert_verification')
                     ->options(VerificationStatusEnum::class)
                     ->required(),
