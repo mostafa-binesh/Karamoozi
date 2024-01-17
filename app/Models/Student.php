@@ -119,9 +119,9 @@ class Student extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function weeklyReport()
+    public function weeklyReports()
     {
-        return $this->hasOne(WeeklyReport::class);
+        return $this->hasMany(WeeklyReport::class);
     }
     public function customCompany()
     {

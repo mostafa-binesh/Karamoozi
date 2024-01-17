@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VerificationStatusEnum;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Report;
@@ -116,12 +117,13 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'لطفا برنامه ی معتبری را وارد کنید',
             ], 400);
         }
-        WeeklyReport::updateOrCreate(
-            ['student_id' => $student->id],
-            [
-                'reports' => $allWorkingDaysDate
-            ]
-        );
+        // create weekly reports
+        foreach ($allWorkingDaysDate as $report) {
+            $days = $report['days'];
+            foreach ($days as $index => $day) {
+                WeeklyReport::new($student->id, $day['date'],$index + 1, VerificationStatusEnum::NotChecked,null);
+            }
+        }
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
         // return $form2;
     }

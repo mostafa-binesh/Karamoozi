@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PreRegVerificationStatusEnum;
+use App\Enums\VerificationStatusEnum;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Student;
@@ -131,7 +132,7 @@ class AdminStudentsController extends Controller
                 $preReg_unVerified++;
             }
             //else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
-              //  $preReg_waiting++;
+            //  $preReg_waiting++;
             //}
         }
         return response()->json([
@@ -156,15 +157,16 @@ class AdminStudentsController extends Controller
             ]
         ]);
     }
-    public function entrance_years(){
-         return Student::select('entrance_year')->distinct('entrance_year')->get();
+    public function entrance_years()
+    {
+        return Student::select('entrance_year')->distinct('entrance_year')->get();
     }
     public function preRegStudents(Request $req)
     {
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)
-        // only search for students where approved by their masters
-        // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
-        ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+            // only search for students where approved by their masters
+            // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
+            ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -172,8 +174,9 @@ class AdminStudentsController extends Controller
             ]
         ]);
     }
-    public function faculty(){
-       return UniversityFacultyResource::collection(University_faculty::all());
+    public function faculty()
+    {
+        return UniversityFacultyResource::collection(University_faculty::all());
     }
     public function forms(Request $req)
     {
@@ -319,12 +322,12 @@ class AdminStudentsController extends Controller
     public function form3($id)
     {
         $user = Auth::user();
-        if($user->hasAnyRole(['master'])){
+        if ($user->hasAnyRole(['master'])) {
             $student = Student::where("id", $id)->with("studentEvaluations")->first();
-            if($student->professor_id != $user->id){
+            if ($student->professor_id != $user->id) {
                 return response()->json([
-                    'error'=>'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
-                ],400);
+                    'error' => 'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
+                ], 400);
             }
             return StudentForm3::make($student);
         }
@@ -377,18 +380,21 @@ class AdminStudentsController extends Controller
     public function weeklyReports($id)
     {
         $student = Student::where("id", $id)->first();
-        // return $student->weeklyReport['reports'];
         // counters
         $weeks = [];
+        $status0 = $status1 = $status2 = $status3 = 0;
+        $groupedByWeeklyReports = $student->weeklyReports->groupBy('week_number');
         // ! put this foreach in Weeklyreportresource
-        // dd($student->weeklyReport['reports'], $student->weeklyReport);
-        foreach ($student->weeklyReport['reports'] as $week) {
-            $status0 = 0;
-            $status1 = 0;
-            $status2 = 0;
-            $status3 = 0;
-            foreach ($week['days'] as $day) {
-                switch ($day['is_done']) {
+        foreach ($groupedByWeeklyReports as $weekNumber => $weeklyReports) {
+            // $weekIsFinished = ($weeklyReport->status == VerificationStatusEnum::Approved);
+            $weekIsFinished = true;
+            foreach ($weeklyReports as $weeklyReport) {
+                $firstDayOfTheWeek = $weeklyReport->date->startOfWeek()->startOfDay();
+                $weekStatus = $weeklyReport->status;
+                if ($weekStatus != VerificationStatusEnum::Approved) {
+                    $weekIsFinished = false;
+                }
+                switch ($weekStatus->value) {
                     case 0:
                         $status0++;
                         break;
@@ -406,17 +412,17 @@ class AdminStudentsController extends Controller
                         break;
                 }
             }
-            array_push($weeks, [
-                'id' => $week['week_number'],
-                'first_day_of_week' => $week['first_day_of_week'],
-                'status' => rand(0, 3),
-                'not_available' => $status0,
-                'not_checked' => $status1,
-                'rejected' => $status2,
-                'accepted' => $status3,
-            ]);
         }
-        return $weeks = [
+        array_push($weeks, [
+            'id' => $weekNumber + 1,
+            'first_day_of_week' => $firstDayOfTheWeek,
+            'status' => $weekIsFinished,
+            'not_available' => $status0,
+            'not_checked' => $status1,
+            'rejected' => $status2,
+            'accepted' => $status3,
+        ]);
+        return [
             'data' => [
                 'weeks' => $weeks,
                 'student' => [
