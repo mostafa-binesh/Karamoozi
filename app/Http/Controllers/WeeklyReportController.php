@@ -266,10 +266,20 @@ class WeeklyReportController extends Controller
                 $reports[$i]['is_done'] = true;
                 $student->weeklyReport->reports = $reports;
                 $student->weeklyReport->save();
+                $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
+                if (empty($latestUncompletedReportWeek)) {
+                    $student->stage = 3;
+                    $student->save();
+                }
                 return response()->json([
                     'message' => 'هفته تایید شد',
                 ]);
             }
+        }
+        $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
+        if (empty($latestUncompletedReportWeek)) {
+            $student->stage = 3;
+            $student->save();
         }
         return response()->json([
             'message' => 'هفته ای برای تایید پیدا نشد'

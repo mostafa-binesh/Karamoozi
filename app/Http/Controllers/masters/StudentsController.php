@@ -86,14 +86,14 @@ class StudentsController extends Controller
                 'message' => 'این دانشجو به شما تعلق ندارد',
             ], 400);
         }
-        if ($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
-                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterRefused
+        if (!($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
+                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterRefused)
         ) {
             return response()->json([
                 'message' => 'نمی توانید این دانشجو را تایید کنید',
             ], 400);
         }
-        $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterApproved;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminPending;
         $student->save();
         return response()->json([
             'message' => 'دانشجو تایید شد',

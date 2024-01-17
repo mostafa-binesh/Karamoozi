@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PreRegVerificationStatusEnum;
+use App\Enums\VerificationStatusEnum;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Option;
@@ -173,17 +174,17 @@ class StudentController extends Controller
     {
         $student = Auth::user()->student;
         if ($student->stage == 1) {
-            if (isset($student->form2->verified)) {
-                $form2Verification = $student->form2->verified == '2' ? true : false;
-            } else {
-                $form2Verification = false;
-            }
+            // if (isset($student->form2->verified)) {
+            //     $form2Verification = $student->form2->verified == '2' ? true : false;
+            // } else {
+            //     $form2Verification = false;
+            // }
             return response()->json([
                 'stage' => 1,
                 'data' => [
                     [
                         'name' => 'initialRegistrationVerification',
-                        'done' => $student->verified == 2 ? true : false,
+                        'done' => $student->verified,
                         // ! TODO: tell frontend that need to change it
                         // ! for now, i will change the verified to true and false
                     ],
@@ -197,8 +198,8 @@ class StudentController extends Controller
                     ],
                     [
                         'name' => 'form2Verification',
-                        'done' => $form2Verification,
-                    ],
+                        'done' => $student->form2?->verified ?? VerificationStatusEnum::NotAvailable,
+                    ],  
                 ]
             ]);
         } else if ($student->stage == 2) {

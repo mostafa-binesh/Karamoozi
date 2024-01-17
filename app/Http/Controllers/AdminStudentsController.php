@@ -163,7 +163,7 @@ class AdminStudentsController extends Controller
     {
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)
         // only search for students where approved by their masters
-        ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
+        // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
         ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
@@ -227,7 +227,7 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
-        $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminApproved;
+        $student->pre_reg_verified = PreRegVerificationStatusEnum::Verified;
         $student->pre_reg_rejection_reason = null;
         $student->save();
         return response()->json([
@@ -381,6 +381,7 @@ class AdminStudentsController extends Controller
         // counters
         $weeks = [];
         // ! put this foreach in Weeklyreportresource
+        // dd($student->weeklyReport['reports'], $student->weeklyReport);
         foreach ($student->weeklyReport['reports'] as $week) {
             $status0 = 0;
             $status1 = 0;

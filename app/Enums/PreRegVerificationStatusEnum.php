@@ -18,4 +18,12 @@ enum PreRegVerificationStatusEnum: int
     // totally verified
     case Verified = 7;
 
+    public function normalize() {
+        return match($this) {
+            static::NotAvailable => static::NotAvailable,
+            static::MasterPending => static::MasterPending,
+            static::MasterApproved => static::MasterApproved,
+            static::MasterRefused => static::MasterRefused,
+        }
+    }
 }

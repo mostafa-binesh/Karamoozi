@@ -25,16 +25,22 @@ class MessagesResourceController extends Controller
      private $public_path_store = "public/messages";
     public function index(Request $request)
     {
-        $val = Validator::make($request->all, [
-            'sender_id'=>'required'
+        $val = Validator::make($request->all(), [
+            'id'=>'required'
         ]);
         if($val->fails()){
             return response()->json([
                 'errors'=>' آیدی فرستنده ارسال نشده است'
             ],400);
         }
-        $messages = Message::where('receiver_id',Auth::user()->id)->andWhere('sender_id',$request->sender_id)->get();
-        return MessagesResource::collection($messages);
+        $messages_receive = Message::where('receiver_id', Auth::user()->id)
+                            ->where('sender_id',$request->id)->orderBy('created_at')->get();
+        $messages_sender = Message::where('receiver_id',$request->id)
+                            ->where('sender_id',Auth::user()->id)->orderBy('created_at')->get();
+        return[
+            'receive'=> MessagesResource::collection($messages_receive),
+            'sender'=>MessagesResource::collection($messages_sender),
+        ];
 
     }
 
@@ -61,9 +67,8 @@ class MessagesResourceController extends Controller
         $val = Validator::make($request->all(),[
             'title'=>'required|string|max:255',
             'body'=>'required|string',
-            'image'=>'required|image|mimes:png,jpg|size:10240',
+            'image'=>'required|image|mimes:png,jpg',
             'receiver_id'=>'required|exists:users,id',
-            'sender_id'=>'required|exists:users,id',
         ]);
         if($val->fails()){
             return response()->json([
@@ -72,6 +77,16 @@ class MessagesResourceController extends Controller
         }
         $image_name = time() . '.png';
         $request->file('image')->storeAs( $this->public_path_store ,$image_name);
+        Message::create([
+            'title'=>$request->title,
+            'body'=>$request->body,
+            'image'=>$image_name,
+            'receiver_id'=>$request->receiver_id,
+            'sender_id'=>Auth::user()->id
+        ]);
+        return response()->json([
+            'message'=>'پیام با موفقیت ارسال شد'
+        ],200);
     }
 
     /**

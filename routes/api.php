@@ -228,8 +228,8 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
 // // //
 //! Message Routing
 // // //
-Route::middleware('auth:api')->prefix('messages')->group(function(){
-    Route::resource('/',MessagesResourceController::class);
+Route::middleware('auth:api')->group(function(){
+    Route::resource('messages',MessagesResourceController::class);
 });
 // ###############                        #####
 // ################ DEVELOPER ONLY ##############
