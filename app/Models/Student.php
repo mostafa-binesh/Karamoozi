@@ -255,6 +255,11 @@ class Student extends Model
         }
         return $totalWorkingDaysCount;
     }
+    public function calculateInternshipFinishedAt() {
+        $reports =  $this->weeklyReport->reports;
+        $lastWeeklyReport = end($reports);
+        return $lastWeeklyReport['date'];
+    }
     // returned value of this function will be used as reports attr.
     // in weeklyReport table
     public function calculateAllWorkingDaysDate()
@@ -269,7 +274,7 @@ class Student extends Model
         $schedule = $this->schedule();
         // calculate how many days student have to work based on schedule, eg: 30
         $howManyDaysMustWork = self::howManyDaysMustWork($schedule);
-        return $howManyDaysMustWork;
+        // return $howManyDaysMustWork;
         // calculate all working days date, an array of dates
         $allWorkingDaysDate = [];
         $allowedDays = [];
@@ -322,6 +327,7 @@ class Student extends Model
                 return $week;
             }
         }
+        return null;
     }
     public function entrance_year()
     {

@@ -52,10 +52,12 @@ class WeeklyReportController extends Controller
             }
         }
         // then go to the Reports database and return all of reports in the array
+        $latestUnfinishedReportWeek = $student->getLatestUncompletedReportWeek();
         return response()->json([
             'weeks_todo' => 1, // chand hafte be joz in hafte moonde ke bayad takmil beshe
             'reports' => ReportResource::collection(Report::where('student_id', $student->id)->whereIn('date', $unfinishedWeekDays)->get()),
-            'unfinished_week' => WeeklyReportResource::make($student->getLatestUncompletedReportWeek()),
+            'is_finished' => empty($latestUnfinishedReportWeek),
+            'unfinished_week' => !empty($latestUnfinishedReportWeek) ? WeeklyReportResource::make($latestUnfinishedReportWeek) : null,
         ]);
     }
 
@@ -119,7 +121,7 @@ class WeeklyReportController extends Controller
     }
         // set week done to true
         $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport?->reports = $reports; // save the modified report
+        $weeklyReport->reports = $reports; // save the modified report
         $weeklyReport->save();
         return response()->json([
             'message' => 'گزارشات با موفقیت ثبت شد',

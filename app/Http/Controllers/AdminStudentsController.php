@@ -429,11 +429,14 @@ class AdminStudentsController extends Controller
     public function showWeeklyReport($id, $weekID)
     { // arguments: studentID, weekID
         $student = Student::findorfail($id)->first();
+        // dd($student);
         $dates = [];
         foreach ($student->weeklyReport['reports'][$weekID - 1]['days'] as $day) {
-            // array_push($dates, Verta::parse($day['date'])->datetime()->format('Y-m-d'));
             array_push($dates, $day['date']);
         }
+        // return($student->weeklyReport['reports'][0]['days']);
+        // return(Report::where('student_id', $id)->whereIn('date', $dates)->get(['date', 'description']));
+        // return($student->weeklyReport['reports'][$weekID - 1]);
         return [
             'data' =>
             [
