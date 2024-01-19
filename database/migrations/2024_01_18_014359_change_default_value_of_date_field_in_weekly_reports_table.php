@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::table('weekly_reports', function (Blueprint $table) {
             $table->date('date')->default(null)->change();
+            $table->text('reports')->nullable()->change();
+            $table->text('content')->nullable()->change();
         });
     }
 

@@ -14,10 +14,11 @@ class ReportResource extends JsonResource
      */
     public function toArray($request)
     {
+        if (empty($this->content)) return null;
         return [
             'id' => $this->id,
-            'date' => $this->date,
-            'description' => $this->description,
+            'date' => $this->date->format('Y-m-d'),
+            'description' => $this->content,
         ];
     }
 }

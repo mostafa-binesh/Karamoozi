@@ -235,7 +235,6 @@ Route::middleware('auth:api')->group(function(){
 // ################ DEVELOPER ONLY ##############
 // ###############                       #####
 // ! DELETE ON PRODUCTION
-
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
     Route::get("freshMigrate", function () {
         Artisan::call("migrate:fresh --seed");

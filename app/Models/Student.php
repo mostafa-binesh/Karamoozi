@@ -12,6 +12,7 @@ use function PHPUnit\Framework\isEmpty;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use App\Http\Resources\WeeklyReportResource;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -212,6 +213,7 @@ class Student extends Model
     public function howManyDaysMustWork($schedule_table)
     {
         $total_duration = 0; // in seconds for a week
+        $durations = [];
         foreach ($schedule_table as $row) {
             // return $row;
             $shifts = explode(',', $row);
@@ -219,9 +221,13 @@ class Student extends Model
                 $start_time = strtotime($shifts[$i]);
                 $end_time = strtotime($shifts[$i + 1]);
                 $duration = $end_time - $start_time;
+                // dd($duration);
+                $durations[] = $duration;
                 $total_duration += $duration;
             }
         }
+        // dd(['total_duration' => $total_duration / (60 * 60 * 24)], $durations);
+        // dd($total_duration / (60 * 60 * 24));
         if ($total_duration == 0) {
             return 0;
         }
@@ -253,7 +259,8 @@ class Student extends Model
         }
         return $totalWorkingDaysCount;
     }
-    public function calculateInternshipFinishedAt() {
+    public function calculateInternshipFinishedAt()
+    {
         $reports =  $this->weeklyReport->reports;
         $lastWeeklyReport = end($reports);
         return $lastWeeklyReport['date'];
@@ -265,7 +272,7 @@ class Student extends Model
         // calculate all working days based on schedule
         // assume that first working day is:
         // TODO: need to get this data from database, haven't created the attr. for it in the db
-        $firstWorkingDayDate = verta('2023/01/07');
+        $firstWorkingDayDate = Carbon::parse('2023/01/07');
         // ! clone and ->copy() for verta do the same thing
         $firstWorkingDayDateBackUp = clone $firstWorkingDayDate;
         // get the schedule
@@ -288,7 +295,7 @@ class Student extends Model
                         $thisWeek,
                         [
                             'title' => self::DAYSOFWEEK[$i],
-                            'date' => $firstWorkingDayDate->addDays($i - $lasti)->DateTime()->format('Y-m-d'),
+                            'date' => $firstWorkingDayDate->addDays($i - $lasti)->format('Y-m-d'),
                             'is_done' => false,
                         ]
                     );
@@ -302,7 +309,7 @@ class Student extends Model
             }
             array_push($allowedDays, [
                 'week_number' => $weekCounter,
-                'first_day_of_week' => $firstWorkingDayDateBackUp->DateTime()->format('Y-m-d'),
+                'first_day_of_week' => $firstWorkingDayDateBackUp->format('Y-m-d'),
                 'is_done' => false,
                 'days' => $thisWeek,
             ]);

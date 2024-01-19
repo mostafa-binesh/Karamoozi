@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VerificationStatusEnum;
 use Carbon\Carbon;
 use App\Models\Report;
 use App\Models\WeeklyReport;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ReportResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\WeeklyReportResource;
+use Illuminate\Support\Carbon as SupportCarbon;
 
 class WeeklyReportController extends Controller
 {
@@ -36,28 +38,18 @@ class WeeklyReportController extends Controller
         // $student = Auth::user()->student->with('weeklyReport');
         $student = Auth::user()->student;
         // find the first unfinished week and get all the the days of it
-        $reports =  $student->weeklyReport->reports;
-        $unfinishedWeekDays = [];
-        foreach ($reports as $week) {
-            if ($week['is_done']) {
-                continue;
-            } else {
-                // iterating in days of the week
-                // if is_done is true, save the date to the array
-                foreach ($week['days'] as $day) {
-                    if ($day['is_done']) {
-                        array_push($unfinishedWeekDays, $day['date']);
-                    }
-                }
-            }
-        }
-        // then go to the Reports database and return all of reports in the array
-        $latestUnfinishedReportWeek = $student->getLatestUncompletedReportWeek();
+        $unfinishedWeeks = $student->weeklyReports->groupBy('week_number');
+        $firstUnfinishedWeek = WeeklyReport::getFirstUnfinishedWeeklyReport($unfinishedWeeks);
+        // send the reponse
         return response()->json([
             'weeks_todo' => 1, // chand hafte be joz in hafte moonde ke bayad takmil beshe
-            'reports' => ReportResource::collection(Report::where('student_id', $student->id)->whereIn('date', $unfinishedWeekDays)->get()),
-            'is_finished' => empty($latestUnfinishedReportWeek),
-            'unfinished_week' => !empty($latestUnfinishedReportWeek) ? WeeklyReportResource::make($latestUnfinishedReportWeek) : null,
+            'reports' => !empty($firstUnfinishedWeek) ? ReportResource::collection($firstUnfinishedWeek?->whereNotNull('content')) : null,
+            'is_finished' => empty($firstUnfinishedWeek),
+            'unfinished_week' => !empty($firstUnfinishedWeek) ? [
+                "week_number" => $firstUnfinishedWeek->first()->week_number,
+                "first_day_of_week" => firstDayOfWeek($firstUnfinishedWeek->first()->date),
+                'days' => WeeklyReportResource::collection($firstUnfinishedWeek),
+            ] : null,
         ]);
     }
 
@@ -90,42 +82,25 @@ class WeeklyReportController extends Controller
             ], 400);
         }
         $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student?->weeklyReport?->reports;
-        // loop of request report
-        if($reports){
-        $dbReports = null;
-        foreach ($req->report as $re) {
-            $found = false;
-            // loop of database WeeklyReports table > reports array
-            for ($i = 0; $i < count($reports); $i++) {
-                // loop of days of weeks
-                for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    if ($re['date'] == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == false) {
-                        $reports[$i]['days'][$j]['is_done'] = true;
-                        $found = true;
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => $re['date'], 'description' => $re['description']]);
-                        $dbReports = ['student_id' => $student->id, 'date' => $re['date'], 'description' => $re['description']];
-                        break;
-                    }
+        // parse the dates in the request because date field was cast to date in the weeklyReport model
+        $carbonParsedDates = castArrayToCarbon(array_column($req->report, 'date'));
+        // find all weeklyReport of the student which the date is in request.date
+        $weeklyReports = $student->weeklyReports->whereIn('date', $carbonParsedDates);
+        // iterate through each found report
+        foreach ($req->report as $report) {
+            // find the report using date
+            $weeklyReport = $weeklyReports->firstWhere('date', $report['date']);
+            if ($weeklyReport) {
+                // set the weeklyReport's content to req.report.description and set the status to NotChekced
+                $weeklyReport->content = $report['description'];
+                if ($weeklyReport->status == VerificationStatusEnum::NotAvailable) {
+                    $weeklyReport->status = VerificationStatusEnum::NotChecked;
                 }
-                if ($found) break;
-            }
-            if (!$found) {
-                array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
-            } else {
-                Report::create($dbReports);
+                $weeklyReport->save();
             }
         }
-    }
-        // set week done to true
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
-        $weeklyReport->save();
         return response()->json([
             'message' => 'گزارشات با موفقیت ثبت شد',
-            'possibleErrors' => $errors,
         ]);
     }
 
@@ -169,36 +144,20 @@ class WeeklyReportController extends Controller
             ], 400);
         }
         $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student->weeklyReport->reports;
-        $dbReport = Report::find($id);
-        if (!$dbReport) {
-            return response()->json([
-                'message' => 'گزارش پیدا نشد',
-            ], 400);
-        }
-        $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
-        $found = false;
-        for ($i = 0; $i < count($reports); $i++) {
-            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                    $found = true;
-                    $dbReport->description = $req->description;
-                    $dbReport->save();
-                    break;
+        $carbonParsedDates = castArrayToCarbon(array_column($req->report, 'date'));
+        $weeklyReports = $student->weeklyReports->whereIn('date', $carbonParsedDates);
+        foreach ($req->report as $report) {
+            $weeklyReport = $weeklyReports->firstWhere('date', $report['date']);
+            if ($weeklyReport) {
+                $weeklyReport->content = $report['description'];
+                if ($weeklyReport->status == VerificationStatusEnum::NotAvailable) {
+                    $weeklyReport->status = VerificationStatusEnum::NotChecked;
                 }
+                $weeklyReport->save();
             }
-            if ($found) break;
         }
-        if (!$found) {
-            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-        }
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
-        $weeklyReport->save();
         return response()->json([
             'message' => 'گزارش بروز شد',
-            'possibleErrors' => $errors,
         ]);
     }
 
@@ -211,78 +170,40 @@ class WeeklyReportController extends Controller
     public function destroy($id)
     {
         $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student->weeklyReport->reports;
-        $dbReport = Report::find($id);
-        if (!$dbReport) {
-            return response()->json([
-                'message' => 'گزارش پیدا نشد',
-            ], 400);
-        }
-        $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
-        // foreach ($req->report as $re) {
-        $found = false;
-        for ($i = 0; $i < count($reports); $i++) {
-            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                    $reports[$i]['days'][$j]['is_done'] = false;
-                    $found = true;
-                    // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                    $dbReport->delete();
-                    // $dbReport->save();
-                    break;
-                }
-            }
-            if ($found) break;
-        }
-        if (!$found) {
-            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-        }
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
+        // get the weeklyReport with desired id which belongs to authenticated student
+        $weeklyReport = WeeklyReport::where('student_id', $student->id)
+            ->where('id', $id)->firstOrFail();
+        // set the content to null and set the status to notAvailable
+        $weeklyReport->content = null;
+        $weeklyReport->status = VerificationStatusEnum::NotAvailable;
         $weeklyReport->save();
+        // send response
         return response()->json([
             'message' => 'گزارشات با موفقیت ثبت شد',
-            'possibleErrors' => $errors,
         ]);
     }
     public function verifyWeek()
     {
+        // get the student
         $student = Auth::user()->student;
-        // find the first unfinished week and get all the the days of it
-        $reports =  $student->weeklyReport->reports;
-        for ($i = 0; $i < count($reports); $i++) {
-            if ($reports[$i]['is_done']) {
-                continue;
-            } else {
-                // check if all reports' days of the week are fullfied
-                foreach ($reports[$i]['days'] as $days) {
-                    if ($days['is_done'] == false) {
-                        return response()->json([
-                            'message' => 'باید همه ی روز های این هفته گزارش داشته باشند',
-                        ], 400);
-                    }
-                }
-                $reports[$i]['is_done'] = true;
-                $student->weeklyReport->reports = $reports;
-                $student->weeklyReport->save();
-                $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
-                if (empty($latestUncompletedReportWeek)) {
-                    $student->stage = 3;
-                    $student->save();
-                }
-                return response()->json([
-                    'message' => 'هفته تایید شد',
-                ]);
-            }
+        // get the first unfinished week
+        $unfinishedWeeks = $student->weeklyReports->groupBy('week_number');
+        $firstUnfinishedWeek = WeeklyReport::getFirstUnfinishedWeeklyReport($unfinishedWeeks);
+        // iterate thourgh each weeklyReport and set the is_week_verified to true 
+        foreach ($firstUnfinishedWeek as $weeklyReport) {
+            $weeklyReport->is_week_verified = true;
+            $weeklyReport->save();
         }
-        $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
+        // search again for first unfinished week
+        $unfinishedWeeks = $student->weeklyReports()->get()->groupBy('week_number');
+        $firstUnfinishedWeek = WeeklyReport::getFirstUnfinishedWeeklyReport($unfinishedWeeks);
+        // if no unfinished week was found, set the student's stage to 3
         if (empty($latestUncompletedReportWeek)) {
             $student->stage = 3;
             $student->save();
         }
         return response()->json([
-            'message' => 'هفته ای برای تایید پیدا نشد'
-        ], 400);
+            'message' => 'هفته تایید شد'
+        ], 200);
     }
 }

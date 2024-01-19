@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\VerificationStatusEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Morilog\Jalali\Jalalian;
 
 class WeeklyReportResource extends JsonResource
 {
@@ -18,20 +20,23 @@ class WeeklyReportResource extends JsonResource
         // didn't know how to handle
         // return parent::toArray($request);
 
-        if (empty($this)) return null;
-        $notCompletedDays = [];
-        foreach ($this['days'] as $day) {
-            if(!$day['is_done']) {
-                array_push($notCompletedDays,[
-                    'title' => $day['title'],
-                    'date' => $day['date'],
-                ]);
-            }
-        }
+        // if (empty($this)) return null;
+        // // $notCompletedDays = [];
+        // foreach ($this as $index => $weeklyReport) {
+        //     // dd($weeklyReport[1]);
+        //     if($weeklyReport->status != VerificationStatusEnum::NotAvailable) {
+        //         array_push($notCompletedDays,[
+        //             'title' => Jalalian::fromDateTime($weeklyReport->date)->format('%A'),
+        //             'date' => $weeklyReport['date'],
+        //         ]);
+        //     }
+        // }
         return [
-            "week_number" => $this['week_number'],
-            "first_day_of_week" => $this['first_day_of_week'],
-            'days' => $notCompletedDays,
+            'title' => Jalalian::fromDateTime($this->date)->format('%A'),
+            'date' => $this->date->format('Y-m-d'),
+            // "week_number" => $this->first()->week_number,
+            // "first_day_of_week" => firstDayOfWeek($this->first()->date),
+            // 'days' => $notCompletedDays,
             // 'days' => $this['days'],
         ];
     }

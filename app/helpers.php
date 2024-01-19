@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Carbon;
 
 if (!function_exists('slugMaker')) {
     function slugMaker($string)
@@ -92,3 +93,18 @@ if (!function_exists('reqConvert')) {
         }
     }
 }
+function firstDayOfWeek(string | Carbon $date)
+{
+    if (is_string(($date))) {
+        $date = Carbon::parse($date);
+    }
+    return $date->startOfWeek()->startOfDay();
+}
+function castArrayToCarbon($dates)
+{
+    $carbonParsedDates = [];
+    foreach ($dates as $date) {
+        $carbonParsedDates[] = Carbon::parse($date);
+    }
+    return $carbonParsedDates;
+};

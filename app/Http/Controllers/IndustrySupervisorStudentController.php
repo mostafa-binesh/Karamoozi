@@ -76,8 +76,10 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
-        if ($form2 != null) {
+        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)
+        // ->first();
+        ->exists();
+        if($form2) {
             return response()->json([
                 'message' => 'اطلاعات این دانشجو قبلا ثبت شده است',
             ], 404);
@@ -118,10 +120,11 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         // create weekly reports
+        // return($allWorkingDaysDate);
         foreach ($allWorkingDaysDate as $report) {
             $days = $report['days'];
             foreach ($days as $index => $day) {
-                WeeklyReport::new($student->id, $day['date'],$index + 1, VerificationStatusEnum::NotChecked,null);
+                WeeklyReport::new($student->id, $day['date'],$report['week_number'], VerificationStatusEnum::NotChecked,null);
             }
         }
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
