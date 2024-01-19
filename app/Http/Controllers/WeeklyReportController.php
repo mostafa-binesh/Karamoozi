@@ -40,15 +40,16 @@ class WeeklyReportController extends Controller
         // find the first unfinished week and get all the the days of it
         $unfinishedWeeks = $student->weeklyReports->groupBy('week_number');
         $firstUnfinishedWeek = WeeklyReport::getFirstUnfinishedWeeklyReport($unfinishedWeeks);
+        // dd($firstUnfinishedWeek, $firstUnfinishedWeek->isEmpty());
         // send the reponse
         return response()->json([
             'weeks_todo' => 1, // chand hafte be joz in hafte moonde ke bayad takmil beshe
-            'reports' => !empty($firstUnfinishedWeek) ? ReportResource::collection($firstUnfinishedWeek?->whereNotNull('content')) : null,
-            'is_finished' => empty($firstUnfinishedWeek),
-            'unfinished_week' => !empty($firstUnfinishedWeek) ? [
+            'reports' => !$firstUnfinishedWeek->isEmpty() ? ReportResource::collection($firstUnfinishedWeek?->whereNotNull('content')) : null,
+            'is_finished' => $firstUnfinishedWeek->isEmpty(),
+            'unfinished_week' => !$firstUnfinishedWeek->isEmpty() ? [
                 "week_number" => $firstUnfinishedWeek->first()->week_number,
-                "first_day_of_week" => firstDayOfWeek($firstUnfinishedWeek->first()->date),
-                'days' => WeeklyReportResource::collection($firstUnfinishedWeek),
+                "first_day_of_week" => firstDayOfWeek($firstUnfinishedWeek->first()->date)->format('Y-m-d'),
+                'days' => WeeklyReportResource::collection($firstUnfinishedWeek->where('stauts', VerificationStatusEnum::NotAvailable)),
             ] : null,
         ]);
     }
@@ -89,7 +90,9 @@ class WeeklyReportController extends Controller
         // iterate through each found report
         foreach ($req->report as $report) {
             // find the report using date
-            $weeklyReport = $weeklyReports->firstWhere('date', $report['date']);
+            $weeklyReport = $weeklyReports->firstWhere('date', Carbon::parse($report['date']));
+            // dd($weeklyReport);
+            // dd($carbonParsedDates, $weeklyReports, $weeklyReport);
             if ($weeklyReport) {
                 // set the weeklyReport's content to req.report.description and set the status to NotChekced
                 $weeklyReport->content = $report['description'];
@@ -97,6 +100,8 @@ class WeeklyReportController extends Controller
                     $weeklyReport->status = VerificationStatusEnum::NotChecked;
                 }
                 $weeklyReport->save();
+            } else {
+                dd("weekly report not found {$report['date']}");
             }
         }
         return response()->json([
@@ -144,18 +149,13 @@ class WeeklyReportController extends Controller
             ], 400);
         }
         $student = Auth::user()->student;
-        $carbonParsedDates = castArrayToCarbon(array_column($req->report, 'date'));
-        $weeklyReports = $student->weeklyReports->whereIn('date', $carbonParsedDates);
-        foreach ($req->report as $report) {
-            $weeklyReport = $weeklyReports->firstWhere('date', $report['date']);
-            if ($weeklyReport) {
-                $weeklyReport->content = $report['description'];
-                if ($weeklyReport->status == VerificationStatusEnum::NotAvailable) {
-                    $weeklyReport->status = VerificationStatusEnum::NotChecked;
-                }
-                $weeklyReport->save();
-            }
+        // $carbonParsedDates = castArrayToCarbon(array_column($req->report, 'date'));
+        $weeklyReport = $student->weeklyReports->whereId('id', $id);
+        $weeklyReport->content = $req->description;
+        if ($weeklyReport->status == VerificationStatusEnum::NotAvailable) {
+            $weeklyReport->status = VerificationStatusEnum::NotChecked;
         }
+        $weeklyReport->save();
         return response()->json([
             'message' => 'گزارش بروز شد',
         ]);

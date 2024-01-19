@@ -41,14 +41,14 @@ class WeeklyReport extends Model
     // arguments >>  GroupedByweeklyReports: a groupedBy('week_number') collection of weeklyReport 
     public static function getFirstUnfinishedWeeklyReport(Collection $GroupedByweeklyReports)
     {
-        dd($GroupedByweeklyReports);
+        // dd($GroupedByweeklyReports);
         foreach ($GroupedByweeklyReports as $weeklyReportCollection) {
             $finished = true;
             foreach ($weeklyReportCollection as $weeklyReport) {
                 // dd($weeklyReport->status);
                 if (
-                    $weeklyReport->status == VerificationStatusEnum::NotAvailable
-                    && $weeklyReport->is_week_finished == false
+                    // $weeklyReport->status == VerificationStatusEnum::NotAvailable
+                    $weeklyReport->is_week_finished == false
                     // || $weeklyReport->status == VerificationStatusEnum::Refused
                 ) {
                     $finished = false;
@@ -56,7 +56,12 @@ class WeeklyReport extends Model
                 }
             }
             // return  ? $weeklyReportCollection : null;
-            if (!$finished) return $weeklyReportCollection;
+            if (!$finished) {
+                // dd($weeklyReportCollection);
+                // dd($weeklyReportCollection->where('status', VerificationStatusEnum::NotAvailable));
+                // return $weeklyReportCollection->where('status', VerificationStatusEnum::NotAvailable);
+                return $weeklyReportCollection;
+            };
         }
         return null;
     }

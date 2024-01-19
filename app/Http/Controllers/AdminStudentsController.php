@@ -415,7 +415,7 @@ class AdminStudentsController extends Controller
         }
         array_push($weeks, [
             'id' => $weekNumber + 1,
-            'first_day_of_week' => $firstDayOfTheWeek,
+            'first_day_of_week' => $firstDayOfTheWeek->format('Y-m-d'),
             'status' => $weekIsFinished,
             'not_available' => $status0,
             'not_checked' => $status1,
