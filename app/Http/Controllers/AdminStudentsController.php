@@ -3,11 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PreRegVerificationStatusEnum;
-<<<<<<< HEAD
-=======
-use App\Enums\VerificationStatusEnum;
-use App\Models\User;
->>>>>>> d2cbe573be860e821458125e079dd93b1d7eac4a
 use App\Models\Report;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -324,12 +319,8 @@ class AdminStudentsController extends Controller
         $user = Auth::user();
         if ($user->hasAnyRole(['master'])) {
             $student = Student::where("id", $id)->with("studentEvaluations")->first();
-<<<<<<< HEAD
             $employee_id = Employee::where('user_id', $user->id)->first()->id;
             if ($student->professor_id != $employee_id) {
-=======
-            if ($student->professor_id != $user->id) {
->>>>>>> d2cbe573be860e821458125e079dd93b1d7eac4a
                 return response()->json([
                     'error' => 'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
                 ], 400);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Master;
 
+use App\Http\Resources\admin\StudentFormsStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MasterStudents extends JsonResource
@@ -15,13 +16,18 @@ class MasterStudents extends JsonResource
     public function toArray($request)
     {
         // return parent::toArray($request);
-        // $this is student 
+        // $this is student
         return [
             'id' => $this->id,
             'first_name' => $this->user->first_name,
             'last_name' => $this->user->last_name,
             'student_number' => $this->student_number,
             'entrance_year' => $this->entrance_year,
+            'status'=>[
+                'stage'=>$this->stage,
+                'pre_reg_verified'=>$this->pre_reg_verified,
+                // 'forms'=>StudentFormsStatus::make($this)
+            ]
         ];
     }
 }

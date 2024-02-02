@@ -15,11 +15,15 @@ class StudentForm3 extends JsonResource
      */
     public function toArray($request)
     {
+        $evaluations = [0.5, 1.5, 2, 2.5];
         // $this is student
         // ! needs user, company, form2, studentEvaluation relationships
-        $total_grade = 19;
-        foreach ($this->studentEvaluations as $evaluation) {
-            $total_grade += StudentEvaluation::StudentEvaluation[$evaluation->value];
+
+        $total_grade = 0;
+        if ($this->studentEvaluations) {
+            foreach ($this->studentEvaluations as $evaluation) {
+                $total_grade += $evaluations[$evaluation->value - 1];
+            }
         }
         // $dictionary = new \MojtabaaHN\PersianNumberToWords\Dictionary();
         // $converter = new \MojtabaaHN\PersianNumberToWords\PersianNumberToWords($dictionary);
@@ -49,32 +53,7 @@ class StudentForm3 extends JsonResource
             'total_grade' => $total_grade, // ! fix later
             // 'total_grade_word' => $converter->convert($total_grade),
             'status' => $this->evaluations_verified,
-            'final_evaluation' => [
-                [
-                    'title' => 'میانگین ارزشیابی بازدید های استاد کارآموزی',
-                    'grade' => 1,
-                ],
-                [
-                    'title' => 'میانگین ارزشیابی سرپرست کارآموزی در صنعت',
-                    'grade' => 1,
-                ],
-                [
-                    'title' => 'ارزشیابی گزارش های کارآموزی دانشجو توسط استاد',
-                    'grade' => 1,
-                ],
-                [
-                    'title' => 'امتحان و دفاع دانشجو - در جلسه حضوری',
-                    'grade' => 1,
-                ],
-                [
-                    'title' => 'نمره میانگین',
-                    'grade' => 1,
-                ],
-                [
-                    'title' => 'ارزیابی نهایی',
-                    'grade' => 1,
-                ],
-            ]
+            'final_evaluation' => []
         ];
     }
 }

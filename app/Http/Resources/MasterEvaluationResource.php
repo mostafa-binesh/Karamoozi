@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Term;
+use App\Models\Option;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Morilog\Jalali\Jalalian;
 
-class WeeklyReportResource extends JsonResource
+class MasterEvaluationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +15,10 @@ class WeeklyReportResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $option_name = Option::where('id',$this->option_id)->first()->name;
         return [
-            'id'=>$this->id,
-            'report'=>$this->report,
-            'report_date'=>$this->report_date,
-            'status'=>$this->status,
-            'term_id'=>Term::where('id',$this->term_id)->first()->name
+            $option_name => $this->grade,
         ];
     }
 }

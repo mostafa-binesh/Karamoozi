@@ -221,6 +221,11 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::get('forms/weekly_reports',[WeeklyReportController::class,'index']);
         Route::get('weekly_reports/verify/{id}',[WeeklyReportController::class ,'verifyWeek']);
 
+        Route::post('/evaluate',[MasterController::class,'store']);
+        Route::get('/evaluate/{id}',[MasterController::class,'show']);
+        Route::put('/evaluate/{id}',[MasterController::class,'update']);
+
+
     });
     // master routes
     //

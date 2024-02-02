@@ -2,13 +2,7 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
 use App\Traits\CPaginationTrait;
-=======
-use App\Enums\VerificationStatusEnum;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
->>>>>>> d2cbe573be860e821458125e079dd93b1d7eac4a
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -42,7 +36,7 @@ class WeeklyReport extends Model
         ]);
     }
 
-    // arguments >>  GroupedByweeklyReports: a groupedBy('week_number') collection of weeklyReport 
+    // arguments >>  GroupedByweeklyReports: a groupedBy('week_number') collection of weeklyReport
     public static function getFirstUnfinishedWeeklyReport(Collection $GroupedByweeklyReports)
     {
         // dd($GroupedByweeklyReports);

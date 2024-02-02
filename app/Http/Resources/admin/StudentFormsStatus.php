@@ -82,7 +82,8 @@ class StudentFormsStatus extends JsonResource
                 'status' => $this->final_report_path == null ? 0 : 1,
             ],
             'finish_internship' => [
-                'status' => Form7::where('student_id',$this->id)->first()->verify_industry_collage,
+                'status' => Form7::where('student_id',$this->id)?->first()?->verify_industry_collage ?
+                Form7::where('student_id',$this->id)->first()->verify_industry_collage : 0,
             ],
             // ],
         ];
