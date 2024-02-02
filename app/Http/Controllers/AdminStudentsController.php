@@ -3,20 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PreRegVerificationStatusEnum;
-use App\Models\User;
 use App\Models\Report;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Hekmatinasser\Verta\Verta;
-use App\Models\CompanyEvaluation;
 use App\Models\University_faculty;
-use App\ModelFilters\StudentFilter;
 use App\Http\Resources\PreRegStudents;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\admin\StudentForm2;
 use App\Http\Resources\admin\StudentForm3;
-use App\ModelFilters\Admin\StudentsFilter;
-use App\Http\Resources\WeeklyReportResource;
 use App\Http\Resources\admin\StudentFormsStatus;
 use App\Http\Resources\InitRegistrationStudents;
 use App\ModelFilters\Admin\PreRegStudentsFilter;
@@ -24,8 +18,11 @@ use App\Http\Resources\UniversityFacultyResource;
 use App\ModelFilters\Admin\InitRegStudentsFilter;
 use App\Http\Resources\admin\StudentForm4Resource;
 use App\Http\Resources\admin\StudentPreRegDescription;
-use App\Http\Resources\admin\CompanyEvaluationResource;
 use App\Http\Resources\admin\FinishInternshipLetterResource;
+use App\Models\Employee;
+use App\Models\Term;
+use App\Models\From7s as Form7;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class AdminStudentsController extends Controller
@@ -131,7 +128,7 @@ class AdminStudentsController extends Controller
                 $preReg_unVerified++;
             }
             //else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminNotChecked) {
-              //  $preReg_waiting++;
+            //  $preReg_waiting++;
             //}
         }
         return response()->json([
@@ -156,15 +153,16 @@ class AdminStudentsController extends Controller
             ]
         ]);
     }
-    public function entrance_years(){
-         return Student::select('entrance_year')->distinct('entrance_year')->get();
+    public function entrance_years()
+    {
+        return Student::select('entrance_year')->distinct('entrance_year')->get();
     }
     public function preRegStudents(Request $req)
     {
         $students = Student::filter($req->all(), PreRegStudentsFilter::class)
-        // only search for students where approved by their masters
-        // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
-        ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
+            // only search for students where approved by their masters
+            // ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)
+            ->with(['user', 'universityFaculty'])->cpagination($req, PreRegStudents::class);
         return response()->json([
             'meta' => $students['meta'],
             'data' => [
@@ -172,8 +170,9 @@ class AdminStudentsController extends Controller
             ]
         ]);
     }
-    public function faculty(){
-       return UniversityFacultyResource::collection(University_faculty::all());
+    public function faculty()
+    {
+        return UniversityFacultyResource::collection(University_faculty::all());
     }
     public function forms(Request $req)
     {
@@ -186,7 +185,6 @@ class AdminStudentsController extends Controller
                 'students' => $students['data'],
             ]
         ]);
-        return $students;
     }
     public function initRegVerifyStudent($id)
     {
@@ -319,12 +317,13 @@ class AdminStudentsController extends Controller
     public function form3($id)
     {
         $user = Auth::user();
-        if($user->hasAnyRole(['master'])){
+        if ($user->hasAnyRole(['master'])) {
             $student = Student::where("id", $id)->with("studentEvaluations")->first();
-            if($student->professor_id != $user->id){
+            $employee_id = Employee::where('user_id', $user->id)->first()->id;
+            if ($student->professor_id != $employee_id) {
                 return response()->json([
-                    'error'=>'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
-                ],400);
+                    'error' => 'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
+                ], 400);
             }
             return StudentForm3::make($student);
         }
@@ -466,5 +465,36 @@ class AdminStudentsController extends Controller
     {
         $student = Student::where("id", $id)->with(["form2", 'user'])->first();
         return FinishInternshipLetterResource::make($student);
+    }
+
+    public function verify_finishInternship(Request $req , $id)
+    {
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        Form7::create([
+            'student_id' => $id,
+            'term_id' => $term_id,
+            'letter_date' => now(),
+            'letter_number' => "1/$id 3 $id ب",
+            'supervisor_approval' => 1,
+            'verify_industry_collage' => 2
+        ]);
+        return response()->json([
+            'message'=>'تایید با موفقیت انجام شد'
+        ]);
+    }
+    public function unverify_finishInternship(Request $req , $id)
+    {
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        Form7::create([
+            'student_id' => $id,
+            'term_id' => $term_id,
+            'letter_date' => now(),
+            'letter_number' => "1/$id 3 $id ب",
+            'supervisor_approval' => 1,
+            'verify_industry_collage' => 1
+        ]);
+        return response()->json([
+            'message'=>' رد تایید با موفقیت انجام شد'
+        ]);
     }
 }

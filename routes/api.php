@@ -164,12 +164,14 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('forms/{id}/form4/verify', 'form4Verify');
         Route::put('forms/{id}/form4/unverify', 'form4UnVerify');
         // weekly report
-        Route::get('forms/{id}/weekly_reports', 'weeklyReports');
-        Route::get('forms/{id}/weekly_reports/{weekID}', 'showWeeklyReport');
-        // finish internship
-        Route::get('forms/{id}/finish_internship', 'finishInternship');
+        Route::get('weekly_reports',[WeeklyReportController::class,'index']);
+        Route::get('weekly_reports/verify/{id}',[WeeklyReportController::class ,'verifyWeek']);
         // final_reports
         Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
+        // finish internship
+        Route::get('forms/{id}/finish_internship', 'finishInternship');
+        Route::put('forms/{id}/finish_internship/verify','verify_finishInternship');
+        Route::put('forms/{id}/finish_internship/unverify','unverify_finishInternship');
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -193,12 +195,11 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('companies', AdminCompanyController::class);
-    Route::delete('companies/image/{id}',[AdminCompanyController::class,'delete_image']);
-    Route::post('companies/image/{id}', [AdminCompanyController::class,'upload_image']);
+    Route::post('companies/update/{id}',[AdminCompanyController::class,'update_company']);
+
     //news
     Route::resource('news', AdminNewsController::class);
-    Route::delete('news/image/{id}',[AdminNewsController::class,'destroyImage']);
-    Route::post('news/image/{id}', [AdminNewsController::class,'updateImage']);
+    Route::post('news/update/{id}',[AdminNewsController::class,'updata_news']);
 });
 // ###############                        #####
 // ! ##################### MASTER  #####################
@@ -214,8 +215,11 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::get('/{id}', 'singleStudent');
         Route::put('/{id}/verify', 'verifyStudent');
         Route::put('/{id}/unverify', 'unverifyStudent');
+
         Route::get('forms/{id}/form3', [AdminStudentsController::class,'form3']);
         Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
+        Route::get('forms/weekly_reports',[WeeklyReportController::class,'index']);
+        Route::get('weekly_reports/verify/{id}',[WeeklyReportController::class ,'verifyWeek']);
 
     });
     // master routes
@@ -300,7 +304,7 @@ Route::get('mytest', function () {
 });
 
 Route::get('pass' , function(){
-    $user = User::where('username', '3981231020')->first();
-    $user->password = Hash::make('5300053260');
+    $user = User::where('username', '3981231052')->first();
+    $user->password = Hash::make('4380413799');
     $user->save();
 });

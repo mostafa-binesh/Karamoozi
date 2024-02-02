@@ -7,6 +7,7 @@ use App\Providers\FileProvider;
 use App\Repositories\CompanyRepo;
 use Illuminate\Http\Request;
 use App\Http\Resources\admin\CompanyResource;
+use App\ModelFilters\CompanyFilter;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,9 +28,10 @@ class AdminCompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $req)
+    public function index(Request $request)
     {
-        return $this->companyRepo->paginate($req);
+        return Company::filter($request->all(), CompanyFilter::class)->cpagination($request, CompanyResource::class);
+
     }
 
     /**
@@ -39,7 +41,7 @@ class AdminCompanyController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -74,7 +76,7 @@ class AdminCompanyController extends Controller
             ], 400);
         }
 
-        $image_name = $this->file->create_name();
+        $image_name = time().'.png';
         $boss = User::create([
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
@@ -83,7 +85,7 @@ class AdminCompanyController extends Controller
             'phone_number' => $req->phone_number,
             'email' => $req->email,
         ])->assignRole('industry_supervisor');
-        $this->companyRepo([
+        Company::create([
             'company_name' => $req->company_name,
             'caption' => $req->caption,
             'company_grade' => 0,
@@ -95,11 +97,11 @@ class AdminCompanyController extends Controller
             'company_postal_code' => $req->company_postal_code,
             'company_type' => $req->company_type,
             'company_boss_id' => $boss->id,
-            'verified' => 1,
+            'verified' => 0,
             'image_logo' => $image_name,
         ]);
-        $this->file->StrogeFile($req);
-        // $req->file('image')->storeAs('public/companies', $image_name);
+        // $this->file->StrogeFile($req);
+        $req->file('image')->storeAs('public/companies', $image_name);
         return response()->json([
             'message' => 'شرکت با موفقیت اضافه شد',
         ], 200);
@@ -146,17 +148,19 @@ class AdminCompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $req, $id)
+
+    public function update_company(Request $req, $id)
     {
         $validator = Validator::make($req->all(), [
             'company_name' => 'required',
-            'company_number' => 'required|digits:11|unique:companies,company_number,' . $id,
+            'company_number' => 'required|unique:companies,company_number,' . $id,
             'company_registry_code' => 'required|unique:companies,company_registry_code,' . $id,
             'company_phone' => 'required|digits:11|unique:companies,company_phone,' . $id,
-            'compny_address' => 'required',
+            'company_address' => 'required',
             'company_category' => 'required',
             'company_postal_code' => 'required|unique:companies,company_postal_code,' . $id,
-            'verified' => 'required'
+            'verified' => 'required',
+            // 'image'=>'image'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -169,21 +173,42 @@ class AdminCompanyController extends Controller
                 'message' => 'شرکت یافت نشد'
             ], 400);
         }
-        $this->companyRepo->update($req->all(),$id);
-        // $company->company_name = $req->company_name;
-        // $company->company_number = $req->company_number;
-        // $company->company_registry_code = $req->company_registry_code;
-        // $company->company_phone = $req->company_phone;
-        // $company->company_address = $req->company_address;
-        // $company->company_grade = $req->company_grade;
-        // $company->verified = $req->verified;
-        // $company->caption = $req->caption;
-        // $company->company_category = $req->company_category;
-        // $company->company_postal_code = $req->company_postal_code;
-        // $company->save();
+        // $this->companyRepo->update($req->all(),$id);
+        if($req->image) {
+            Validator::make($req->all(), [
+                'image'=>'image'
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => $validator->errors(),
+                ], 400);
+            }
+            if($company->image){
+                $this->file->delete_image($company->image);
+            }
+
+            $imageName = time().'.png';
+            $req->file('image')->storeAs('public/companies/', $imageName);
+            $company->image = $imageName;
+        }
+        $company->company_name = $req->company_name;
+        $company->company_number = $req->company_number;
+        $company->company_registry_code = $req->company_registry_code;
+        $company->company_phone = $req->company_phone;
+        $company->company_address = $req->company_address;
+        $company->company_grade = $req->company_grade;
+        $company->verified = $req->verified;
+        $company->caption = $req->caption;
+        $company->company_category = $req->company_category;
+        $company->company_postal_code = $req->company_postal_code;
+        $company->save();
         return response()->json([
             'message' => 'اطلاعات با موفقیت ویرایش شد',
         ]);
+    }
+    public function update(Request $req, $id)
+    {
+       return;
     }
 
     /**

@@ -42,7 +42,7 @@ class FileProvider
         }
     }
 
-    private function delete_image($image_name)
+    public function delete_image($image_name)
     {
         Storage::delete("storage/" . $this->file_path . $image_name);
         try {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\admin;
 
+use App\Models\University_faculty;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CompanyResource extends JsonResource
@@ -26,8 +27,10 @@ class CompanyResource extends JsonResource
             'company_category'=>$this->company_category,
             'company_postal_code'=>$this->company_postal_code,
             'company_type'=>$this->company_type,
+            'verified'=> $this->verified? 1 : 0,
             'company_boss_data'=>$this->user==null ? '' : $this->user->resource_user(),
-            'company_image' => asset('/storage/companies/'.$this->image),
+            'image' => $this->image ? asset('/storage/companies/'.$this->image): null,
+            'company_boss_data'=>$this->user
         ];
     }
 }

@@ -74,7 +74,7 @@ class StudentFinalReportController extends Controller
      */
     public function show($id)
     {
-        $student = Student::where('user_id',$id)->first();
+        $student = Student::where('id',$id)->first();
         if(!isset($student->id)){
             return response()->json([
                 'error'=>'دانشجو یافت نشد'

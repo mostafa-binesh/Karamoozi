@@ -3,7 +3,9 @@
 namespace App\Http\Resources\admin;
 
 use App\Http\Resources\StudentResource;
+use App\Models\WeeklyReport;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\From7s as Form7;
 
 class StudentFormsStatus extends JsonResource
 {
@@ -59,6 +61,7 @@ class StudentFormsStatus extends JsonResource
         //     // form not available
         //     $form3_status = 0;
         // }
+        $weekly_status = WeeklyReport::where('student_id',$this->id)->first();
         return [
             'student' => StudentFormsResource::make($this),
             // 'forms' => [
@@ -73,10 +76,13 @@ class StudentFormsStatus extends JsonResource
                 'status' => $this->form4_verified,
             ],
             'weekly_reports' => [
-                'status' => 1,
+                'status' => isset($weekly_status->id) ? 1 : 0,
+            ],
+            'final_reports' => [
+                'status' => $this->final_report_path == null ? 0 : 1,
             ],
             'finish_internship' => [
-                'status' => 1,
+                'status' => Form7::where('student_id',$this->id)->first()->verify_industry_collage,
             ],
             // ],
         ];

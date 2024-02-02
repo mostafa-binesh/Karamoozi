@@ -17,7 +17,7 @@ class StudentForm3 extends JsonResource
     {
         // $this is student
         // ! needs user, company, form2, studentEvaluation relationships
-        $total_grade = 0;
+        $total_grade = 19;
         foreach ($this->studentEvaluations as $evaluation) {
             $total_grade += StudentEvaluation::StudentEvaluation[$evaluation->value];
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Term;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class WeeklyReportResource extends JsonResource
@@ -14,24 +15,12 @@ class WeeklyReportResource extends JsonResource
      */
     public function toArray($request)
     {
-        // i didn't create a new resource for day
-        // didn't know how to handle
-        // return parent::toArray($request);
-
-        $notCompletedDays = [];
-        foreach ($this['days'] as $day) {
-            if(!$day['is_done']) {
-                array_push($notCompletedDays,[
-                    'title' => $day['title'],
-                    'date' => $day['date'],
-                ]);
-            }
-        }
         return [
-            "week_number" => $this['week_number'],
-            "first_day_of_week" => $this['first_day_of_week'],
-            'days' => $notCompletedDays,
-            // 'days' => $this['days'],
+            'id'=>$this->id,
+            'report'=>$this->report,
+            'report_date'=>$this->report_date,
+            'status'=>$this->status,
+            'term_id'=>Term::where('id',$this->term_id)->first()->name
         ];
     }
 }

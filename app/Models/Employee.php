@@ -31,7 +31,7 @@ class Employee extends Model
     // attributes
     public function getFullNameAttribute() {
         return $this->user->first_name . " " . $this->user->last_name;
-    } 
+    }
 
     // ###############################################
     // ################## FUNCTIONS ###################

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\News;
 use App\Repositories\NewsRepo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -94,41 +94,53 @@ class AdminNewsController extends Controller
         return $this->show($id);
     }
 
+    public function  updata_news (Request $request , $id){
+         //! Validation
+         $val = Validator::make($request->all(), [
+            'title' => 'required|string|max:100|unique:news,title,' . $id,
+            'body' => 'required|string',
+            'image'=>'image'
+        ]);
+
+        // return $request->image;
+        if ($val->fails()) {
+            return response()->json([
+                'error' => $val->errors(),
+            ], 400);
+        }
+        //! Found news
+        $newsUpdate = $this->news->getById($id);
+        if ($newsUpdate == false) {
+            return response()->json([
+                'error' => "خبر یافت نشد",
+            ], 404);
+        }
+        if($request->image) {
+
+            if($newsUpdate->image){
+                $this->delete_image($newsUpdate->image);
+            }
+
+            $imageName = 'news-' . time() . '.png';
+
+            $request->file('image')->storeAs($this->public_path_store, $imageName);
+
+            $newsUpdate->update(['image'=>$imageName]);
+        }
+        //! update news
+        $newsUpdate->update([
+            'title'=>$request->title,
+            'body'=>$request->body
+        ]);
+
+        return response()->json([
+            'messagw' => 'خبر با موفقیت ویرایش شد'
+        ], 200);
+
+    }
     public function update(Request $request, $id)
     {
-        // try {
-            //! Validation
-            $val = Validator::make($request->all(), [
-                'title' => 'required|string|max:100|unique:news,title,' . $id,
-                'body' => 'required|string'
-            ]);
-            if ($val->fails()) {
-                return response()->json([
-                    'error' => $val->errors(),
-                ], 400);
-            }
-
-            //! Found news
-            $news = $this->news->getById($id);
-            if ($news == false) {
-                return response()->json([
-                    'error' => "خبر یافت نشد",
-                ], 404);
-            }
-
-            //! update news
-            $this->news->update($request, $news);
-
-            return response()->json([
-                'messagw' => 'خبر با موفقیت ویرایش شد'
-            ], 200);
-
-        // }
-        //  catch (\Exception $e) {
-        //     return response()->json([
-        //         "error" => $e->getMessage(),
-        //     ],400);
-        // }
+        return;
     }
 
     public function destroy($id)
@@ -158,53 +170,4 @@ class AdminNewsController extends Controller
         }
     }
 
-    public function updateImage(Request $request, $id)
-    {
-        try {
-            $news = $this->news->getById($id);
-            if ($news == false) {
-                return response()->json([
-                    'error' => "خبر یافت نشد",
-                ], 404);
-            }
-
-            $imageName = 'news-' . time() . '.png';
-            $request->file('image')->storeAs($this->public_path_store, $imageName);
-            $news->image = $imageName;
-            $news->save();
-            return response()->json([
-                'message' => 'تصویر خبر با موفقیت ادیت شد'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                "error" => $e->getMessage(),
-            ]);
-        }
-    }
-
-    public function destroyImage(Request $request, $id)
-    {
-        try {
-            //! found news
-            $news = $this->news->getById($id);
-            if ($news == false) {
-                return response()->json([
-                    'error' => "خبر یافت نشد",
-                ], 404);
-            }
-
-            //! delete image news
-            $this->delete_image($news->image);
-            $news->image = null;
-            $news->save();
-            return response()->json([
-                "message" => "تصویر خبر حذف شد"
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                "error" => $e->getMessage(),
-            ]);
-        }
-    }
 }

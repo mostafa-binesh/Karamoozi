@@ -59,7 +59,8 @@ class StudentsController extends Controller
     public function verifiedStudents(Request $req)
     {
         $master = auth()->user()->master;
-    return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
+        // return $master;
+        return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
     }
     public function pendingStudents(Request $req)
     {
@@ -87,8 +88,7 @@ class StudentsController extends Controller
             ], 400);
         }
         if (!($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
-                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterRefused)
-        ) {
+            || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterRefused)) {
             return response()->json([
                 'message' => 'نمی توانید این دانشجو را تایید کنید',
             ], 400);
@@ -99,7 +99,7 @@ class StudentsController extends Controller
             'message' => 'دانشجو تایید شد',
         ]);
     }
-    public function unverifyStudent(Request $req,$id)
+    public function unverifyStudent(Request $req, $id)
     {
         $student = Student::with('user')->find($id);
         $master = auth()->user()->master;
@@ -108,8 +108,9 @@ class StudentsController extends Controller
                 'message' => 'این دانشجو به شما تعلق ندارد',
             ], 400);
         }
-        if ($student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
-                || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterApproved
+        if (
+            $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
+            || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterApproved
         ) {
             return response()->json([
                 'message' => 'نمی توانید این دانشجو را رد کنید',

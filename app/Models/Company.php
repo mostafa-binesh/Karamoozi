@@ -29,7 +29,7 @@ class Company extends Model
         'company_type',
         'company_boss_id',
         'verified',
-        'image_logo'
+        'image'
     ];
     public const COMPANY_TYPE = [
         1 => 'دولتی',
@@ -48,7 +48,7 @@ class Company extends Model
     {
         return $this->belongsTo(User::class, 'company_boss_id');
     }
-    
+
     public function companyType()
     {
         return self::COMPANY_TYPE[$this->company_type];

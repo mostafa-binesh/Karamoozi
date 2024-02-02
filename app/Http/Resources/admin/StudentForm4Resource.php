@@ -3,7 +3,9 @@
 namespace App\Http\Resources\admin;
 
 use App\Models\CompanyEvaluation;
+
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class StudentForm4Resource extends JsonResource
 {
@@ -15,10 +17,10 @@ class StudentForm4Resource extends JsonResource
      */
     public function toArray($request)
     {
-        $companyEvaluations = CompanyEvaluation::where('student_id', $this->id)->with('option')->get();
+        $companyEvaluations = CompanyEvaluation::where('student_id', 3)->with('option')->get();
         return [
             'evaluations' => CompanyEvaluationResource::collection($companyEvaluations),
-            'comment' => 'یه متن تست هارد کود',
+            'comment' => DB::table('Form4s')->where('student_number',3)->first()->caption,
             'status' => $this->form4_verified,
             'student' => [
                 'id' => $this->id,

@@ -11,7 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ReportResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\WeeklyReportResource;
+use App\Models\Employee;
+use App\Models\Form2s;
+use App\Models\Student;
+use App\Models\Term;
+use DateTime;
 
+// ! status Coding : 0->not verify, 1->verify master, 2->verify supervisor
 class WeeklyReportController extends Controller
 {
     // ! weekly reports which been submitted by students
@@ -30,35 +36,66 @@ class WeeklyReportController extends Controller
         5 => 'پنج شنبه',
         6 => 'جمعه',
     ];
-    public function index()
+    public function index(Request $request)
     {
-        // ! todo: eager loading too inja aslan rayat nashode
-        // $student = Auth::user()->student->with('weeklyReport');
-        $student = Auth::user()->student;
-        // find the first unfinished week and get all the the days of it
-        $reports =  $student->weeklyReport->reports;
-        $unfinishedWeekDays = [];
-        foreach ($reports as $week) {
-            if ($week['is_done']) {
-                continue;
-            } else {
-                // iterating in days of the week
-                // if is_done is true, save the date to the array
-                foreach ($week['days'] as $day) {
-                    if ($day['is_done']) {
-                        array_push($unfinishedWeekDays, $day['date']);
-                    }
+        $user = Auth::user();
+        if ($user->hasRole('student')) {
+            $validate = Validator::make($request->all(), [
+                'start' => 'date',
+                'end' => 'date',
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+            $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+            $student_id = Student::where('user_id', $user->id)->first()->id;
+            $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->cpagination($request, WeeklyReportResource::class);
+            if (isset($request->start) and !isset($request->end)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '>=', $request->start)->cpagination($request, WeeklyReportResource::class);
+            }
+            if (isset($request->end) and !isset($request->start)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '<=', $request->end)->cpagination($request, WeeklyReportResource::class);
+            }
+            if (isset($request->end) and isset($request->start)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '<=', $request->end)->where('report_date', '>=', $request->start)->cpagination($request, WeeklyReportResource::class);
+            }
+            return $reports;
+        } elseif ($user->hasRole('master') || $user->hasRole('admin')) {
+            if ($user->hasRole('master')) {
+                $professor_id  = Student::where('id', $request->student_id)->first()->professor_id;
+                $employee_id = Employee::where('user_id', $user->id)->first()->id;
+                if ($professor_id  != $employee_id) {
+                    return response()->json([
+                        'error' => 'این دانش آموز برای شما نیست'
+                    ], 400);
                 }
             }
+            $validate = Validator::make($request->all(), [
+                'start' => 'date',
+                'end' => 'date',
+                'student_id' => 'required'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'errors' => $validate->errors()
+                ], 400);
+            }
+            $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+            $student_id = $request->student_id;
+            $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->cpagination($request, WeeklyReportResource::class);
+            if (isset($request->start) and !isset($request->end)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '>=', $request->start)->cpagination($request, WeeklyReportResource::class);
+            }
+            if (isset($request->end) and !isset($request->start)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '<=', $request->end)->cpagination($request, WeeklyReportResource::class);
+            }
+            if (isset($request->end) and isset($request->start)) {
+                $reports = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', '<=', $request->end)->where('report_date', '>=', $request->start)->cpagination($request, WeeklyReportResource::class);
+            }
+            return $reports;
         }
-        // then go to the Reports database and return all of reports in the array
-        $latestUnfinishedReportWeek = $student->getLatestUncompletedReportWeek();
-        return response()->json([
-            'weeks_todo' => 1, // chand hafte be joz in hafte moonde ke bayad takmil beshe
-            'reports' => ReportResource::collection(Report::where('student_id', $student->id)->whereIn('date', $unfinishedWeekDays)->get()),
-            'is_finished' => empty($latestUnfinishedReportWeek),
-            'unfinished_week' => !empty($latestUnfinishedReportWeek) ? WeeklyReportResource::make($latestUnfinishedReportWeek) : null,
-        ]);
     }
 
     /**
@@ -79,54 +116,52 @@ class WeeklyReportController extends Controller
      */
     public function store(Request $req)
     {
-        $validator = Validator::make($req->all(), [
-            'report' => 'required|array',
-            'report.*.date' => 'required|date',
-            'report.*.description' => 'required',
-        ]);
-        if ($validator->fails()) {
+        $user = Auth::user();
+        if ($user->hasRole('student')) {
+            $validator = Validator::make($req->all(), [
+                'reports' => 'required|array'
+            ]);
+            if ($validator->fails()) {
+                return $validator->errors();
+            }
+            $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+            $student_id = Student::where('user_id', $user->id)->first()->id;
+            $internship_started_at = Form2s::where('student_id', $student_id)->first()->internship_started_at;
+            if (!$internship_started_at) {
+                return response()->json([
+                    'error' => 'فرم شماره دو شما پر نشده '
+                ], 400);
+            }
+            $givenDate = Carbon::createFromFormat('Y-m-d', $internship_started_at);
+            $currentDate = Carbon::now();
+            $weeksPassed = $givenDate->diffInWeeks($currentDate);
+            $reports = $req->reports;
+            foreach ($reports as $report) {
+                $weekly = WeeklyReport::where('student_id', $student_id)->where('term_id', $term_id)->where('report_date', $report["date"])->first();
+                if (isset($weekly->id)) {
+                    return response()->json([
+                        'error' => 'تاریخ این گزارش تکراری هست',
+                        'report' => $report
+                    ], 400);
+                }
+                WeeklyReport::create([
+                    'student_id' => $student_id,
+                    'term_id' => $term_id,
+                    'report' => $report["description"],
+                    'report_date' => $report["date"],
+                    'week_number' => $weeksPassed,
+                    'status' => 0,
+                    'is_week_verified' => 0
+                ]);
+            }
             return response()->json([
-                'message' => $validator->errors()
+                'message' => 'گزارش با موفقیت اضافه شد'
+            ]);
+        } else {
+            return response()->json([
+                'error' => 'شما دانش اموز نیستید'
             ], 400);
         }
-        $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student?->weeklyReport?->reports;
-        // loop of request report
-        if($reports){
-        $dbReports = null;
-        foreach ($req->report as $re) {
-            $found = false;
-            // loop of database WeeklyReports table > reports array
-            for ($i = 0; $i < count($reports); $i++) {
-                // loop of days of weeks
-                for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                    if ($re['date'] == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == false) {
-                        $reports[$i]['days'][$j]['is_done'] = true;
-                        $found = true;
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                        // array_push($dbReports, ['student_id' => $student->id, 'date' => $re['date'], 'description' => $re['description']]);
-                        $dbReports = ['student_id' => $student->id, 'date' => $re['date'], 'description' => $re['description']];
-                        break;
-                    }
-                }
-                if ($found) break;
-            }
-            if (!$found) {
-                array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $re['date']]);
-            } else {
-                Report::create($dbReports);
-            }
-        }
-    }
-        // set week done to true
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
-        $weeklyReport->save();
-        return response()->json([
-            'message' => 'گزارشات با موفقیت ثبت شد',
-            'possibleErrors' => $errors,
-        ]);
     }
 
     /**
@@ -160,46 +195,42 @@ class WeeklyReportController extends Controller
      */
     public function update(Request $req, $id)
     {
-        $validator = Validator::make($req->all(), [
-            'description' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors()
-            ], 400);
-        }
-        $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student->weeklyReport->reports;
-        $dbReport = Report::find($id);
-        if (!$dbReport) {
-            return response()->json([
-                'message' => 'گزارش پیدا نشد',
-            ], 400);
-        }
-        $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
-        $found = false;
-        for ($i = 0; $i < count($reports); $i++) {
-            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                    $found = true;
-                    $dbReport->description = $req->description;
-                    $dbReport->save();
-                    break;
-                }
+        $user = Auth::user();
+        if ($user->hasRole('student')) {
+            $validator = Validator::make($req->all(), [
+                'reports' => 'required|array'
+            ]);
+            if ($validator->fails()) {
+                return $validator->errors();
             }
-            if ($found) break;
+            $report_edit = WeeklyReport::where('id', $id)->first();
+            if (!isset($report_edit->id)) {
+                return response()->json([
+                    'errors' => 'گزارش یافت نشد'
+                ], 400);
+            }
+            $student_id = Student::where('user_id', $user->id)->first()->id;
+            $reports = $req->reports;
+            $weekly = WeeklyReport::where('student_id', $student_id)
+                ->where('report_date', $reports[0]['date'])
+                ->where('id', '!=', $id)
+                ->first();
+            if (isset($weekly->id)) {
+                return response()->json([
+                    'error' => 'تاریخ این گزارش تکراری هست'
+                ], 400);
+            }
+            $report_edit->report = $reports[0]['description'];
+            $report_edit->report_date = $reports[0]['date'];
+            $report_edit->save();
+            return response()->json([
+                'message' => 'گزارش با موفقیت ادیت شد'
+            ]);
+        } else {
+            return response()->json([
+                'error' => 'شما دانش اموز نیستید'
+            ], 400);
         }
-        if (!$found) {
-            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-        }
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
-        $weeklyReport->save();
-        return response()->json([
-            'message' => 'گزارش بروز شد',
-            'possibleErrors' => $errors,
-        ]);
     }
 
     /**
@@ -210,79 +241,49 @@ class WeeklyReportController extends Controller
      */
     public function destroy($id)
     {
-        $student = Auth::user()->student;
-        $errors = [];
-        $reports = $student->weeklyReport->reports;
-        $dbReport = Report::find($id);
-        if (!$dbReport) {
+        $user = Auth::user();
+        if ($user->hasRole('student')) {
+            $report_edit = WeeklyReport::where('id', $id)->first();
+            if (!isset($report_edit->id)) {
+                return response()->json([
+                    'errors' => 'گزارش یافت نشد'
+                ], 400);
+            }
+            if ($report_edit->status == 1 or $report_edit->status == 2) {
+                return response()->json([
+                    'error' => 'شما اجازه حذف این گزارش را ندارید'
+                ], 400);
+            }
+            WeeklyReport::destroy($report_edit->id);
             return response()->json([
-                'message' => 'گزارش پیدا نشد',
+                'message' => 'گزارش با موفقیت حذف شد'
+            ]);
+        } else {
+            return response()->json([
+                'error' => 'شما دانش اموز نیستید'
             ], 400);
         }
-        $dbDate = Carbon::parse($dbReport->date)->format('Y-m-d');
-        // foreach ($req->report as $re) {
-        $found = false;
-        for ($i = 0; $i < count($reports); $i++) {
-            for ($j = 0; $j < count($reports[$i]['days']); $j++) {
-                if ($dbDate == $reports[$i]['days'][$j]['date'] && $reports[$i]['days'][$j]['is_done'] == true) {
-                    $reports[$i]['days'][$j]['is_done'] = false;
-                    $found = true;
-                    // array_push($dbReports, ['student_id' => $student->id, 'date' => Verta::parse($re['date'])->datetime(), 'description' => $re['description']]);
-                    $dbReport->delete();
-                    // $dbReport->save();
-                    break;
-                }
-            }
-            if ($found) break;
-        }
-        if (!$found) {
-            array_push($errors, ['message' => 'خطا در دریافت گزارش تاریخ ' . $dbReport->date]);
-        }
-        $weeklyReport = WeeklyReport::where('student_id', $student->id)->first();
-        $weeklyReport->reports = $reports; // save the modified report
-        $weeklyReport->save();
-        return response()->json([
-            'message' => 'گزارشات با موفقیت ثبت شد',
-            'possibleErrors' => $errors,
-        ]);
     }
-    public function verifyWeek()
+    public function verifyWeek($id)
     {
-        $student = Auth::user()->student;
-        // find the first unfinished week and get all the the days of it
-        $reports =  $student->weeklyReport->reports;
-        for ($i = 0; $i < count($reports); $i++) {
-            if ($reports[$i]['is_done']) {
-                continue;
-            } else {
-                // check if all reports' days of the week are fullfied
-                foreach ($reports[$i]['days'] as $days) {
-                    if ($days['is_done'] == false) {
-                        return response()->json([
-                            'message' => 'باید همه ی روز های این هفته گزارش داشته باشند',
-                        ], 400);
-                    }
-                }
-                $reports[$i]['is_done'] = true;
-                $student->weeklyReport->reports = $reports;
-                $student->weeklyReport->save();
-                $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
-                if (empty($latestUncompletedReportWeek)) {
-                    $student->stage = 3;
-                    $student->save();
-                }
+        $user = Auth::user();
+        if ($user->hasRole('master')) {
+            $professor_id  = Student::where('id', $id)->first()->professor_id;
+            $employee_id = Employee::where('user_id', $user->id)->first()->id;
+            if ($professor_id  != $employee_id->id) {
                 return response()->json([
-                    'message' => 'هفته تایید شد',
-                ]);
+                    'error' => 'این دانش آموز برای شما نیست'
+                ], 400);
             }
+            $reports = WeeklyReport::where('student_id', $id)->update(['status' => 1]);
+            return response()->json([
+                'message' => 'تایید توسط استاد انجام شد'
+            ]);
+        } elseif ($user->hasRole('admin')) {
+            $reports = WeeklyReport::where('student_id', $id)->update(['status' => 2]);
+            return response()->json([
+                'message' => 'تایید توسط سرپرست انجام شد'
+            ]);
         }
-        $latestUncompletedReportWeek = $student->getLatestUncompletedReportWeek();
-        if (empty($latestUncompletedReportWeek)) {
-            $student->stage = 3;
-            $student->save();
-        }
-        return response()->json([
-            'message' => 'هفته ای برای تایید پیدا نشد'
-        ], 400);
     }
 }
