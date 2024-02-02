@@ -62,8 +62,6 @@ class StudentResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('internship_type')
                     ->numeric(),
-                // Forms\Components\Toggle::make('verified')
-                //     ->required(),
                 Forms\Components\Select::make('verified')
                     ->options(VerificationStatusEnum::class)
                     ->required(),

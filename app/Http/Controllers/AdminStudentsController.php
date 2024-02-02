@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PreRegVerificationStatusEnum;
+<<<<<<< HEAD
+=======
+use App\Enums\VerificationStatusEnum;
+use App\Models\User;
+>>>>>>> d2cbe573be860e821458125e079dd93b1d7eac4a
 use App\Models\Report;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -319,8 +324,12 @@ class AdminStudentsController extends Controller
         $user = Auth::user();
         if ($user->hasAnyRole(['master'])) {
             $student = Student::where("id", $id)->with("studentEvaluations")->first();
+<<<<<<< HEAD
             $employee_id = Employee::where('user_id', $user->id)->first()->id;
             if ($student->professor_id != $employee_id) {
+=======
+            if ($student->professor_id != $user->id) {
+>>>>>>> d2cbe573be860e821458125e079dd93b1d7eac4a
                 return response()->json([
                     'error' => 'این دانشجو با شما این درس را اخذ نکرده است( در این ترم)'
                 ], 400);
@@ -376,18 +385,21 @@ class AdminStudentsController extends Controller
     public function weeklyReports($id)
     {
         $student = Student::where("id", $id)->first();
-        // return $student->weeklyReport['reports'];
         // counters
         $weeks = [];
+        $status0 = $status1 = $status2 = $status3 = 0;
+        $groupedByWeeklyReports = $student->weeklyReports->groupBy('week_number');
         // ! put this foreach in Weeklyreportresource
-        // dd($student->weeklyReport['reports'], $student->weeklyReport);
-        foreach ($student->weeklyReport['reports'] as $week) {
-            $status0 = 0;
-            $status1 = 0;
-            $status2 = 0;
-            $status3 = 0;
-            foreach ($week['days'] as $day) {
-                switch ($day['is_done']) {
+        foreach ($groupedByWeeklyReports as $weekNumber => $weeklyReports) {
+            // $weekIsFinished = ($weeklyReport->status == VerificationStatusEnum::Approved);
+            $weekIsFinished = true;
+            foreach ($weeklyReports as $weeklyReport) {
+                $firstDayOfTheWeek = $weeklyReport->date->startOfWeek()->startOfDay();
+                $weekStatus = $weeklyReport->status;
+                if ($weekStatus != VerificationStatusEnum::Approved) {
+                    $weekIsFinished = false;
+                }
+                switch ($weekStatus->value) {
                     case 0:
                         $status0++;
                         break;
@@ -405,17 +417,17 @@ class AdminStudentsController extends Controller
                         break;
                 }
             }
-            array_push($weeks, [
-                'id' => $week['week_number'],
-                'first_day_of_week' => $week['first_day_of_week'],
-                'status' => rand(0, 3),
-                'not_available' => $status0,
-                'not_checked' => $status1,
-                'rejected' => $status2,
-                'accepted' => $status3,
-            ]);
         }
-        return $weeks = [
+        array_push($weeks, [
+            'id' => $weekNumber + 1,
+            'first_day_of_week' => $firstDayOfTheWeek->format('Y-m-d'),
+            'status' => $weekIsFinished,
+            'not_available' => $status0,
+            'not_checked' => $status1,
+            'rejected' => $status2,
+            'accepted' => $status3,
+        ]);
+        return [
             'data' => [
                 'weeks' => $weeks,
                 'student' => [
@@ -445,11 +457,14 @@ class AdminStudentsController extends Controller
     public function showWeeklyReport($id, $weekID)
     { // arguments: studentID, weekID
         $student = Student::findorfail($id)->first();
+        // dd($student);
         $dates = [];
         foreach ($student->weeklyReport['reports'][$weekID - 1]['days'] as $day) {
-            // array_push($dates, Verta::parse($day['date'])->datetime()->format('Y-m-d'));
             array_push($dates, $day['date']);
         }
+        // return($student->weeklyReport['reports'][0]['days']);
+        // return(Report::where('student_id', $id)->whereIn('date', $dates)->get(['date', 'description']));
+        // return($student->weeklyReport['reports'][$weekID - 1]);
         return [
             'data' =>
             [

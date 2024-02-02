@@ -49,10 +49,6 @@ class StudentController extends Controller
             'companies' => CompanyResource::collection(Company::where('verified', true)->get()),
             'student_company' => isset($studentSubmittedCompany) ? StudentSubmittedCompanyResource::make($studentSubmittedCompany) : null,
             'academic_year' => $activeTerm->name,
-            // 'academic_year' => [
-            //     'semester' => 'نیم سال اول',
-            //     'year' => '1401',
-            // ]
         ];
         return response()->json($x);
     }
@@ -203,6 +199,9 @@ class StudentController extends Controller
                 ]
             ]);
         } else if ($student->stage == 2) {
+            // check if student's stage is 2, check for the time finish of internship
+            // if internship time was finished, set the stage to 3
+            // if ($student->form2->)
             return response()->json([
                 'stage' => 2,
                 'industry_supervisor_name' => $student->industrySupervisor->user->fullName,
@@ -210,6 +209,10 @@ class StudentController extends Controller
         } else if ($student->stage == 3) {
             return response()->json([
                 'stage' => 3,
+                // نمره ای که این فرد به محل کاراموزیش داده
+                // نمره ای که محل کارآموزی به این فرد داده
+                // نمره ای که استاد به این فرد داده
+                // فرم شماره 3 وفرم شماره 4 و گزارش پایانی و نامه پایان کارآموزی
             ]);
         }
     }
@@ -404,19 +407,20 @@ class StudentController extends Controller
             'message' => 'پروفایل با موفقیت ویرایش شد',
         ], 200);
     }
-    public function studentInfo() {
+    public function studentInfo()
+    {
         $user = auth()->user();
         $student = $user->student;
         $data = [
             'first_name' => $user->first_name,
-        'last_name' => $user->last_name,
-        'student_number' => $student->student_number,
-        'faculty_name' => $student->facultyName(),
-        'grade' => $student->grade, // TODO not sure
-        'passed_units_count' => $student->passed_units,
-        'term' => $student->term?->name,
-        'entrance_year' => $student->entrance_year(),
-        'professor_name' => $student->professorName(),
+            'last_name' => $user->last_name,
+            'student_number' => $student->student_number,
+            'faculty_name' => $student->facultyName(),
+            'grade' => $student->grade, // TODO not sure
+            'passed_units_count' => $student->passed_units,
+            'term' => $student->term?->name,
+            'entrance_year' => $student->entrance_year(),
+            'professor_name' => $student->professorName(),
         ];
         return response()->json($data);
     }

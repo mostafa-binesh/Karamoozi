@@ -29,6 +29,14 @@ class EditStudent extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+            Action::make('calculateInternshipFinishedAt')
+            ->label('محاسبه ی زمان پایان کاراموزی')
+            ->color('info')
+            ->action(function (array $data, array $arguments, Action $action, Component $livewire, $record) {
+                $record->load('weeklyReport');
+                $record->internship_finished_at = $record->calculateInternshipFinishedAt();
+                $record->save();
+            }),
             Action::make('MakeForm2')
                 ->icon('heroicon-m-folder-minus')
                 ->color('info')

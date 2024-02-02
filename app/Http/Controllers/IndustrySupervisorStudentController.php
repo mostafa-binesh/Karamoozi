@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VerificationStatusEnum;
 use App\Models\User;
 use App\Models\Form2s;
 use App\Models\Report;
@@ -75,8 +76,10 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)->first();
-        if ($form2 != null) {
+        $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)
+        // ->first();
+        ->exists();
+        if($form2) {
             return response()->json([
                 'message' => 'اطلاعات این دانشجو قبلا ثبت شده است',
             ], 404);
@@ -116,12 +119,14 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'لطفا برنامه ی معتبری را وارد کنید',
             ], 400);
         }
-        WeeklyReport::updateOrCreate(
-            ['student_id' => $student->id],
-            [
-                'reports' => $allWorkingDaysDate
-            ]
-        );
+        // create weekly reports
+        // return($allWorkingDaysDate);
+        foreach ($allWorkingDaysDate as $report) {
+            $days = $report['days'];
+            foreach ($days as $index => $day) {
+                WeeklyReport::new($student->id, $day['date'],$report['week_number'], VerificationStatusEnum::NotChecked,null);
+            }
+        }
         return response()->json(['message' => 'دانشجو با موفقیت ثبت شد']);
         // return $form2;
     }

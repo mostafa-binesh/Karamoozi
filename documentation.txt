@@ -195,3 +195,8 @@ if you want some variable to exist in the data but can be null, you need to use 
 
 ! nested relationship example in get pre reg with serveral with methods
 
+
+
+// todo:
+// upload final report 
+// stage 3 data (internship status endpoint)
