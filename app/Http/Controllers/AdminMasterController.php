@@ -77,11 +77,7 @@ class AdminMasterController extends Controller
             'phone_number' => $req->phone_number,
             'email' => $req->email,
         ]);
-        ModelHasRole::create([
-            "role_id" => 3,
-            "model_type" => "App\Models\User",
-            "model_id" => $master->id,
-        ]);
+        $master->assignRole('master');
         Employee::create([
             'user_id' => $master->id,
             'faculty_id' => $req->faculty_id,
