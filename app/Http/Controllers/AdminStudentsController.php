@@ -122,7 +122,7 @@ class AdminStudentsController extends Controller
             } else if ($student->verified == 1) {
                 $init_waiting++;
             }
-            if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminApproved) {
+            if ($student->pre_reg_verified == PreRegVerificationStatusEnum::Verified) {
                 $preReg_verified++;
             } else if ($student->pre_reg_verified == PreRegVerificationStatusEnum::AdminRefused) {
                 $preReg_unVerified++;

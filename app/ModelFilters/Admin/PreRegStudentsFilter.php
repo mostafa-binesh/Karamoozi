@@ -30,10 +30,10 @@ class PreRegStudentsFilter extends ModelFilter
     // pre reg verified
     public function verified($verified)
     {
-        $convertedVerification = match($verified) {
+        $convertedVerification = match ($verified) {
             '0' => PreRegVerificationStatusEnum::AdminPending,
             '1' => PreRegVerificationStatusEnum::AdminPending,
-            '2' => PreRegVerificationStatusEnum::AdminApproved,
+            '2' => PreRegVerificationStatusEnum::Verified,
             '3' => PreRegVerificationStatusEnum::AdminRefused,
         };
         $this->where('pre_reg_verified', $convertedVerification);
