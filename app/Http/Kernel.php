@@ -70,12 +70,12 @@ class Kernel extends HttpKernel
         // manual ones
         // these three below middlewares were added for spatie
         // 'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-        // 'role' => RoleMiddleware::class,
+        'role' => RoleMiddleware::class,
         // 'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         // 'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-        'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-        'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        // 'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+        // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        // 'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'cors' => \App\Http\Middleware\Cors::class,
         // added
         'verifiedIndustrySupervisor' => \App\Http\Middleware\VerifiedIndustrySupervisor::class,

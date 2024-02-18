@@ -4,6 +4,7 @@ namespace App\Http\Resources\IndustrySupervisor;
 
 use App\Http\Resources\ReportResource;
 use App\Models\Report;
+use App\Models\Student;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class IndustrySupervisorsStudent extends JsonResource
@@ -17,8 +18,13 @@ class IndustrySupervisorsStudent extends JsonResource
      */
     public function toArray($request)
     {
-        // this is student 
+        // this is student
+        $student = Student::where('id',$this->student_id)->first();
         return [
+            'first_name'=>$student->user->first_name,
+            'last_name'=>$student->user->last_name,
+            'national_code'=>$student->user->national_code,
+            'student_number'=>$student->student_number,
             'introduction_letter_number' => $this->introduction_letter_number,
             'introduction_letter_date' => $this->introduction_letter_date,
             'internship_department' => $this->internship_department,

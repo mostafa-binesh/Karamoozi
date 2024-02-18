@@ -3,6 +3,7 @@
 namespace App\Http\Resources\admin;
 
 use App\Http\Resources\StudentResource;
+use App\Models\Form3s;
 use App\Models\WeeklyReport;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\From7s as Form7;
@@ -44,7 +45,7 @@ class StudentFormsStatus extends JsonResource
         // }
         // #### FORM3
         // $form3_status = $this->studentEvaluations->verified ?? 0;
-        $form3_status = $this->evaluations_verified;
+        $form3_status = Form3s::where('student_id',$this->id)->first();
         // if (isset($this->studentEvaluations)) {
         //     // available
         //     if (!isset($this->studentEvaluations->verified)) {
@@ -69,7 +70,7 @@ class StudentFormsStatus extends JsonResource
                 'status' => $form2_status,
             ],
             'form3' => [ // student evaluations
-                'status' => $form3_status,
+                'status' => isset($form3_status->id)? $form3_status->verified : 0 ,
                 // 'status' => $this->studentEvaluations,
             ],
             'form4' => [

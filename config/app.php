@@ -194,11 +194,10 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\Filament\AdminPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
 
 
-        EloquentFilter\ServiceProvider::class // manually added: https://github.com/Tucker-Eric/EloquentFilter
+        // EloquentFilter\ServiceProvider::class // manually added: https://github.com/Tucker-Eric/EloquentFilter
 
     ],
 

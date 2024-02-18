@@ -21,8 +21,11 @@ use App\Http\Resources\Students\preRegFacultiesWithMasters;
 use App\Http\Resources\Students\StudentSubmittedCompanyResource;
 use App\Http\Resources\Students\SubmittedCompanyEvaluation;
 use App\Models\CompanyEvaluation;
+use App\Models\Form3s;
+use App\Models\MasterTerm;
 use App\Models\Term;
 use Faker\Extension\CompanyExtension;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -36,8 +39,9 @@ class StudentController extends Controller
     public function get_pre_registration()
     {
         // TODO: replace this foreach with a api resource collection
-        $studentSubmittedCompany = Company::where('student_id', Auth::user()->student->id)->first();
-        $activeTerm = Term::where('is_active', true)->firstOrFail();
+        $studentSubmittedCompany = Student::where('id', Auth::user()->student->id)->first()->company_id != null ?
+            Company::where('id', Student::where('id', Auth::user()->student->id)->first()->company_id)->first() : null;
+        $activeTerm = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first();
         $x = [
             // ! one of the most complicated queries of this project
             // ? this query's problem was i couldn't get the user and i needed to send a query to the database to get user for every employee
@@ -81,21 +85,28 @@ class StudentController extends Controller
             $company_id = $req->company_id ?? $student->customCompany->id;
         }
         // TODO: check: submitted company must be verified
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        $master_term = MasterTerm::where('term_id', $term_id)->where('master_id', $req->internship_master)->first();
+        if ($master_term->students_count < 1) {
+            return response()->json([
+                'error' => 'ظرفیت این استاد به پایان رسیده'
+            ], 400);
+        }
+
         // edit assigned student to this user
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
         $student->passed_units = $req->passed_units;
         $student->professor_id = $req->internship_master;
         // ! fix semester and internship year later
-        $student->semester = 1;
-        $student->internship_year = 1401;
-        $student->internship_type = $req->internship_type;
+
+        // $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         // TODO: pre_reg_verified needs to be renamed to pre_reg_done
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
         $student->pre_reg_verified = PreRegVerificationStatusEnum::MasterPending; // this field shows pre reg has been done by student or not
-        $student->term_id = 1; // ! TODO needs to be dynamic
+        $student->term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id; // ! TODO needs to be dynamic
         $student->save();
         return response()->json([
             'message' => $req->isMethod('post') ?
@@ -131,6 +142,13 @@ class StudentController extends Controller
             $company_id = $req->company_id ?? $student->customCompany->id;
         }
         // TODO: check: submitted company must be verified
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        $master_term = MasterTerm::where('term_id', $term_id)->where('master_id', $req->internship_master)->first();
+        if ($master_term->students_count < 1) {
+            return response()->json([
+                'error' => 'ظرفیت این استاد به پایان رسیده'
+            ], 400);
+        }
         $user = Auth::user();
         // $user->first_name = $req->first_name;
         // $user->last_name = $req->last_name;
@@ -141,9 +159,9 @@ class StudentController extends Controller
         $student->passed_units = $req->passed_units;
         $student->professor_id = $req->internship_master;
         // ! fix semester and internship year later
-        $student->semester = 1;
-        $student->internship_year = 1401;
-        $student->internship_type = $req->internship_type;
+        // $student->semester = 1;
+        // $student->internship_year = 1401;
+        // $student->internship_type = $req->internship_type;
         $student->company_id = $company_id;
         $student->grade = $req->degree;
         $student->pre_reg_done = true; // this field shows pre reg has been done by student or not
@@ -160,7 +178,7 @@ class StudentController extends Controller
         if ($user->student->pre_reg_verified == PreRegVerificationStatusEnum::NotAvailable) {
             return response()->json([
                 'message' => 'پیش ثبت نامی برای شما وجود ندارد',
-            ], 400); // todo 201 ? 404
+            ], 201); // todo 201 ? 404
         }
         // ! TODO optimize eager loading
         return StudentPreRegInfo::make(Auth::user());
@@ -195,7 +213,7 @@ class StudentController extends Controller
                     [
                         'name' => 'form2Verification',
                         'done' => $student->form2?->verified ?? VerificationStatusEnum::NotAvailable,
-                    ],  
+                    ],
                 ]
             ]);
         } else if ($student->stage == 2) {
@@ -207,8 +225,24 @@ class StudentController extends Controller
                 'industry_supervisor_name' => $student->industrySupervisor->user->fullName,
             ]);
         } else if ($student->stage == 3) {
+            $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+            $form3 = Form3s::where('student_id', $student->id)->where('term_id', $term_id)->first();
+            $student_evaluate_company = 0;
+            $evaluations = [0.5, 1.5, 2, 2.5];
+            $companyEvaluations = CompanyEvaluation::where('student_id', $student->id)->get();
+            foreach ($companyEvaluations as $companyEvaluation) {
+                if ($companyEvaluation->evaluation) {
+                    $student_evaluate_company += $evaluations[$companyEvaluation->evaluation - 1];
+                }
+            }
+            $form7 = DB::table('Form7s')->where('student_id', $student->id)->first();
+            // return $form7;
             return response()->json([
                 'stage' => 3,
+                'student_evaluate_company' => $student_evaluate_company == 0 ? $student_evaluate_company : null,
+                'company_evaluate_student' => isset($form3->grade) ? $form3->grade : null,
+                'master_evaluate_student' => $student->grade != 1 ? $student->grade : null,
+                'final_letter_verified' => $form7?->verify_industry_collage
                 // نمره ای که این فرد به محل کاراموزیش داده
                 // نمره ای که محل کارآموزی به این فرد داده
                 // نمره ای که استاد به این فرد داده

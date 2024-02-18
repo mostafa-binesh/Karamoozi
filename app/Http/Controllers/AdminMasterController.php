@@ -9,10 +9,14 @@ use App\ModelFilters\Admin\FacultyFilter;
 use App\ModelFilters\Admin\InitRegStudentsFilter;
 use App\ModelFilters\MasterFilter;
 use App\Models\Employee;
+use App\Models\MasterTerm;
 use App\Models\ModelHasRole;
+use App\Models\Term;
 use App\Models\User;
 use App\Models\University_faculty;
+use App\Providers\GenerateRandomId;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AdminMasterController extends Controller
@@ -60,7 +64,7 @@ class AdminMasterController extends Controller
             'last_name' => 'required',
             'email' => 'email|required|unique:users,email',
             'national_code' => 'required|digits:10|unique:users,national_code',
-            'personal_code' => 'required|digits:10|unique:users,username',
+            'personal_code' => 'required|digits:6|unique:users,username',
             'phone_number' => 'required|digits:11|unique:users,phone_number',
             'faculty_id' => 'required'
         ]);
@@ -70,17 +74,25 @@ class AdminMasterController extends Controller
             ], 400);
         }
         $master = User::create([
+            'rand_id' => GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->personal_code,
             'national_code' => $req->national_code,
             'phone_number' => $req->phone_number,
             'email' => $req->email,
+            'password' => Hash::make($req->national_code)
         ]);
         $master->assignRole('master');
-        Employee::create([
+        $masEmp = Employee::create([
             'user_id' => $master->id,
             'faculty_id' => $req->faculty_id,
+        ]);
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        MasterTerm::create([
+            'master_id' => $masEmp->id,
+            'term_id' => $term_id,
+            'students_count' => 0
         ]);
         return response()->json([
             'message' => 'استاد با موفقیت اضافه شد',
@@ -146,7 +158,7 @@ class AdminMasterController extends Controller
             'last_name' => 'required',
             'email' => 'email|required|unique:users,email,' . $id,
             'national_code' => 'required|digits:10|unique:users,national_code,' . $id,
-            'personal_code' => 'required|digits:10|unique:users,username,' . $id,
+            'personal_code' => 'required|digits:6|unique:users,username,' . $id,
             'phone_number' => 'required|digits:11|unique:users,phone_number,' . $id,
             'faculty_id' => 'required'
         ]);
@@ -167,6 +179,7 @@ class AdminMasterController extends Controller
         $master->email = $req->email;
         $master->username = $req->personal_code;
         $master->national_code = $req->national_code;
+        $master->password = Hash::make($req->national_code);
         $master->save();
         $emp = Employee::where("user_id", $master->id)->first();
         // return $emp;

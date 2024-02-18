@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\admin\CompanyResource;
 use App\ModelFilters\CompanyFilter;
 use App\Models\User;
+use App\Providers\GenerateRandomId;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -78,6 +79,7 @@ class AdminCompanyController extends Controller
 
         $image_name = time().'.png';
         $boss = User::create([
+            'rand_id'=>GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->username,

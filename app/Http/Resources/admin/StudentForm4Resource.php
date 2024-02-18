@@ -17,10 +17,16 @@ class StudentForm4Resource extends JsonResource
      */
     public function toArray($request)
     {
-        $companyEvaluations = CompanyEvaluation::where('student_id', 3)->with('option')->get();
+        $desc = '';
+        $companyEvaluations = CompanyEvaluation::where('student_id', $this->id)->with('option')->get();
+        foreach($companyEvaluations as $companyEvaluation){
+            if($companyEvaluation->description){
+                $desc = $companyEvaluation->description;
+            }
+        }
         return [
             'evaluations' => CompanyEvaluationResource::collection($companyEvaluations),
-            'comment' => DB::table('Form4s')->where('student_number',3)->first()->caption,
+            'comment' => $desc,
             'status' => $this->form4_verified,
             'student' => [
                 'id' => $this->id,

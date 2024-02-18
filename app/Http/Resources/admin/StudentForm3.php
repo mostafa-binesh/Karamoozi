@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\admin;
 
+use App\Models\MasterEvaluation;
 use App\Models\StudentEvaluation;
+use App\Models\Term;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StudentForm3 extends JsonResource
@@ -19,6 +21,30 @@ class StudentForm3 extends JsonResource
         // $this is student
         // ! needs user, company, form2, studentEvaluation relationships
 
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        $master = MasterEvaluation::where('student_id', $this->id)->where('term_id', $term_id)->get();
+        $final_evaluation = [];
+        if (count($master) != 0) {
+
+            $final_evaluation = [
+                [
+                    'title'=>'internship_visit',
+                    'grade'=>$master[0]?->grade ? $master[0]?->grade : 0
+                ],
+                [
+                    'title'=>'report_validation',
+                    'grade'=>$master[1]?->grade ? $master[1]?->grade : 0
+                ],
+                [
+                    'title'=>'examination_score',
+                    'grade'=>$master[2]?->grade ? $master[2]?->grade : 0
+                ],
+                [
+                    'title'=>'final_evaluation',
+                    'grade'=>$master[3]?->grade ? $master[3]?->grade : 0
+                ],
+            ];
+        }
         $total_grade = 0;
         if ($this->studentEvaluations) {
             foreach ($this->studentEvaluations as $evaluation) {
@@ -53,7 +79,7 @@ class StudentForm3 extends JsonResource
             'total_grade' => $total_grade, // ! fix later
             // 'total_grade_word' => $converter->convert($total_grade),
             'status' => $this->evaluations_verified,
-            'final_evaluation' => []
+            'final_evaluation' => $final_evaluation
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Students;
 
+use App\Models\MasterTerm;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class preRegMasters extends JsonResource
@@ -14,17 +15,12 @@ class preRegMasters extends JsonResource
      */
     public function toArray($request)
     {
-        // return [
-        //     'id' => $this->id,
-        //     'name' => $this->user->fullName,
-        // ];
+
         if ($this->user != []) {
             return [
                 'id' => $this->id,
                 'name' => $this->user->fullName,
             ];
-        } else {
-            return null;
         }
     }
 }

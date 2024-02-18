@@ -22,8 +22,9 @@ class DatabaseSeeder extends Seeder
             RoleAndPermissionSeeder::class,
             OptionsSeeder::class,
             UniversityFacultySeeder::class,
-            AdminSeeder::class,
+            UsersSeeder::class,
             CompanySeeder::class,
+            AdminSeeder::class,
             MasterTermSeeder::class,
         ]);
     }

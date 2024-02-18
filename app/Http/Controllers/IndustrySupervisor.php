@@ -14,8 +14,8 @@ class IndustrySupervisor extends Controller
         return response()->json([
             'data' => [
                 'total_students_count' => Auth()->user()->industrySupervisor->industrySupervisorStudents->count(),
-                'unevaluated_students_count' => Auth()->user()->industrySupervisor->industrySupervisorUnevaluatedStudents->count(),
-                'unread_messages' => Auth()->user()->receivedMessages()->count(),
+                // 'unevaluated_students_count' => Auth()->user()->industrySupervisor->industrySupervisorUnevaluatedStudents->count(),
+                // 'unread_messages' => Auth()->user()->receivedMessages()->count(),
             ]
         ], 200);
     }

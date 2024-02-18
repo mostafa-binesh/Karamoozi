@@ -14,6 +14,7 @@ use App\Models\Password_reset;
 use Melipayamak\MelipayamakApi;
 // use Illuminate\Contracts\Validation\Validator;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserLoginResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -23,10 +24,11 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\Mail\send_code_reset_password;
 use App\Models\Company;
 use App\Models\IndustrySupervisor;
+use App\Providers\GenerateRandomId;
 
 class AuthController extends Controller
 {
-    
+
 
     public function __construct()
     {
@@ -58,6 +60,7 @@ class AuthController extends Controller
         }
         // ADD: error handling
         $user = User::create([
+            'rand_id'=>GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->student_number,
@@ -75,7 +78,7 @@ class AuthController extends Controller
         $token = Auth::login($user);
         return response()->json([
             'message' => 'عضویت با موفقیت انجام شد.',
-            'user' => $user,
+            'user' => UserLoginResource::make($user),
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
@@ -124,12 +127,12 @@ class AuthController extends Controller
                 abort(400, "user role not found in switch case");
         }
         return response()->json([
-            'user' => $user,
+            'user' => UserLoginResource::make($user),
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ], 201);
+        ], 200);
     }
     public function user()
     {
@@ -250,6 +253,7 @@ class AuthController extends Controller
             ], 400);
         }
         $industrySupervisor = User::create([
+            'rand_id'=>GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->national_code,

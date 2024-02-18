@@ -15,18 +15,34 @@ class StudentFinalReportController extends Controller
      * @return \Illuminate\Http\Response
      */
     private $final_report_path = 'storage/final_reports/';
-    private function resource($fileName){
-        return $this->final_report_path.$fileName;
+    private function resource($fileName)
+    {
+        return $this->final_report_path . $fileName;
     }
     public function index()
     {
-        $filePath = auth()->user()->student->final_report_path;
+        $student = auth()->user()->student;
+        if (!isset($student->id)) {
+            return response()->json([
+                'error' => 'دانشجو یافت نشد'
+            ], 404);
+        }
+        if ($student->final_report_path == null) {
+            return response()->json([
+                'error' => 'گزارش پایانی برای این دانشجو ثبت نشده است'
+            ], 404);
+        }
         return response()->json([
-            'data' => [
-                'finalReportPath' => asset($filePath),
-                'name' => $filePath,
-                'size' => Storage::disk('public')->size($filePath)
-            ]
+            'final_report' => asset($this->resource($student->final_report_path)),
+            'student' => [
+                'id' => $student->id,
+                'first_name' => $student->user->first_name,
+                'last_name' => $student->user->last_name,
+                'faculty_name' => $student->facultyName(),
+                'student_number' => $student->student_number,
+                'internship_start_date' => $student->form2->internship_started_at,
+                'internship_finish_date' => $student->form2->internship_finished_at,
+            ],
         ]);
     }
 
@@ -37,7 +53,6 @@ class StudentFinalReportController extends Controller
      */
     public function create(Request $request)
     {
-
     }
 
     /**
@@ -56,7 +71,7 @@ class StudentFinalReportController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $fileName = time() .'.'. $request->file('final_report')->getClientOriginalExtension();
+        $fileName = time() . '.' . $request->file('final_report')->getClientOriginalExtension();
         $request->file('final_report')->storeAs('public/final_reports/', $fileName);
         $student = auth()->user()->student;
         $student->final_report_path = $fileName;
@@ -74,19 +89,19 @@ class StudentFinalReportController extends Controller
      */
     public function show($id)
     {
-        $student = Student::where('id',$id)->first();
-        if(!isset($student->id)){
+        $student = Student::where('id', $id)->first();
+        if (!isset($student->id)) {
             return response()->json([
-                'error'=>'دانشجو یافت نشد'
-            ],404);
+                'error' => 'دانشجو یافت نشد'
+            ], 404);
         }
-        if($student->final_report_path == null){
+        if ($student->final_report_path == null) {
             return response()->json([
-                'error'=>'گزارش پایانی برای این دانشجو ثبت نشده است'
-            ],404);
+                'error' => 'گزارش پایانی برای این دانشجو ثبت نشده است'
+            ], 404);
         }
         return response()->json([
-            'final_report'=>asset($this->resource($student->final_report_path)),
+            'final_report' => asset($this->resource($student->final_report_path)),
             'student' => [
                 'id' => $student->id,
                 'first_name' => $student->user->first_name,
@@ -125,7 +140,7 @@ class StudentFinalReportController extends Controller
     public function destroy()
     {
         $student = auth()->user()->student;
-        if ($student->final_report_path == null ) {
+        if ($student->final_report_path == null) {
             return response()->json([
                 'message' => 'گزارش پایانی برای شما یافت نشد',
             ], 404);

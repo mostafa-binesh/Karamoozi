@@ -17,7 +17,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, HasRoles, Filterable;
     use CPaginationTrait;
@@ -27,6 +27,7 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
      * @var array<int, string>
      */
     protected $fillable = [
+        'rand_id',
         'first_name',
         'last_name',
         'email',
@@ -110,7 +111,8 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     # scopes
 
     # attributes
-    public function getFullNameAttribute() {
+    public function getFullNameAttribute()
+    {
         return $this->first_name . ' ' . $this->last_name;
     }
 
@@ -119,12 +121,12 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     // ###############################################
 
     // filament functions
-    public function canAccessPanel(Panel $panel): bool {
-        return true;
-    }
-    public function getFilamentName(): string {
-        return $this->fullName;
-    }
+    // public function canAccessPanel(Panel $panel): bool {
+    //     return true;
+    // }
+    // public function getFilamentName(): string {
+    //     return $this->fullName;
+    // }
 
 
     // custom role function
@@ -166,9 +168,10 @@ class User extends Authenticatable implements JWTSubject, FilamentUser, HasName
     //     return $this->first_name . ' ' . $this->last_name;
     // }
 
-    public static function getName($id){
-        $user = User::where('id',$id)?->first();
-        return $user->first_name . ' '. $user->last_name;
+    public static function getName($id)
+    {
+        $user = User::where('id', $id)?->first();
+        return $user->first_name . ' ' . $user->last_name;
     }
     public function resource_user()
     {

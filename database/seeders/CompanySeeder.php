@@ -16,25 +16,52 @@ class CompanySeeder extends Seeder
     public function run()
     {
         Company::create([
-            'company_name' => 'مه پویا',
+            'company_name' => 'رایادرس',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
             'company_address' => "تهران، تجریش، کوچه جاویدان، پلاک 233",
             'company_postal_code' => "3561963485",
-            'company_phone' => "023336520874",
+            'company_phone' => "02835437323",
+            'company_number'=>'1234567890',
+            'company_registry_code'=>'2345678902',
+            'image'=>'image.png'
         ]);
         Company::create([
-            'company_name' => 'رایان اندیش',
+            'company_name' => 'ایز ایران',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
+            'company_address' => "تهران، تجریش، کوچه جاویدان، پلاک 233",
+            'company_postal_code' => "3561963485",
+            'company_phone' => "02835437323",
+            'company_number'=>'1234567890',
+            'company_registry_code'=>'2345678902',
+            'image'=>'image.png'
         ]);
         Company::create([
-            'company_name' => 'خندق کاران',
+            'company_name' => 'بیمه ایران',
             'company_boss_id' => 1,
             'verified' => true,
             'company_type' => 1,
+            'company_address' => "تهران، تجریش، کوچه جاویدان، پلاک 233",
+            'company_postal_code' => "3561963485",
+            'company_phone' => "02835437323",
+            'company_number'=>'1234567890',
+            'company_registry_code'=>'2345678902',
+            'image'=>'image.png'
         ]);
+        // Company::create([
+        //     'company_name' => 'رایان اندیش',
+        //     'company_boss_id' => 1,
+        //     'verified' => true,
+        //     'company_type' => 1,
+        // ]);
+        // Company::create([
+        //     'company_name' => 'خندق کاران',
+        //     'company_boss_id' => 1,
+        //     'verified' => true,
+        //     'company_type' => 1,
+        // ]);
     }
 }

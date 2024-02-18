@@ -15,13 +15,13 @@ class StudentEvaluationResource extends JsonResource
     public function toArray($request)
     {
         // $this is student
-        // ! internship status is stage ! 
+        // ! internship status is stage !
         return [
             'student_number' => $this->student_number,
-            'first_name' => $this->user->first_name,
-            'last_name' => $this->user->last_name,
-            'internship_started_at' => $this->internship_started_at,
-            'internship_status' => $this->stage,
+            'first_name' => $this->user?->first_name,
+            'last_name' => $this->user?->last_name,
+            'internship_started_at' => $this?->internship_started_at,
+            'internship_status' => $this?->stage,
             'editable' => $this->editableAsIndSup(),
         ];
     }

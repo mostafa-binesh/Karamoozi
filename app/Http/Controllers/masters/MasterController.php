@@ -7,6 +7,7 @@ use App\Http\Resources\MasterEvaluationResource;
 use App\Models\Form3s;
 use App\Models\MasterEvaluation;
 use App\Models\Option;
+use App\Models\Student;
 use App\Models\Term;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,14 +18,14 @@ class MasterController extends Controller
     {
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
         $master = MasterEvaluation::where('student_id', $id)->where('term_id', $term_id)->get();
-        if(count($master)==0){
+        if (count($master) == 0) {
             return [];
         }
         return [
-            "internship_visit"=>$master[0]->grade,
-            "report_validation"=>$master[1]->grade,
-            "examination_score"=>$master[2]->grade,
-            "final_evaluation"=>$master[3]->grade,
+            "internship_visit" => $master[0]?->grade ? $master[0]?->grade : 0  ,
+            "report_validation" => $master[1]?->grade ? $master[1]?->grade : 0,
+            "examination_score" => $master[2]?->grade ? $master[2]?->grade : 0,
+            "final_evaluation" => $master[3]?->grade ? $master[3]?->grade : 0,
         ];
     }
 
@@ -47,7 +48,7 @@ class MasterController extends Controller
         ];
         $grade = 0;
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        $index = 0 ;
+        $index = 0;
         foreach ($request->evaluate as $evaluate) {
             $option_id = Option::where('name', $array[$index])->first()->id;
             $grade += $evaluate;
@@ -57,14 +58,11 @@ class MasterController extends Controller
                 'option_id' => $option_id,
                 'grade' => $evaluate,
             ]);
-            $index ++;
+            $index++;
         }
-        Form3s::create([
-            'student_id' => $request->student_id,
-            'term_id' => $term_id,
-            'grade' => $grade / count($request->evaluate),
-            'verified' => 0
-        ]);
+        $student = Student::where('id', $request->student_id)->first();
+        $student->score = $request->evaluate['final_evaluation'];
+        $student->save();
         return response()->json([
             'message' => 'نمره با موفقیت ثبت شد'
         ]);
@@ -89,12 +87,12 @@ class MasterController extends Controller
             "examination_score",
             "final_evaluation",
         ];
-        $index=0;
+        $index = 0;
         foreach ($request->evaluate as $evaluate) {
             $option_id = Option::where('name', $array[$index])->first()->id;
             $grade += $evaluate;
-            foreach($evaluates as $item){
-                if($option_id == $item->option_id){
+            foreach ($evaluates as $item) {
+                if ($option_id == $item->option_id) {
                     $item->grade =  $evaluate;
                     $item->save();
                     break;
@@ -102,12 +100,11 @@ class MasterController extends Controller
             }
             $index++;
         }
-        $form3= Form3s::where('student_id',$id)->where('term_id',$term_id)->first();
-        $form3->grade = $grade/count($request->evaluate);
-        $form3->save();
+        $student = Student::where('id', $id)->first();
+        $student->grade = $request->evaluate['final_evaluation'];
+        $student->save();
         return response()->json([
             'message' => 'نمره با موفقیت ویرایش شد'
         ]);
-
     }
 }

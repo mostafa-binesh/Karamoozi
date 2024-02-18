@@ -39,7 +39,7 @@ class StudentsController extends Controller
     {
         $term = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first();
         $master_id = Employee::where('user_id', Auth::user()->id)->first()->id;
-        $minStudents = Student::where('professor_id',$master_id)->where('term_id',$term->id)->count();
+        $minStudents = Student::where('professor_id', $master_id)->where('term_id', $term->id)->count();
         $validator = Validator::make($req->all(), [
             // ! todo: make students_count validation dynamic
             'students_count' => 'required|integer|min:' . $minStudents,
@@ -75,7 +75,7 @@ class StudentsController extends Controller
         // return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
         $master = Employee::where('user_id', Auth::user()->id)->first();
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        return Student::where('professor_id', $master->id)->where('term_id', $term_id)
+        return Student::where('professor_id', $master->id)->where('term_id', $term_id)->where('stage', '>=', 2)
             ->cpagination($req, MasterStudents::class);
     }
     public function pendingStudents(Request $req)
@@ -96,6 +96,7 @@ class StudentsController extends Controller
     }
     public function verifyStudent(Request $req, $id)
     {
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
         $student = Student::with('user')->find($id);
         $master = auth()->user()->master;
         if ($student->professor_id != $master->id) {
@@ -111,6 +112,14 @@ class StudentsController extends Controller
         }
         $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminPending;
         $student->save();
+        $master_term = MasterTerm::where('term_id', $term_id)->where('master_id', $student->professor_id)->first();
+        if ($master_term->students_count == 0) {
+            return response()->json([
+                'message' => 'تعداد ظرفیت دانشجویان استاد در این ترم به پایان رسیده است'
+            ], 400);
+        }
+        $master_term->students_count = $master_term->students_count - 1;
+        $master_term->save();
         return response()->json([
             'message' => 'دانشجو تایید شد',
         ]);
@@ -125,8 +134,7 @@ class StudentsController extends Controller
             ], 400);
         }
         if (
-            $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
-            || $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterApproved
+            $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterApproved
         ) {
             return response()->json([
                 'message' => 'نمی توانید این دانشجو را رد کنید',
@@ -139,3 +147,6 @@ class StudentsController extends Controller
         ]);
     }
 }
+
+// $student->pre_reg_verified == PreRegVerificationStatusEnum::MasterPending
+//             ||

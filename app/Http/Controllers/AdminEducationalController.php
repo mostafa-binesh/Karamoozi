@@ -10,6 +10,8 @@ use App\Http\Resources\admin\TermResource;
 use App\Http\Resources\FacultyResource;
 use App\Http\Resources\StudentResource;
 use App\ModelFilters\Admin\TermFilter;
+use App\Models\Employee;
+use App\Models\MasterTerm;
 use App\Models\Term;
 use App\Models\University_faculty;
 use Illuminate\Support\Facades\Validator;
@@ -95,7 +97,7 @@ class AdminEducationalController extends Controller
         // ! for example if the term is 1440 and we have 4 univ. faculties
         // ! we need to show 1440 term with every single one of faculties and their student and masters count
 
-        return Term::filter($req->all(),TermFilter::class)->cpagination($req,TermResource::class);
+        return Term::filter($req->all(), TermFilter::class)->cpagination($req, TermResource::class);
 
         // $terms =  Term::with(['students', 'masters'])->filter($req->all(), TermFilter::class)->cpagination($req);
         // $faculties = University_faculty::all();
@@ -149,11 +151,19 @@ class AdminEducationalController extends Controller
                 'message' => 'ترم دیگری در این رنج زمانی وجود دارد',
             ], 400);
         }
-        Term::create([
+        $term = Term::create([
             'name' => $req->name,
             'start_date' => $startDate,
             'end_date' => $endDate,
         ]);
+        $masters = Employee::get()->all();
+        foreach ($masters as $master) {
+            MasterTerm::create([
+                'master_id'=>$master->id,
+                'term_id'=>$term->id,
+                'students_count'=> 0
+            ]);
+        }
         return response()->json([
             'message' => 'سر ترم با موفقیت افزوده شد',
         ]);

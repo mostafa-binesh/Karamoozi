@@ -20,8 +20,10 @@ use App\Http\Resources\admin\StudentForm4Resource;
 use App\Http\Resources\admin\StudentPreRegDescription;
 use App\Http\Resources\admin\FinishInternshipLetterResource;
 use App\Models\Employee;
+use App\Models\Form3s;
 use App\Models\Term;
 use App\Models\From7s as Form7;
+use App\Models\MasterTerm;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -225,6 +227,18 @@ class AdminStudentsController extends Controller
     public function preRegVerifyStudent($id)
     {
         $student = Student::findorfail($id);
+        if ($student->pre_reg_verified == 6) {
+            $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+            $master_term = MasterTerm::where('term_id', $term_id)->where('master_id', $student->professor_id)->first();
+            if ($master_term->students_count == 0) {
+                return response()->json([
+                    'message' => 'تعداد ظرفیت دانشجویان استاد در این ترم به پایان رسیده است'
+                ], 400);
+            }
+            $master_term->students_count = $master_term->students_count - 1;
+            $master_term->save();
+            $student->save();
+        }
         $student->pre_reg_verified = PreRegVerificationStatusEnum::Verified;
         $student->pre_reg_rejection_reason = null;
         $student->save();
@@ -246,6 +260,12 @@ class AdminStudentsController extends Controller
         $student->pre_reg_verified = PreRegVerificationStatusEnum::AdminRefused;
         $student->pre_reg_rejection_reason = $req->rejection_reason;
         $student->stage = 1;
+        //! -----------------------------------------------------------------------------------------------------------------
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        $master_term = MasterTerm::where('term_id', $term_id)->where('master_id', $student->professor_id)->first();
+        $master_term->students_count =  $master_term->students_count + 1;
+        $master_term->save();
+        //! -----------------------------------------------------------------------------------------------------------------
         $student->save();
         return response()->json([
             'message' => 'پیش ثبت نام رد شد'
@@ -333,18 +353,18 @@ class AdminStudentsController extends Controller
     }
     public function form3Verify($id)
     {
-        $student = Student::where("id", $id)->first();
-        $student->evaluations_verified = 2;
-        $student->save();
+        $form3 = Form3s::where("student_id", $id)->first();
+        $form3->verified = 2;
+        $form3->save();
         return response()->json([
             'message' => 'فرم تایید شد',
         ]);
     }
     public function form3UnVerify($id)
     {
-        $student = Student::where("id", $id)->first();
-        $student->evaluations_verified = 3;
-        $student->save();
+        $form3 = Form3s::where("student_id", $id)->first();
+        $form3->verified = 2;
+        $form3->save();
         return response()->json([
             'message' => 'فرم رد شد',
         ]);
@@ -473,34 +493,34 @@ class AdminStudentsController extends Controller
         return FinishInternshipLetterResource::make($student);
     }
 
-    public function verify_finishInternship(Request $req , $id)
+    public function verify_finishInternship(Request $req, $id)
     {
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        Form7::create([
-            'student_id' => $id,
-            'term_id' => $term_id,
-            'letter_date' => now(),
-            'letter_number' => "1/$id 3 $id ب",
-            'supervisor_approval' => 1,
-            'verify_industry_collage' => 2
-        ]);
+        $form7 = Form7::where('student_id', $id)->where('term_id', $term_id)->first();
+        if (!isset($form7->id)) {
+            return response()->json([
+                'error' => 'نامه پایان کارآموزی وجود ندارد'
+            ]);
+        }
+        $form7->verify_industry_collage = 2;
+        $form7->save();
         return response()->json([
-            'message'=>'تایید با موفقیت انجام شد'
+            'message' => 'تایید با موفقیت انجام شد'
         ]);
     }
-    public function unverify_finishInternship(Request $req , $id)
+    public function unverify_finishInternship(Request $req, $id)
     {
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        Form7::create([
-            'student_id' => $id,
-            'term_id' => $term_id,
-            'letter_date' => now(),
-            'letter_number' => "1/$id 3 $id ب",
-            'supervisor_approval' => 1,
-            'verify_industry_collage' => 1
-        ]);
+        $form7 = Form7::where('student_id', $id)->where('term_id', $term_id)->first();
+        if (!isset($form7->id)) {
+            return response()->json([
+                'error' => 'نامه پایان کارآموزی وجود ندارد'
+            ]);
+        }
+        $form7->verify_industry_collage = 3;
+        $form7->save();
         return response()->json([
-            'message'=>' رد تایید با موفقیت انجام شد'
+            'message' => ' رد تایید با موفقیت انجام شد'
         ]);
     }
 }
