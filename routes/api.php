@@ -260,6 +260,9 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
     Route::get("role",function(){
         return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
     });
+    Route::get('', function () {
+        Artisan::call('storage:link');
+    });
 });
 
 
@@ -272,43 +275,11 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
 // // //
 
 
-Route::prefix('test')->controller(TestController::class)->group(function () {
-    Route::get('send/{id}', 'sender');
-    Route::get('receive/{id}', 'receive');
-    Route::post('create_chat', 'create_chat');
-    Route::post('create_message', 'create_message');
-    Route::get('pagination', 'usersPagination');
-    Route::get('user-function', 'user_function');
-    Route::get('verta', 'verta');
-    Route::get('studentTest', 'studentTest');
-    Route::get('howManyDaysMustWork', 'howManyDaysMustWork');
-    Route::get('allStudents', 'allstudent');
-    Route::get('student/{id}/studentEvaluation', 'studentEval');
-    Route::get('studentEvaluation/{id}', 'studentEvaluation');
-    Route::get('allUsers', 'alluser');
-    Route::get('allForms', 'Form2');
-    Route::get('allUsersWithRole', 'RoleUser');
-    Route::get('null', 'Null_test');
-    Route::get('allCompanies', 'allCompany');
-    Route::get('weeklyReports', 'ReportWeekly');
-    Route::get('weeklyReports/{id}', 'single_weeklyReport');
-    Route::delete('deleteWeeklyReports', 'delete_weeklyReports');
-    Route::get('duplicateQuery', 'dupliq');
-    Route::get('num2word', 'num2word');
-    Route::post("validationTest", 'TstValidation');
-    Route::get("queryTest", 'queryTest');
-    Route::get('', function () {
-        Artisan::call('storage:link');
-    });
-});
 
 
-Route::get('mytest', function () {
-    return "sssss";
-});
 
-Route::get('pass' , function(){
-    $user = User::where('username', '3981231052')->first();
-    $user->password = Hash::make('4380413799');
-    $user->save();
-});
+// Route::get('pass' , function(){
+//     $user = User::where('username', '3981231052')->first();
+//     $user->password = Hash::make('4380413799');
+//     $user->save();
+// });
