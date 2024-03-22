@@ -18,9 +18,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('company_id');
-            $table->foreign('company_id')->references('id')
-                ->on('companies')->onDelete('cascade')->onUpdate('cascade');
+            // $table->unsignedBigInteger('company_id');
+            // $table->foreign('company_id')->references('id')
+            //     ->on('companies')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('verified');
             $table->timestamps();
         });

@@ -47,7 +47,7 @@ class StudentForm2 extends JsonResource
                 'full_name' => $this->industrySupervisor->user->fullName,
                 'position' => $this->form2->supervisor_position,
             ],
-            'reports' => IndustrySupervisorReportResource::collection($this->indSupervisorReports()),
+            // 'reports' => IndustrySupervisorReportResource::collection($this->indSupervisorReports()),
         ];
     }
 }

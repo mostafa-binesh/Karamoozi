@@ -23,6 +23,7 @@ use App\Models\StudentEvaluation;
 use App\Models\Term;
 use App\Models\WeeklyReport;
 use App\Models\From7s as Form7;
+use App\Models\IndustrySupervisor;
 
 class IndustrySupervisorStudentController extends Controller
 {
@@ -79,6 +80,12 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
+        $ind_id = IndustrySupervisor::where('user_id', auth()->user()->id)->first()->id;
+        if (!$ind_id) {
+            return response()->json([
+                'error' => 'این سرپرست یافت نشد. '
+            ], 400);
+        }
         $form2 = Form2s::where('student_id', Student::where('student_number', $req->student_number)->first()->id)
             // ->first();
             ->exists();
@@ -88,7 +95,7 @@ class IndustrySupervisorStudentController extends Controller
             ], 404);
         }
         $form2 = Form2s::create([
-            'industry_supervisor_id' => auth()->user()->id,
+            'industry_supervisor_id' => $ind_id,
             'student_id' => User::where('national_code', $req->national_code)->firstorfail()->student->where('student_number', $req->student_number)->first()->id ?? abort(404),
             // ! fix later, dry
             'schedule_table' => $req->schedule_table,
@@ -104,7 +111,7 @@ class IndustrySupervisorStudentController extends Controller
             // waiting
         ]);
         $student = Student::where("student_number", $req->student_number)->first();
-        $student->supervisor_id = Auth::id();
+        $student->supervisor_id = $ind_id;
         $student->unevaluate();
         $student->save();
         // submit reports
@@ -168,6 +175,7 @@ class IndustrySupervisorStudentController extends Controller
         return IndustrySupervisorsStudent::make($form2);
     }
 
+
     /**
      * Update the specified resource in storage.
      *
@@ -205,7 +213,13 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => 'این دانشجو توسط سرپرستی ثبت نام نشده است',
             ], 400);
         }
-        $form2->industry_supervisor_id = auth()->user()->id;
+        $ind_id = IndustrySupervisor::where('user_id', auth()->user()->id)->first()->id;
+        if (!$ind_id) {
+            return response()->json([
+                'error' => 'این سرپرست یافت نشد. '
+            ], 400);
+        }
+        $form2->industry_supervisor_id = $ind_id;
         $form2->student_id = Student::where('student_number', $req->student_number)->first()->id;
         // !! fix later, dry | theres two search in this page, one in form2 where student, and second is user where
         $form2->schedule_table = $req->schedule_table;
@@ -312,7 +326,13 @@ class IndustrySupervisorStudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        $ind_id = IndustrySupervisor::where('user_id', auth()->user()->id)->first()->id;
+        if (!$ind_id) {
+            return response()->json([
+                'error' => 'این سرپرست یافت نشد. '
+            ], 400);
+        }
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', $ind_id)->first();
         if ($student == null) {
             return response()->json([
                 'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
@@ -361,7 +381,13 @@ class IndustrySupervisorStudentController extends Controller
             ], 400);
         }
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', auth()->id())->first();
+        $ind_id = IndustrySupervisor::where('user_id', auth()->user()->id)->first()->id;
+        if (!$ind_id) {
+            return response()->json([
+                'error' => 'این سرپرست یافت نشد. '
+            ], 400);
+        }
+        $student = Student::where('student_number', $req->student_number)->where('supervisor_id', $ind_id)->first();
         if ($student == null) {
             return response()->json([
                 'message' => 'سرپرست در صنعت کارآموزی این دانشجو شما نیستید'
@@ -374,7 +400,7 @@ class IndustrySupervisorStudentController extends Controller
         // ! fix: delete evaluation column in students table
         // ! new implementation: save it on another table
         foreach ($req->data as $evaluation) {
-            $grade += $evaluations[$evaluation['value']-1];
+            $grade += $evaluations[$evaluation['value'] - 1];
             StudentEvaluation::create([
                 'student_id' => $student->id,
                 'option_id' => $evaluation['id'],
@@ -389,14 +415,14 @@ class IndustrySupervisorStudentController extends Controller
         ]);
         // $student->internship_finished_at = $req->internship_finished_at;
         // $student->internship_status = 3;
-        $student->evaluations_verified = 1;
+        // $student->evaluations_verified = 1;
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
         Form7::create([
             'student_id' => $student->id,
             'term_id' => $term_id,
             'letter_date' => now(),
             'letter_number' => "1/$student->id 3 $student->id ب",
-            'supervisor_approval' => 1,
+            // 'supervisor_approval' => 1,
             'verify_industry_collage' => 1
         ]);
         $student->stage = 3;

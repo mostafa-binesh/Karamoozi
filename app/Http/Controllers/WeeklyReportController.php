@@ -152,7 +152,6 @@ class WeeklyReportController extends Controller
                     'report_date' => $report["date"],
                     'week_number' => $weeksPassed,
                     'status' => 0,
-                    'is_week_verified' => 0
                 ]);
             }
             return response()->json([

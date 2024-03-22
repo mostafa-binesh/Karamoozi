@@ -24,6 +24,7 @@ use App\Http\Controllers\AdminCompanyController;
 use App\Http\Controllers\AdminNewsController;
 use App\Http\Controllers\WeeklyReportController;
 use App\Http\Controllers\AdminStudentsController;
+use App\Http\Controllers\HomeController;
 use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\masters\MasterController;
@@ -88,7 +89,6 @@ Route::controller(StudentController::class)->middleware(['auth:api', 'role:stude
     })->middleware(['fullyVerifiedStudent']);
 
     Route::resource('final_report', StudentFinalReportController::class);
-
 });
 
 // ###############                       ######
@@ -103,6 +103,8 @@ Route::prefix('home')->group(function () {
     // companies
     Route::get('companies', [CompaniesController::class, 'index']);
 
+    //statics
+    Route::get('statics', [HomeController::class, 'statics']);
 });
 
 
@@ -124,6 +126,7 @@ Route::controller(IndustrySupervisor::class)->middleware(['auth:api', 'role:indu
         Route::post('students/check/submit', [IndustrySupervisorStudentController::class, 'submitCheckedStudent']);
         Route::Resource('students', IndustrySupervisorStudentController::class);
     });
+    Route::get("form2/student", [HomeController::class, 'get_student_data']);
 });
 
 // ###############                        #####
@@ -164,14 +167,14 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
         Route::put('forms/{id}/form4/verify', 'form4Verify');
         Route::put('forms/{id}/form4/unverify', 'form4UnVerify');
         // weekly report
-        Route::get('weekly_reports',[WeeklyReportController::class,'index']);
-        Route::get('weekly_reports/verify/{id}',[WeeklyReportController::class ,'verifyWeek']);
+        Route::get('weekly_reports', [WeeklyReportController::class, 'index']);
+        Route::get('weekly_reports/verify/{id}', [WeeklyReportController::class, 'verifyWeek']);
         // final_reports
-        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
+        Route::get('forms/{id}/final_report', [StudentFinalReportController::class, 'show']);
         // finish internship
         Route::get('forms/{id}/finish_internship', 'finishInternship');
-        Route::put('forms/{id}/finish_internship/verify','verify_finishInternship');
-        Route::put('forms/{id}/finish_internship/unverify','unverify_finishInternship');
+        Route::put('forms/{id}/finish_internship/verify', 'verify_finishInternship');
+        Route::put('forms/{id}/finish_internship/unverify', 'unverify_finishInternship');
     });
     Route::controller(AdminEducationalController::class)->prefix('educational')->group(function () {
         // ! faculties
@@ -195,11 +198,11 @@ Route::controller(AdminController::class)->middleware(['auth:api', 'role:admin']
     Route::resource('master', AdminMasterController::class);
     // Route::get('searchMaster',[AdminMasterController::class,'initialRegistrationMaster']);
     Route::resource('companies', AdminCompanyController::class);
-    Route::post('companies/update/{id}',[AdminCompanyController::class,'update_company']);
+    Route::post('companies/update/{id}', [AdminCompanyController::class, 'update_company']);
 
     //news
     Route::resource('news', AdminNewsController::class);
-    Route::post('news/update/{id}',[AdminNewsController::class,'updata_news']);
+    Route::post('news/update/{id}', [AdminNewsController::class, 'updata_news']);
 });
 // ###############                        #####
 // ! ##################### MASTER  #####################
@@ -216,16 +219,14 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
         Route::put('/{id}/verify', 'verifyStudent');
         Route::put('/{id}/unverify', 'unverifyStudent');
 
-        Route::get('forms/{id}/form3', [AdminStudentsController::class,'form3']);
-        Route::get('forms/{id}/final_report',[StudentFinalReportController::class,'show']);
-        Route::get('forms/weekly_reports',[WeeklyReportController::class,'index']);
-        Route::get('weekly_reports/verify/{id}',[WeeklyReportController::class ,'verifyWeek']);
+        Route::get('forms/{id}/form3', [AdminStudentsController::class, 'form3']);
+        Route::get('forms/{id}/final_report', [StudentFinalReportController::class, 'show']);
+        Route::get('forms/weekly_reports', [WeeklyReportController::class, 'index']);
+        Route::get('weekly_reports/verify/{id}', [WeeklyReportController::class, 'verifyWeek']);
 
-        Route::post('/evaluate',[MasterController::class,'store']);
-        Route::get('/evaluate/{id}',[MasterController::class,'show']);
-        Route::put('/evaluate/{id}',[MasterController::class,'update']);
-
-
+        Route::post('/evaluate', [MasterController::class, 'store']);
+        Route::get('/evaluate/{id}', [MasterController::class, 'show']);
+        Route::put('/evaluate/{id}', [MasterController::class, 'update']);
     });
     // master routes
     //
@@ -237,8 +238,8 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
 // // //
 //! Message Routing
 // // //
-Route::middleware('auth:api')->group(function(){
-    Route::resource('messages',MessagesResourceController::class);
+Route::middleware('auth:api')->group(function () {
+    Route::resource('messages', MessagesResourceController::class);
 });
 // ###############                        #####
 // ################ DEVELOPER ONLY ##############
@@ -257,7 +258,7 @@ Route::controller(DeveloperController::class)->prefix('devs')->group(function ()
         Artisan::call("migrate:fresh --seed");
         return "Migration completed successfully";
     });
-    Route::get("role",function(){
+    Route::get("role", function () {
         return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
     });
     Route::get('', function () {

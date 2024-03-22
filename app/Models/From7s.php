@@ -9,14 +9,14 @@ class From7s extends Model
 {
     use HasFactory;
 
-    protected $table = 'Form7s';
+    protected $table = 'form7s';
 
     protected $fillable = [
         'student_id',
         'term_id',
         'letter_date',
         'letter_number',
-        'supervisor_approval',
+        // 'supervisor_approval',
         'verify_industry_collage'
     ];
 }

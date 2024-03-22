@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('type');
             $table->string('name');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

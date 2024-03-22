@@ -42,6 +42,11 @@ class StudentController extends Controller
         $studentSubmittedCompany = Student::where('id', Auth::user()->student->id)->first()->company_id != null ?
             Company::where('id', Student::where('id', Auth::user()->student->id)->first()->company_id)->first() : null;
         $activeTerm = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first();
+        if (!isset($activeTerm->id)) {
+            return response()->json([
+                'error' => 'هنوز سرترمی تعریف نشده است'
+            ], 400);
+        }
         $x = [
             // ! one of the most complicated queries of this project
             // ? this query's problem was i couldn't get the user and i needed to send a query to the database to get user for every employee
@@ -83,6 +88,13 @@ class StudentController extends Controller
             ], 400);
         } else {
             $company_id = $req->company_id ?? $student->customCompany->id;
+            // $company = Company::where('id', $req->company_id)->first();
+            // if (!isset($company->id)) {
+            //     return response()->json([
+            //         'error' => 'مشکلی در پیش ثبت نام به وجود آمده است'
+            //     ], 400);
+            // }
+            // $student->supervisor_id = $company->company_boss_id;
         }
         // TODO: check: submitted company must be verified
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
@@ -92,7 +104,6 @@ class StudentController extends Controller
                 'error' => 'ظرفیت این استاد به پایان رسیده'
             ], 400);
         }
-
         // edit assigned student to this user
         $student->student_number = $user->username;
         $student->faculty_id = $req->faculty_id;
@@ -235,7 +246,7 @@ class StudentController extends Controller
                     $student_evaluate_company += $evaluations[$companyEvaluation->evaluation - 1];
                 }
             }
-            $form7 = DB::table('Form7s')->where('student_id', $student->id)->first();
+            $form7 = DB::table('form7s')->where('student_id', $student->id)->first();
             // return $form7;
             return response()->json([
                 'stage' => 3,
@@ -256,6 +267,9 @@ class StudentController extends Controller
     // submit or update a custom company in pre reg. page
     public function submitCompany(Request $req)
     {
+        return response()->json([
+            'error' => 'این قسمت در این ترم فعال نیست',
+        ], 400);
         $validator = Validator::make($req->all(), [
             'name' => 'required|max:255',
             'type' => 'required|max:255',
@@ -268,16 +282,14 @@ class StudentController extends Controller
                 'message' => $validator->errors()
             ], 400);
         }
-        Company::updateOrCreate([
-            'student_id' => Auth::user()->student->id
-        ], [
+        Company::create([
             'company_name' => $req->name,
             'company_type' => $req->type,
             'company_number' => $req->phone_number,
             'company_postal_code' => $req->postal_code,
             'company_address' => $req->address,
             'verified' => false,
-            'image' => 'ss', // todo: make image nullable in the database
+            // 'image' => 'ss', // todo: make image nullable in the database
         ]);
         return response()->json([
             'message' => 'شرکت با موفقیت ثبت شد',
@@ -294,6 +306,7 @@ class StudentController extends Controller
     }
     public function submitEvaluateCompany(Request $req)
     {
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
         // ! TODO: add description to the database
         // this id refers to an options row
         $validator = Validator::make($req->all(), [
@@ -320,6 +333,7 @@ class StudentController extends Controller
         }
         foreach ($req->data as $data) {
             CompanyEvaluation::create([
+                'term_id' => $term_id,
                 'company_id' => $student->company_id,
                 'student_id' => $student->id,
                 'option_id' => $data['id'],
@@ -328,11 +342,12 @@ class StudentController extends Controller
         }
         // create the comment
         CompanyEvaluation::create([
+            'term_id' => $term_id,
             'company_id' => $student->company_id,
             'student_id' => $student->id,
             'description' => $req->comment,
         ]);
-        $student->form4_verified = 1; // waiting
+        // $student->form4_verified = 1; // waiting
         $student->save();
         return response()->json([
             'message' => 'ارزیابی شرکت با موفقیت ثبت شد',

@@ -9,7 +9,7 @@ class Form3s extends Model
 {
     use HasFactory;
 
-    protected $table = 'Form3s';
+    protected $table = 'form3s';
 
     protected $fillable = [
         'student_id',

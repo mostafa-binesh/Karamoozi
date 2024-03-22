@@ -44,9 +44,9 @@ class Company extends Model
     // ###############################################
     // ################## RELATIONSHIPS ###################
     // ###############################################
-    public function user()
+    public function IndustrySupervisor()
     {
-        return $this->belongsTo(User::class, 'company_boss_id');
+        return $this->belongsTo(IndustrySupervisor::class, 'company_boss_id');
     }
 
     public function companyType()

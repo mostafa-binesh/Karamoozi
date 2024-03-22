@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\IndustrySupervisor as IND;
 
 class IndustrySupervisor extends Controller
 {
@@ -13,7 +15,7 @@ class IndustrySupervisor extends Controller
     {
         return response()->json([
             'data' => [
-                'total_students_count' => Auth()->user()->industrySupervisor->industrySupervisorStudents->count(),
+                'total_students_count' => Student::where('supervisor_id', IND::where('user_id', Auth()->user()->id)->first()->id)->count(),
                 // 'unevaluated_students_count' => Auth()->user()->industrySupervisor->industrySupervisorUnevaluatedStudents->count(),
                 // 'unread_messages' => Auth()->user()->receivedMessages()->count(),
             ]

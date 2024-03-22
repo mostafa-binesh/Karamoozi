@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('company_grade')->default(0);
             $table->unsignedBigInteger('company_boss_id');
             $table->foreign('company_boss_id')->references('id')
-                ->on('users')->onDelete('cascade')->onUpdate('cascade');
+                ->on('industry_supervisors')->onDelete('cascade')->onUpdate('cascade');
             $table->string('company_number', 11);
             $table->string('company_registry_code');
             $table->string('company_phone', 11);

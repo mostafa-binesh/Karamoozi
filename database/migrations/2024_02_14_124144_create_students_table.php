@@ -55,7 +55,7 @@ return new class extends Migration
             // $table->boolean('internship_master_verification')->default(0);
             // $table->boolean('educational_assistant_verification')->default(0);
             // $table->date('internship_started_at')->nullable();
-            // $table->date('internship_finished_at')->nullable();
+            $table->date('internship_finished_at')->nullable();
             $table->unsignedTinyInteger('internship_status')->default(1);
             // second stage
             // $table->text('evaluations')->nullable();

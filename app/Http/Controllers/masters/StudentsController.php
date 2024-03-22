@@ -75,13 +75,18 @@ class StudentsController extends Controller
         // return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterApproved)->cpagination($req, MasterStudents::class);
         $master = Employee::where('user_id', Auth::user()->id)->first();
         $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
-        return Student::where('professor_id', $master->id)->where('term_id', $term_id)->where('stage', '>=', 2)
+        return Student::where('professor_id', $master->id)->where('term_id', $term_id)
+            ->where('stage', '>=', 2)
             ->cpagination($req, MasterStudents::class);
     }
     public function pendingStudents(Request $req)
     {
         $master = auth()->user()->master;
-        return $master->MasterStudents()->with('user')->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterPending)->cpagination($req, MasterStudents::class);
+        $term_id = Term::where('start_date', '<=', now())->where('end_date', '>=', now())->first()->id;
+        return Student::where('professor_id', $master->id)->where('term_id', $term_id)
+        ->where('stage', '<', 2)
+        ->where('pre_reg_verified', PreRegVerificationStatusEnum::MasterPending)
+        ->cpagination($req, MasterStudents::class);
     }
     public function singleStudent(Request $req, $id)
     {
