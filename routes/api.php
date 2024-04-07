@@ -8,6 +8,7 @@ use App\Models\Form2s;
 use App\Models\Company;
 use App\Models\Student;
 use App\Models\WeeklyReport;
+use App\Providers\GenerateRandomId;
 use Illuminate\Http\Request;
 use App\Models\StudentEvaluation;
 use Illuminate\Support\Facades\Validator;
@@ -27,11 +28,13 @@ use App\Http\Controllers\AdminStudentsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Resources\admin\StudentEvaluationResource;
 use App\Http\Controllers\IndustrySupervisorStudentController;
+use App\Http\Controllers\MailroomController;
 use App\Http\Controllers\masters\MasterController;
 use App\Http\Controllers\masters\StudentsController;
 use App\Http\Controllers\MessagesResourceController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 // ! install 'better comments' plugin on vs code to see the code more clear
 // ! NOTE: ALL ROUTES BEGINS WITH {siteAddress}/API/...
@@ -235,6 +238,18 @@ Route::controller(MasterController::class)->middleware(['auth:api', 'role:master
 
 });
 
+
+//! ###############                        #####
+//! ################ MAILROOM ROUTE  ##############
+//! ###############                       #####
+// middleware(['auth:api', 'role:mailroom'])->
+Route::prefix('mailroom')->group(function () {
+    Route::get('student', [MailroomController::class, 'get_student']);
+    Route::get('letter', [MailroomController::class, 'show_letter']);
+    Route::put('update/{id}', [MailroomController::class, 'update_letter']);
+    Route::post('letter', [MailroomController::class, 'complete_letter']);
+});
+
 // // //
 //! Message Routing
 // // //
@@ -246,41 +261,44 @@ Route::middleware('auth:api')->group(function () {
 // ###############                       #####
 // ! DELETE ON PRODUCTION
 Route::controller(DeveloperController::class)->prefix('devs')->group(function () {
-    Route::get("freshMigrate", function () {
-        Artisan::call("migrate:fresh --seed");
-        return "Migration completed successfully";
-    });
-    Route::get("migrate", function () {
-        Artisan::call("migrate");
-        return "Migration completed successfully";
-    });
-    Route::get("migrateSeed", function () {
-        Artisan::call("migrate:fresh --seed");
-        return "Migration completed successfully";
-    });
-    Route::get("role", function () {
-        return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
-    });
-    Route::get('', function () {
-        Artisan::call('storage:link');
-    });
+    // Route::get("freshMigrate", function () {
+    //     Artisan::call("migrate:fresh --seed");
+    //     return "Migration completed successfully";
+    // });
+    // Route::get("migrate", function () {
+    //     Artisan::call("migrate");
+    //     return "Migration completed successfully";
+    // });
+    // Route::get("migrateSeed", function () {
+    //     Artisan::call("migrate:fresh --seed");
+    //     return "Migration completed successfully";
+    // });
+    // Route::get("role", function () {
+    //     return Artisan::call("vendor:publish --provider='Spatie\Permission\PermissionServiceProvider'");
+    // });
+    // Route::get('', function () {
+    //     Artisan::call('storage:link');
+    // });
+
+    // Route::get('pass' , function(){
+    //     $user = User::where('username', '3981231052')->first();
+    //     $user->password = Hash::make('4380413799');
+    //     $user->save();
+    // });
+
+    // Route::get('develop',function(){
+    //     $master = User::create([
+    //         'rand_id' => GenerateRandomId::generateRandomId(),
+    //         'first_name' => 'احمد',
+    //         'last_name' => 'محمدی',
+    //         'username' => '435622',
+    //         'national_code' => '1234567910',
+    //         'phone_number' => '09121112229',
+    //         'email' => 'ahmad@gmail.com',
+    //         'password' => Hash::make('1234567910')
+    //     ]);
+    //     $master->assignRole('mailroom');
+
+    // });
+
 });
-
-
-
-
-
-
-// // //
-// TEST CONTROLLER
-// // //
-
-
-
-
-
-// Route::get('pass' , function(){
-//     $user = User::where('username', '3981231052')->first();
-//     $user->password = Hash::make('4380413799');
-//     $user->save();
-// });

@@ -36,6 +36,7 @@ class RoleAndPermissionSeeder extends Seeder
         $masterRole = Role::create(['name' => 'master']);
         $studentRole = Role::create(['name' => 'student']);
         $industryBoss = Role::create(['name' => 'industry_supervisor']);
+        Role::create(['name'=>'mailroom']);
         $adminRole->givePermissionTo([
             'create-users',
             'edit-users',
@@ -50,6 +51,6 @@ class RoleAndPermissionSeeder extends Seeder
             'edit-blog-posts',
             'delete-blog-posts',
         ]);
-        
+
     }
 }

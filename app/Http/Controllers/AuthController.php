@@ -60,7 +60,7 @@ class AuthController extends Controller
         }
         // ADD: error handling
         $user = User::create([
-            'rand_id'=>GenerateRandomId::generateRandomId(),
+            'rand_id' => GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->student_number,
@@ -121,6 +121,9 @@ class AuthController extends Controller
                 $user->load('master');
                 break;
             case 'admin':
+                // do nothing i guess
+                break;
+            case 'mailroom':
                 // do nothing i guess
                 break;
             default:
@@ -253,7 +256,7 @@ class AuthController extends Controller
             ], 400);
         }
         $industrySupervisor = User::create([
-            'rand_id'=>GenerateRandomId::generateRandomId(),
+            'rand_id' => GenerateRandomId::generateRandomId(),
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'username' => $req->national_code,
@@ -285,4 +288,3 @@ class AuthController extends Controller
         ], 201);
     }
 }
-

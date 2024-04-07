@@ -420,8 +420,8 @@ class IndustrySupervisorStudentController extends Controller
         Form7::create([
             'student_id' => $student->id,
             'term_id' => $term_id,
-            'letter_date' => now(),
-            'letter_number' => "1/$student->id 3 $student->id ب",
+            // 'letter_date' => now(),
+            // 'letter_number' => "1/$student->id 3 $student->id ب",
             // 'supervisor_approval' => 1,
             'verify_industry_collage' => 1
         ]);
